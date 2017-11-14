@@ -1,0 +1,94 @@
+image: docker:latest
+
+variables:
+  CONTAINER_ARTISAN_IMAGE: $CI_REGISTRY_IMAGE:artisan-$CI_PIPELINE_ID
+  CONTAINER_ARTISAN_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:artisan-latest
+  CONTAINER_NGINX_IMAGE: $CI_REGISTRY_IMAGE:nginx-$CI_PIPELINE_ID
+  CONTAINER_NGINX_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:nginx-latest
+  CONTAINER_PHPFPM_IMAGE: $CI_REGISTRY_IMAGE:phpfpm-$CI_PIPELINE_ID
+  CONTAINER_PHPFPM_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:phpfpm-latest
+  COMPOSER_CACHE_DIR: /cache
+  DOCKER_DRIVER: overlay
+
+stages:
+- meld
+- build
+- test
+- release
+- deploy
+
+before_script:
+  - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+
+build:
+  stage: build
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  script:
+  # First we build using an image we will have to download anyway
+  - docker run -e COMPOSER_CACHE_DIR="$COMPOSER_CACHE_DIR" --volumes-from $HOSTNAME-build -w `pwd` composer/composer install
+  - docker build -f infrastructure/containers/artisan/Dockerfile -t $CONTAINER_ARTISAN_IMAGE .
+  - docker build -f infrastructure/containers/nginx/Dockerfile -t $CONTAINER_NGINX_IMAGE .
+  - docker build -f infrastructure/containers/phpfpm/Dockerfile -t $CONTAINER_PHPFPM_IMAGE .
+  - docker push $CONTAINER_ARTISAN_IMAGE
+  - docker push $CONTAINER_NGINX_IMAGE
+  - docker push $CONTAINER_PHPFPM_IMAGE
+  dependencies:
+  - meld
+
+test:
+  stage: test
+  script:
+  - docker run --entrypoint php $CONTAINER_ARTISAN_IMAGE vendor/phpunit/phpunit/phpunit
+  - docker run --entrypoint vendor/behat/behat/bin/behat $CONTAINER_ARTISAN_IMAGE
+  dependencies: []
+
+release:
+  stage: release
+  script:
+  # ARTISAN
+  - docker pull $CONTAINER_ARTISAN_IMAGE
+  - docker tag $CONTAINER_ARTISAN_IMAGE $CONTAINER_ARTISAN_RELEASE_IMAGE
+  - docker push $CONTAINER_ARTISAN_RELEASE_IMAGE
+  - docker tag $CONTAINER_ARTISAN_RELEASE_IMAGE $AWS_ECR_URI:artisan-$CI_PIPELINE_ID
+  # NGINX
+  - docker pull $CONTAINER_NGINX_IMAGE
+  - docker tag $CONTAINER_NGINX_IMAGE $CONTAINER_NGINX_RELEASE_IMAGE
+  - docker push $CONTAINER_NGINX_RELEASE_IMAGE
+  - docker tag $CONTAINER_NGINX_RELEASE_IMAGE $AWS_ECR_URI:nginx-$CI_PIPELINE_ID
+  # PHPFPM
+  - docker pull $CONTAINER_PHPFPM_IMAGE
+  - docker tag $CONTAINER_PHPFPM_IMAGE $CONTAINER_PHPFPM_RELEASE_IMAGE
+  - docker push $CONTAINER_PHPFPM_RELEASE_IMAGE
+  - docker tag $CONTAINER_PHPFPM_RELEASE_IMAGE $AWS_ECR_URI:phpfpm-$CI_PIPELINE_ID
+  - docker run -t -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION garland/aws-cli-docker aws ecr get-login
+  - echo "$(echo $(docker run -t -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION garland/aws-cli-docker aws ecr get-login) | sed 's/\r$//' | sed 's/-e \S*//g')"
+  - eval "$(echo $(docker run -t -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY -e AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION garland/aws-cli-docker aws ecr get-login) | sed 's/\r$//' | sed 's/-e \S*//g')"
+  - docker push $AWS_ECR_URI:artisan-$CI_PIPELINE_ID
+  - docker push $AWS_ECR_URI:nginx-$CI_PIPELINE_ID
+  - docker push $AWS_ECR_URI:phpfpm-$CI_PIPELINE_ID
+  only:
+  - master
+  - development
+  dependencies: []
+
+# WARNING: Prefer using --context=$CI_PROJECT_ID else concurrent builds may fail.
+deploy_dev:
+  image: google/cloud-sdk:162.0.0
+  before_script:
+  - kubectl config set-cluster "$CI_PROJECT_ID" --server="$KUBE_URL" --certificate-authority="$KUBE_CA_PEM_FILE"
+  - kubectl config set-credentials "$CI_PROJECT_ID" --token="$KUBE_TOKEN"
+  - kubectl config set-context "$CI_PROJECT_ID" --cluster="$CI_PROJECT_ID" --user="$CI_PROJECT_ID" --namespace="$KUBE_NAMESPACE"
+  - kubectl config use-context "$CI_PROJECT_ID"
+  stage: deploy
+  script:
+  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-artisan laravel-artisan-scheduler=$AWS_ECR_URI:artisan-$CI_PIPELINE_ID
+  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-artisan laravel-artisan-worker=$AWS_ECR_URI:artisan-$CI_PIPELINE_ID
+  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-nginx nginx=$AWS_ECR_URI:nginx-$CI_PIPELINE_ID
+  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm laravel-phpfpm=$AWS_ECR_URI:phpfpm-$CI_PIPELINE_ID
+  environment:
+    name: dev
+    url: http://$CI_ENVIRONMENT_SLUG.$CI_TARGET_DOMAIN
+  only:
+  - development
+  dependencies: []
