@@ -19,6 +19,5 @@ Route::get('/cool', function () {
     return view('cool');
 });
 
-Route::resource('hello','Hello');
 
-Route::get('/task','TasksController@get');
+Route::resource('profiles','ProfileController');
