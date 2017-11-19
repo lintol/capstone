@@ -60,6 +60,9 @@ class ProfileController extends Controller
     public function show($id)
     {
         //
+        if (!$id) {
+           throw new HttpException(400, "Invalid id");
+        }
         return Profile::find($id);
     }
 
@@ -83,7 +86,17 @@ class ProfileController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        /*if (!$id) {
+            throw new HttpException(400, "Invalid id");
+        }*/
+        $profile = Profile::find($id);
+        $profile->name = $request->input('name');
+        $profile->description = $request->input('description');
+        $profile->updated_at = date('Y-m-d H:i:s');
+        if ($profile->save()) {
+            return $profile;
+        }
+        throw new HttpException(400, "Invalid data");
     }
 
     /**
