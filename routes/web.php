@@ -15,10 +15,5 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/cool', function () {
-    return view('cool');
-});
-
-
 Route::resource('profiles','ProfileController');
 Route::resource('processors','ProcessorController');
