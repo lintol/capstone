@@ -21,3 +21,4 @@ Route::get('/cool', function () {
 
 
 Route::resource('profiles','ProfileController');
+Route::resource('processors','ProcessorController');
