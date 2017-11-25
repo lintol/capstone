@@ -23,7 +23,7 @@ class ProcessorTableSeeder extends Seeder
         DB::table('processors')->insert([
             'name' => 'json processor',
             'description' => 'processes json files',
-            'uniqueTag' => 'json-101',
+            'uniqueTag' => 'json-102',
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
 
