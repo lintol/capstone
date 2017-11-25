@@ -11,7 +11,6 @@ variables:
   DOCKER_DRIVER: overlay
 
 stages:
-- meld
 - build
 - test
 - release
@@ -33,8 +32,6 @@ build:
   - docker push $CONTAINER_ARTISAN_IMAGE
   - docker push $CONTAINER_NGINX_IMAGE
   - docker push $CONTAINER_PHPFPM_IMAGE
-  dependencies:
-  - meld
 
 test:
   stage: test
