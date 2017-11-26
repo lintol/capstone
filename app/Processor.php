@@ -10,7 +10,9 @@ class Processor extends Model
      protected $fillable = [ 
          'name',
          'description',
-         'moreInfo',
-         'type'
+         'creator',
+         'uniqueTag',
+         'created_at',
+         'updated_at'
     ]; 
 }
