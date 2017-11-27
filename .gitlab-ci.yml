@@ -25,7 +25,7 @@ build:
     GIT_SUBMODULE_STRATEGY: recursive
   script:
   # First we build using an image we will have to download anyway
-  - docker run -e COMPOSER_CACHE_DIR="$COMPOSER_CACHE_DIR" --volumes-from $HOSTNAME-build -w `pwd` composer/composer install
+  - docker run -e COMPOSER_CACHE_DIR="$COMPOSER_CACHE_DIR" --volumes-from $HOSTNAME-build -w `pwd` composer install
   - docker build -f infrastructure/containers/artisan/Dockerfile -t $CONTAINER_ARTISAN_IMAGE .
   - docker build -f infrastructure/containers/nginx/Dockerfile -t $CONTAINER_NGINX_IMAGE .
   - docker build -f infrastructure/containers/phpfpm/Dockerfile -t $CONTAINER_PHPFPM_IMAGE .
