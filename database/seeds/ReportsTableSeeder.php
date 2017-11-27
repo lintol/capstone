@@ -12,53 +12,53 @@ class ReportsTableSeeder extends Seeder
     public function run()
     {
         //
-        DB::table('profiles')->insert([
+        DB::table('reports')->insert([
             'name' => 'Data Profile Name',
             'user' => 'Martin',
             'errors' => '7',
             'warnings' => '44',
             'passes' => '44',
-            'qualityScores' => '76',
+            'qualityScore' => '76',
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ]);
-        DB::table('profiles')->insert([
+        DB::table('reports')->insert([
             'name' => 'Data Profile Name',
             'user' => 'Martin',
             'errors' => '7',
             'warnings' => '44',
             'passes' => '10',
-            'qualityScores' => '60',
+            'qualityScore' => '60',
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ]);
-        DB::table('profiles')->insert([
+        DB::table('reports')->insert([
             'name' => 'Data Profile Name',
             'user' => 'Martin',
             'errors' => '7',
             'warnings' => '44',
             'passes' => '3',
-            'qualityScores' => '30',
+            'qualityScore' => '30',
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ]);
-        DB::table('profiles')->insert([
+        DB::table('reports')->insert([
             'name' => 'Data Profile Name',
             'user' => 'Martin',
             'errors' => '50',
             'warnings' => '44',
             'passes' => '0',
-            'qualityScores' => 'uniq-44',
+            'qualityScore' => '44',
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ]);
-        DB::table('profiles')->insert([
+        DB::table('reports')->insert([
             'name' => 'Data Profile Name',
             'user' => 'Martin',
             'errors' => '7',
             'warnings' => '40',
             'passes' => '1',
-            'qualityScores' => '40',
+            'qualityScore' => '40',
             'created_at' => date('Y-m-d H:i:s'),
             'updated_at' => date('Y-m-d H:i:s')
         ]);

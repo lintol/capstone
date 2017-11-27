@@ -17,3 +17,4 @@ Route::get('/', function () {
 
 Route::resource('profiles','ProfileController');
 Route::resource('processors','ProcessorController');
+Route::resource('reports','ReportController');
