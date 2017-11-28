@@ -48,7 +48,7 @@ class ReportController extends Controller
         if ($report->save()) {
             return $report;
         }
-        throw new HttpException(400, "Invalid data");
+        throw new HttpException(400, "Invalid data ");
     }
 
     /**
