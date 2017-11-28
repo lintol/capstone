@@ -11,14 +11,26 @@ variables:
   DOCKER_DRIVER: overlay
 
 stages:
+- meld
 - build
 - test
 - release
 - deploy
 
 before_script:
-  - echo -n "Registering with token ${CI_BUILD_TOKEN}" 
+  - echo "Registering with token $CI_BUILD_TOKEN" 
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+
+meld:
+  stage: meld
+  image: garland/aws-cli-docker
+  before_script:
+  - echo "Pulling in front-end from $AWS_FRONTEND_BUCKET"
+  script:
+  - aws s3api get-object --bucket $AWS_FRONTEND_BUCKET --key front-end-latest.tgz frontend-build.tgz --region eu-west-1
+  artifacts:
+    paths:
+    - frontend-build.tgz
 
 build:
   stage: build
@@ -33,6 +45,8 @@ build:
   - docker push $CONTAINER_ARTISAN_IMAGE
   - docker push $CONTAINER_NGINX_IMAGE
   - docker push $CONTAINER_PHPFPM_IMAGE
+  dependencies:
+  - meld
 
 test:
   stage: test
