@@ -1,0 +1,13 @@
+{
+    "name": "lintol/capstone",
+    "description": "Project Lintol management package",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lintol Team",
+            "email": "info@lintol.io"
+        }
+    ],
+    "require": {}
+}

@@ -167,6 +167,7 @@ return [
         /*
          * Package Service Providers...
          */
+        Lintol\Capstone\CapstoneServiceProvider::class,
 
         /*
          * Application Service Providers...

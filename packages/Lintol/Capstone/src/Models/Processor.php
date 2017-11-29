@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models;
+namespace Lintol\Capstone\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Alsofronie\Uuid\UuidModelTrait;

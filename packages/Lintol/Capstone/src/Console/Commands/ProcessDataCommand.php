@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Console\Commands;
+namespace Lintol\Capstone\Console\Commands;
 
 use App;
 use File;
