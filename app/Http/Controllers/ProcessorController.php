@@ -46,7 +46,7 @@ class ProcessorController extends Controller
         if ($processor->save()) {
             return $processor;
         }
-        throw new HttpException(400, "Invalid data");
+        throw new HttpException(400, "Invalid data ");
     }
 
     /**
