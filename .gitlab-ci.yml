@@ -70,7 +70,7 @@ release:
   dependencies: []
 
 # WARNING: Prefer using --context=$CI_PROJECT_ID else concurrent builds may fail.
-deploy_dev:
+deploy:
   image: google/cloud-sdk:162.0.0
   before_script:
   - kubectl config set-cluster "$CI_PROJECT_ID" --server="$KUBE_URL" --certificate-authority="$KUBE_CA_PEM_FILE"
