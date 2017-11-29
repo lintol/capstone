@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateProcessorsTable extends Migration
+class CreateReportsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,14 @@ class CreateProcessorsTable extends Migration
      */
     public function up()
     {
-        Schema::create('processors', function (Blueprint $table) {
+        Schema::create('reports', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->string('creator');
-            $table->text('description');
-            $table->text('uniqueTag');
+            $table->text('name');
+            $table->text('user');
+            $table->integer('errors');
+            $table->integer('warnings');
+            $table->integer('passes');
+            $table->integer('qualityScore');
             $table->timestamps();
         });
     }
@@ -30,6 +32,6 @@ class CreateProcessorsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('processors');
+        Schema::dropIfExists('reports');
     }
 }
