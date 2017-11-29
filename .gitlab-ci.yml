@@ -92,6 +92,7 @@ deploy_dev:
   - kubectl config set-credentials "$CI_PROJECT_ID" --token="$KUBE_TOKEN"
   - kubectl config set-context "$CI_PROJECT_ID" --cluster="$CI_PROJECT_ID" --user="$CI_PROJECT_ID" --namespace="$KUBE_NAMESPACE"
   - kubectl config use-context "$CI_PROJECT_ID"
+  - echo "SLUG  $CI_ENVIRONMENT_SLUG"
   stage: deploy
   script:
   - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-artisan laravel-artisan-scheduler=$AWS_ECR_URI:artisan-$CI_PIPELINE_ID
