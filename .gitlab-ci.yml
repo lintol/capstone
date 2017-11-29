@@ -52,7 +52,7 @@ test:
   stage: test
   script:
   - docker run --entrypoint php $CONTAINER_ARTISAN_IMAGE vendor/phpunit/phpunit/phpunit
-  - docker run --entrypoint vendor/behat/behat/bin/behat $CONTAINER_ARTISAN_IMAGE
+  #- docker run --entrypoint vendor/behat/behat/bin/behat $CONTAINER_ARTISAN_IMAGE
   dependencies: []
 
 release:
