@@ -27,7 +27,7 @@
         ],
         "psr-4": {
             "App\\": "app/",
-            "Lintol\\Doorstep\\": "packages/Lintol/Doorstep/src"
+            "Lintol\\Capstone\\": "packages/lintol/capstone/src/"
         }
     },
     "autoload-dev": {
