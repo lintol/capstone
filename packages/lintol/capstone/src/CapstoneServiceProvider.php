@@ -29,7 +29,8 @@ class CapstoneServiceProvider extends ServiceProvider
         );
 
         $this->loadTranslationsFrom(
-            __DIR__ . '/../translations'
+            __DIR__ . '/../translations',
+            'capstone'
         );
 
         if ($this->app->runningInConsole()) {
@@ -47,8 +48,9 @@ class CapstoneServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->mergeConfigFrom([
-            __DIR__ . '/config/capstone.php', 'capstone'
-        ]);
+        $this->mergeConfigFrom(
+            __DIR__ . '/../config/capstone.php',
+            'capstone'
+        );
     }
 }

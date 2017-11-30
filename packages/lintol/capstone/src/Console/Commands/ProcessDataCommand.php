@@ -4,11 +4,11 @@ namespace Lintol\Capstone\Console\Commands;
 
 use App;
 use File;
-use App\Models\Validation;
-use App\Models\Processor;
-use App\Models\Data;
+use Lintol\Capstone\Models\Validation;
+use Lintol\Capstone\Models\Processor;
+use Lintol\Capstone\Models\Data;
 use Illuminate\Console\Command;
-use App\Jobs\ProcessDataJob;
+use Lintol\Capstone\Jobs\ProcessDataJob;
 
 class ProcessDataCommand extends Command
 {

@@ -3,7 +3,7 @@
 namespace Lintol\Capstone\Console\Commands;
 
 use Illuminate\Console\Command;
-use App\Jobs\ObserveDataJob;
+use Lintol\Capstone\Jobs\ObserveDataJob;
 
 class ObserveDataCommand extends Command
 {
