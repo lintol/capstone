@@ -18,7 +18,19 @@ stages:
 - deploy
 
 before_script:
+  - echo "Registering with token $CI_BUILD_TOKEN" 
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
+
+meld:
+  stage: meld
+  image: garland/aws-cli-docker
+  before_script:
+  - echo "Pulling in front-end from $AWS_FRONTEND_BUCKET"
+  script:
+  - aws s3api get-object --bucket $AWS_FRONTEND_BUCKET --key front-end-latest.tgz frontend-build.tgz --region eu-west-1
+  artifacts:
+    paths:
+    - frontend-build.tgz
 
 build:
   stage: build
@@ -26,7 +38,7 @@ build:
     GIT_SUBMODULE_STRATEGY: recursive
   script:
   # First we build using an image we will have to download anyway
-  - docker run -e COMPOSER_CACHE_DIR="$COMPOSER_CACHE_DIR" --volumes-from $HOSTNAME-build -w `pwd` composer/composer install
+  - docker run -e COMPOSER_CACHE_DIR="$COMPOSER_CACHE_DIR" --volumes-from $HOSTNAME-build -w `pwd` composer install
   - docker build -f infrastructure/containers/artisan/Dockerfile -t $CONTAINER_ARTISAN_IMAGE .
   - docker build -f infrastructure/containers/nginx/Dockerfile -t $CONTAINER_NGINX_IMAGE .
   - docker build -f infrastructure/containers/phpfpm/Dockerfile -t $CONTAINER_PHPFPM_IMAGE .
