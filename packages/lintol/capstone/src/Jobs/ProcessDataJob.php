@@ -23,18 +23,22 @@ class ProcessDataJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $dataSession = [];
-
     public $validationId = null;
+
+    protected $processFactory;
+
+    protected $wampConnection;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($validationId)
+    public function __construct($validationId, ValidationProcess $validationProcess, WampConnection $wampConnection)
     {
         $this->validationId = $validationId;
+        $this->processFactory = $validationProcess;
+        $this->wampConnection = $wampConnection;
     }
 
     /**
@@ -42,66 +46,15 @@ class ProcessDataJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(Validation $validationModel, ValidationProcess $validationProcess)
+    public function handle()
     {
-        $validationId = $this->validationId;
+        Log::info(__("Job running for validation ") . $this->validationId);
 
-        Log::info(__("Job running for validation ") . $validationId);
-
-        $client = new Client('realm1');
-        $client->addTransportProvider(new PawlTransportProvider(''));
-        $client->setAttemptRetry(false);
-
-        $validation = $validationModel->find($validationId);
-
-        if (!$validation) {
-            throw RuntimeException(__("Validation ID not found"));
-        }
-
-        $client->on('open', function (ClientSession $session) use ($validation, $client) {
-            $process = $validationProcess->make($validation, $session);
-
-            try {
-                $session->call('com.ltldoorstep.engage')
-                ->done(
-                    function ($res) use ($process) {
-                        $process->beginValidation($res[0][0], $res[0][1]);
-                        return $process->sendProcessor();
-                    },
-                    function ($error) {
-                        $session->close();
-                        throw RuntimeException($error);
-                    }
-                )->then(
-                    function ($res) use ($process) {
-                        return $process->sendData();
-                    },
-                    function ($error) {
-                        throw RuntimeException($error);
-                    }
-                )->then(
-                    function ($res) use ($session, $process) {
-                        $process->markInitiated();
-                        Log::info(__("Validation process initiated for ") . $validation->id);
-                    },
-                    function ($error) use ($session) {
-                        throw RuntimeException($error);
-                    }
-                );
-
-                $session->close();
-            } catch (Exception $e) {
-                $session->close();
-                Log::error($error);
-            }
+        $this->wampConnection->execute(function (ClientSession $session) {
+            $process = $this->processFactory->make($this->validationId, $session);
+            $process->run();
         });
 
-        $client->start();
-
         Log::info(__("Client exited"));
-    }
-
-    protected function makeUri($endpoint, $serverId) {
-        return 'com.ltldoorstep.' . $serverId . '.' . $endpoint;
     }
 }

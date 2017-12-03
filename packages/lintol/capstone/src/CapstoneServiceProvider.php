@@ -2,8 +2,12 @@
 
 namespace Lintol\Capstone;
 
+use Event;
+use Lintol\Capstone\Events\ResultRetrievedEvent;
+use Lintol\Capstone\Listeners\ResultRetrievedListener;
 use Lintol\Capstone\Console\Commands\ObserveDataCommand;
 use Lintol\Capstone\Console\Commands\ProcessDataCommand;
+use Lintol\Capstone\WampConnection;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -39,6 +43,15 @@ class CapstoneServiceProvider extends ServiceProvider
                 ProcessDataCommand::class
             ]);
         }
+
+        Event::listen(
+            ResultRetrievedEvent::class,
+            ResultRetrievedListener::class
+        );
+
+        $this->app->singleton(WampConnection::class, function ($app) {
+            return new WampConnection;
+        });
     }
 
     /**

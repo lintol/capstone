@@ -8,6 +8,7 @@ use App;
 use App\Models\Validation;
 use App\Models\Processor;
 use App\Models\Data;
+use Lintol\Capstone\ValidationProcess;
 use Thruway\ClientSession;
 use Thruway\Peer\Client;
 use Thruway\Transport\PawlTransportProvider;
@@ -23,18 +24,21 @@ class ObserveDataJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public $dataSession = [];
-
     public $validation = null;
+
+    protected $processFactory;
+
+    protected $wampConnection;
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(ValidationProcess $validationProcess, WampConnection $wampConnection)
     {
-        //
+        $this->processFactory = $validationProcess;
+        $this->wampConnection = $wampConnection;
     }
 
     /**
@@ -42,151 +46,76 @@ class ObserveDataJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(ValidationProcess $validationProcess)
     {
-        Log::info(__("Subscribing..."));
+        $this->wampConnection->execute(function (ClientSession $session) {
+                Log::info("[lintol-observe]" . __("Connected and subscribing to result events."));
 
-        $client = new Client('realm1');
-        $client->addTransportProvider(new PawlTransportProvider('ws://172.18.0.1:8080/ws'));
+                $session->subscribe('com.ltldoorstep.event_result', function ($res) use ($session) {
+                    $process = $this->processFactory->fromDataSession($res[0], $res[1], $session);
 
-        $client->on('open', function (ClientSession $session) {
-            $session->subscribe('com.ltldoorstep.event_result',
-                function ($res) use ($session) {
-                    try {
-                        $this->beginData($res[0], $res[1]);
+                    Log::debug("[lintol-observe]" . __("Validation result event seen."));
 
-                        Log::info("Found a completing validation job");
+                    if ($process) {
+                        Log::info("[lintol-observe]" . __("Incoming validation is in our database."));
 
-                        $validation = Validation::where('doorstep_server_id', '=', $res[0])
-                            ->where('doorstep_session_id', '=', $res[1])
-                            ->first();
-
-                        if ($validation) {
-                            Log::info("...it is one of ours.");
-
-                            $context = ['validation' => $validation];
-                            $this->runSteps($session, null, [
-                                [$this, 'getReport'],
-                                [$this, 'outputReport']
-                            ], $context)->done(function ($res) use ($validation, $session) {
-                                \Log::info('Publishing com.ltlcapstone.validation.' . $validation->id . '.event_complete');
-                                return $session->publish(
-                                    'com.ltlcapstone.validation.' . $validation->id . '.event_complete',
-                                    [$validation->report]
-                                );
-                            }, function ($error) {
-                                Log::info('error');
-                                Log::error($error);
-                            });
-                        }
-                    } catch (\Exception $e) {
-                        Log::error($e);
+                        $process->retrieve();
                     }
-                    Log::info("Finished [B]");
-                }
-            );
+                });
 
-            $session->register('com.ltlcapstone.validation',
-                function ($res) use ($session) {
-                    try {
+                $session->register('com.ltlcapstone.validation',
+                    function ($res) use ($session) {
                         $dataUri = $res[0];
-
-                        Log::info("Validation requested of " . $dataUri);
-
-                        $validation = App::make(Validation::class);
-
-                        $path = 'good';
-                        $pData = File::get(__DIR__ . '../../example/processors/good.py');
-
-                        $processor = App::make(Processor::class);
-                        $processor->module = $path;
-                        $processor->content = $pData;
-                        $processor->save();
-                        $validation->processor()->associate($processor);
-                        $validation->save();
-
-                        Log::info('Requesting data from ' . $dataUri);
-
-                        $client = new GuzzleHttp\Client();
-                        $request = new GuzzleHttp\Psr7\Request('GET', $dataUri);
-
-                        $promise = $client->sendAsync($request)->then(function ($response) use ($dataUri, $validation) {
-                            $path = basename($dataUri);
-                            $dData = $response->getBody();
-
-                            $data = App::make(Data::class);
-                            $data->filename = $path;
-                            $data->content = $dData;
-                            $data->save();
-
-                            $validation->data()->associate($data);
-                            $validation->save();
-
-                            ProcessDataJob::dispatch($validation->id);
-                        }, function ($error) {
-                            throw RuntimeException($error);
-                        });
-
-                        Log::info('Requested data');
-                        $promise->wait();
-                        Log::info('Finished [A]');
-
-                        return $validation->id;
-                    } catch (\Exception $e) {
-                        Log::error($e);
-                        throw $e;
+                        return $this->exampleValidationLaunch($dataUri);
                     }
-                }
-            );
+                );
         });
-
-        $client->start();
 
         Log::info(__("Subscription exited."));
     }
 
-    protected function runSteps(&$session, $result, $steps, &$context)
+    public function exampleValidationLaunch($dataUri)
     {
-        if (empty($steps)) {
-            return;
-        }
+        Log::info(__("Validation requested of ") . $dataUri);
 
-        $step = array_shift($steps);
+        $validation = App::make(Validation::class);
 
-        $future = $step($session, $result, $context);
+        $path = 'good';
+        $pData = File::get(__DIR__ . '../../example/processors/good.py');
 
-        if ($future) {
-            return $future->then(
-                function ($result) use (&$session, $steps, &$context) {
-                    return $this->runSteps($session, $result, $steps, $context);
-                },
-                function ($error) {
-                    throw RuntimeException($error);
-                }
-            );
-        }
-    }
-
-    protected function makeUri($endpoint) {
-        return 'com.ltldoorstep.' . $this->dataSession['server'] . '.' . $endpoint;
-    }
-
-    protected function getReport($session, $previous, &$context) {
-        return $session->call(
-            $this->makeUri('report.get'),
-            [$this->dataSession['session']]
-        );
-    }
-
-    protected function outputReport($session, $previous, &$context) {
-        $validation = $context['validation'];
-        $validation->report = $previous;
-        $validation->completed_at = Carbon::now();
+        $processor = App::make(Processor::class);
+        $processor->module = $path;
+        $processor->content = $pData;
+        $processor->save();
+        $validation->processor()->associate($processor);
         $validation->save();
-    }
 
-    protected function beginData($server, $session)
-    {
-        $this->dataSession = ['server' => $server, 'session' => $session];
+        Log::info('Requesting data from ' . $dataUri);
+
+        $client = new GuzzleHttp\Client();
+        $request = new GuzzleHttp\Psr7\Request('GET', $dataUri);
+
+        $promise = $client->sendAsync($request)->then(function ($response) use ($dataUri, $validation) {
+            $path = basename($dataUri);
+            $dData = $response->getBody();
+
+            $data = App::make(Data::class);
+            $data->filename = $path;
+            $data->content = $dData;
+            $data->save();
+
+            $validation->data()->associate($data);
+            $validation->save();
+
+            ProcessDataJob::dispatch($validation->id);
+        }, function ($error) {
+            throw RuntimeException($error);
+        });
+
+        Log::info('Requested data');
+
+        $promise->wait();
+
+        return $validation->id;
     }
 }
