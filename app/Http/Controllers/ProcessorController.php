@@ -35,17 +35,17 @@ class ProcessorController extends Controller
      */
     public function store(Request $request)
     {
-        //
         $processor = new Processor;
+
         $processor->name = $request->input('name');
         $processor->creator = $request->input('creator');
         $processor->description = $request->input('description');
-        $processor->uniqueTag = $request->input('uniqueTag');
-        $processor->created_at = date('Y-m-d H:i:s');
-        $processor->updated_at = date('Y-m-d H:i:s');
+        $processor->unique_Tag = $request->input('uniqueTag');
+
         if ($processor->save()) {
             return $processor;
         }
+
         throw new HttpException(400, "Invalid data");
     }
 

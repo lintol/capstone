@@ -38,13 +38,11 @@ class ReportController extends Controller
         //
         $report = new Report;
         $report->name = $request->input('name');
-        $report->creator = $request->input('user');
-        $report->description = $request->input('errors');
-        $report->uniqueTag = $request->input('warnings');
-        $report->uniqueTag = $request->input('passes');
-        $report->uniqueTag = $request->input('qualityScore');
-        $report->created_at = date('Y-m-d H:i:s');
-        $report->updated_at = date('Y-m-d H:i:s');
+        $report->creator_id = $request->input('user');
+        $report->errors = $request->input('errors');
+        $report->warnings = $request->input('warnings');
+        $report->passes = $request->input('passes');
+        $report->quality_score = $request->input('qualityScore');
         if ($report->save()) {
             return $report;
         }

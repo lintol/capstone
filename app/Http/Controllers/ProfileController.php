@@ -42,9 +42,8 @@ class ProfileController extends Controller
         $profile->creator = $request->input('creator');
         $profile->description = $request->input('description');
         $profile->version = $request->input('version');
-        $profile->uniqueTag = $request->input('uniqueTag');
-        $profile->created_at = date('Y-m-d H:i:s');
-        $profile->updated_at = date('Y-m-d H:i:s');
+        $profile->unique_tag = $request->input('uniqueTag');
+
         if ($profile->save()) {
             return $profile;
         }
@@ -92,7 +91,7 @@ class ProfileController extends Controller
         $profile = Profile::find($id);
         $profile->name = $request->input('name');
         $profile->description = $request->input('description');
-        $profile->updated_at = date('Y-m-d H:i:s');
+
         if ($profile->save()) {
             return $profile;
         }

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateProcessorTable extends Migration
+class CreateProcessorsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -15,8 +15,17 @@ class CreateProcessorTable extends Migration
     {
         Schema::create('processors', function (Blueprint $table) {
             $table->uuid('id');
+            $table->string('name');
+
+            $table->uuid('creator_id');
+            $table->foreign('creator_id')->references('id')->on('users')->onDelete('set null');
+
+            $table->text('description');
+            $table->text('unique_tag');
+
             $table->string('module');
             $table->text('content');
+
             $table->timestamps();
             $table->unique('id');
         });

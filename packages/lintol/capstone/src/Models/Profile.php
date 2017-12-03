@@ -2,26 +2,20 @@
 
 namespace Lintol\Capstone\Models;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
 use Alsofronie\Uuid\UuidModelTrait;
-use App\User;
 
-class Processor extends Model
+class Profile extends Model
 {
     use UuidModelTrait;
 
-     protected $fillable = [
+    protected $fillable = [
          'name',
          'description',
-         'unique_tag',
-         'module',
-         'content'
+         'version',
+         'unique_tag'
     ];
-
-    public function validation()
-    {
-        return $this->hasMany(Validation::class);
-    }
 
     public function creator()
     {

@@ -9,6 +9,11 @@ class Data extends Model
 {
     use UuidModelTrait;
 
+    public $fillable = [
+        'filename',
+        'content'
+    ];
+
     public function validation()
     {
         return $this->hasMany(Validation::class);

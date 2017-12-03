@@ -2,19 +2,24 @@
 
 namespace App;
 
+use App\User;
 use Illuminate\Database\Eloquent\Model;
+use Alsofronie\Uuid\UuidModelTrait;
 
 class Report extends Model
 {
-    //
+    use UuidModelTrait;
+
     protected $fillable = [ 
          'name',
-         'user',
          'errors',
          'warnings',
          'passes',
-         'qualityScore',
-         'created_at',
-         'updated_at'
-    ];  
+         'quality_score'
+    ];
+
+    public function owner()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

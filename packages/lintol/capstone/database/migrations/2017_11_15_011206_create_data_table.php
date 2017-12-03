@@ -15,9 +15,11 @@ class CreateDataTable extends Migration
     {
         Schema::create('data', function (Blueprint $table) {
             $table->uuid('id');
+
             $table->string('filename');
             $table->text('content');
             $table->timestamps();
+
             $table->unique('id');
         });
     }

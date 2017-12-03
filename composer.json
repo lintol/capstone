@@ -27,6 +27,7 @@
         ],
         "psr-4": {
             "App\\": "app/",
+            "Flaxandteal\\Bedappy\\": "packages/flaxandteal/bedappy/src/",
             "Lintol\\Capstone\\": "packages/lintol/capstone/src/"
         }
     },

@@ -1,0 +1,16 @@
+default:
+  extensions:
+    Laracasts\Behat\ServiceContainer\BehatExtension: ~
+    Behat\MinkExtension\ServiceContainer\MinkExtension:
+      default_session: laravel
+      laravel: ~
+      sessions:
+        api:
+          goutte: ~
+
+  suites:
+    default:
+      contexts:
+        - ApiContext
+        - FeatureContext
+        - Behat\MinkExtension\Context\MinkContext
