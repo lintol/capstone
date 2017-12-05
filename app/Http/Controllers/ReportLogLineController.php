@@ -13,7 +13,7 @@ class ReportLogLineController extends Controller
      */
     public function index()
     {
-        //
+        return ReportLogLine::all();
     }
 
     /**
