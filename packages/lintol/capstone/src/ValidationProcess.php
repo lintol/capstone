@@ -161,9 +161,13 @@ class ValidationProcess
     }
 
     protected function outputReport($report) {
-        $this->validation->report = $report;
+        $report = $this->reportFactory->make($report);
+
+        $this->validation->report->associate($report);
         $this->validation->completed_at = Carbon::now();
         $this->validation->save();
+
+        $this->report->validation()->associate($validation);
     }
 
     /**

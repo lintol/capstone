@@ -20,6 +20,11 @@ class CreateReportsTable extends Migration
             $table->uuid('owner_id');
             $table->foreign('owner_id')->references('id')->on('users')->onDelete('set null');
 
+            $table->uuid('validation_id')->nullable();
+            $table->foreign('validation_id')->references('id')->on('validations')->onDelete('set null');
+
+            $table->json('content');
+
             $table->integer('errors');
             $table->integer('warnings');
             $table->integer('passes');

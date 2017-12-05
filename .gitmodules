@@ -1,3 +1,6 @@
 [submodule "infrastructure"]
 	path = infrastructure
 	url = https://gitlab.com/lintol/buckram.git
+[submodule "infrastructure"]
+	path = packages/flaxandteal/bedappy-crossover
+	url = https://gitlab.com/lintol/bedappy-crossover.git

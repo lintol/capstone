@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Lintol\Capstone\Models;
 
 use App\User;
 use Illuminate\Database\Eloquent\Model;
@@ -10,16 +10,32 @@ class Report extends Model
 {
     use UuidModelTrait;
 
-    protected $fillable = [ 
-         'name',
-         'errors',
-         'warnings',
-         'passes',
-         'quality_score'
+    public $fillable = [ 
+        'name',
+        'errors',
+        'warnings',
+        'passes',
+        'quality_score'
+    ];
+
+    public $casts = [
+        'content' => 'json'
     ];
 
     public function owner()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function make($report)
+    {
+        $report = new self;
+        $report->content = $report;
+        return $report;
+    }
+
+    public function validation()
+    {
+        return $this->belongsTo(Validation::class);
     }
 }

@@ -26,9 +26,6 @@ class CreateValidationsTable extends Migration
             $table->string('doorstep_server_id')->nullable();
             $table->string('doorstep_session_id')->nullable();
 
-            $table->uuid('report_id')->nullable();
-            $table->foreign('report_id')->references('id')->on('reports')->onDelete('set null');
-
             $table->text('output')->nullable();
 
             $table->timestamp('requested_at')->nullable();
