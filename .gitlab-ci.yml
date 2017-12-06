@@ -97,7 +97,7 @@ deploy_dev:
   stage: deploy
   script:
   script:
-  - kubectl patch cronjob.v2alpha1.batch $CI_ENVIRONMENT_SLUG-laravel-artisan -p "{ \"spec\": { \"jobTemplate\": { \"spec\": { \"template\": { \"spec\": { \"containers\": [ { \"name\": \"$CI_ENVIRONMENT_SLUG-laravel-scheduler\", \"image\": \"$AWS_ECR_URI:artisan-$CI_PIPELINE_ID\" } ] } } } } } }"
+  - 'kubectl patch cronjob.v2alpha1.batch $CI_ENVIRONMENT_SLUG-laravel-artisan -p "{ \"spec\": { \"jobTemplate\": { \"spec\": { \"template\": { \"spec\": { \"containers\": [ { \"name\": \"$CI_ENVIRONMENT_SLUG-laravel-scheduler\", \"image\": \"$AWS_ECR_URI:artisan-$CI_PIPELINE_ID\" } ] } } } } } }"'
   - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-artisan laravel-artisan-worker=$AWS_ECR_URI:artisan-$CI_PIPELINE_ID
   - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-nginx nginx=$AWS_ECR_URI:nginx-$CI_PIPELINE_ID
   - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm laravel-phpfpm=$AWS_ECR_URI:phpfpm-$CI_PIPELINE_ID
