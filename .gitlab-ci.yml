@@ -97,8 +97,7 @@ deploy_dev:
   stage: deploy
   script:
   script:
-  - >-
-    kubectl patch cronjob.v2alpha1.batch $CI_ENVIRONMENT_SLUG-laravel-artisan
+  - kubectl patch cronjob.v2alpha1.batch $CI_ENVIRONMENT_SLUG-laravel-artisan
       -p "{
         \"spec\": {
           \"jobTemplate\": {
