@@ -4,26 +4,17 @@ Feature: Lintol Capstone API
   I want to be able to use the REST API
 
   Scenario: profile.store
-    Given I am logged in as "coordinator@profile.com", who is a coordinator
+    Given I am logged in as "coordinator@example.com", who is an administrator
     And I have an API token
-    And I already have an Profile, with known ID:
+    And I want to store a Profile through the API
+    And its properties will be:
     """DB
     {
-      "field_1": "Value",
-      "compound_field_name": "Subthing"
-    }
-    """
-    # Only relevant for $user->profiles as a relation
-    And I have this Profile as one of my profiles
-    And I want to store an Profile through the API
-    And its properties will be:
-    """JSON
-    {
-      "otherProfileId": {KNOWN_ID:Profile},
-      "fieldInJson": "Value2",
-      "compoundField": {
-        "name": "Superthing"
-      }
+      "creatorId": {KNOWN_ID:User},
+      "version": "2",
+      "name": "My Profil",
+      "description": "Foo Profil",
+      "uniqueTag": "fdsa"
     }
     """
     When I send a request
@@ -32,34 +23,23 @@ Feature: Lintol Capstone API
     And the response should contain JSON:
     """
     {
-      "fieldInJson": "Value2",
-      "compoundField": {
-        "name": "Superthing"
-      }
+      "creatorId": {KNOWN_ID:User},
+      "version": "2",
+      "name": "My Profil",
+      "description": "Foo Profil",
+      "uniqueTag": "fdsa"
     }
     """
-
-    Given I want to store an Profile through the API
-    And its properties will be:
-    """JSON
-    {
-      "fieldAsJson": "Value",
-      "compoundField": {
-        "name": "Invalid name"
-      }
-    }
-    """
-    When I send a request
-    Then the response should be unprocessable
 
   Scenario: profiles.index
-    Given I am logged in as "coordinator@profile.com", who is a coordinator
+    Given I am logged in as "coordinator@profile.com", who is an administrator
     And I have an API token
-    And I already have an Profile, with known ID:
+    And I already have a Profile, with known ID:
     """DB
     {
-      "field_1": "Value",
-      "compound_field_name": "Subthing"
+      "creator_id": {KNOWN_ID:User},
+      "name": "My Profil",
+      "description": "Foo Profil"
     }
     """
     And I have this Profile as one of my profiles
@@ -86,7 +66,7 @@ Feature: Lintol Capstone API
     Then the response should be unprocessable because "uuid" has problem "Invalid Profile UUID"
 
   Scenario: profiles.show
-    Given I am logged in as "coordinator@profile.com", who is a coordinator
+    Given I am logged in as "coordinator@profile.com", who is an administrator
     And I have an API token
     And I already have an Profile, with known ID:
     """DB
@@ -112,7 +92,7 @@ Feature: Lintol Capstone API
     """
 
   Scenario: profiles.destroy
-    Given I am logged in as "coordinator@profile.com", who is a coordinator
+    Given I am logged in as "coordinator@profile.com", who is an administrator
     And I have an API token
     And I already have an Profile, with known ID:
     """DB
@@ -131,7 +111,7 @@ Feature: Lintol Capstone API
     Then the response should be missing
 
   Scenario: profiles.update
-    Given I am logged in as "coordinator@profile.com", who is a coordinator
+    Given I am logged in as "coordinator@profile.com", who is an administrator
     And I have an API token
     And I already have an Profile, with known ID:
     """DB

@@ -9,9 +9,12 @@
         "alsofronie/eloquent-uuid": "^1.0",
         "fideloper/proxy": "~3.3",
         "guzzlehttp/guzzle": "^6.3",
+        "imbo/behat-api-extension": "^2.0",
         "laravel/framework": "5.5.*",
+        "laravel/passport": "^4.0",
         "laravel/tinker": "~1.0",
         "predis/predis": "^1.1",
+        "spatie/laravel-fractal": "^5.3",
         "spatie/laravel-permission": "^2.7",
         "voryx/thruway": "^0.5.0"
     },
@@ -34,7 +37,7 @@
         ],
         "psr-4": {
             "App\\": "app/",
-            "Flaxandteal\\BedappyCrossover\\": "packages/flaxandteal/bedappy-crossover/src/",
+            "Flaxandteal\\Bedappy\\": "packages/flaxandteal/bedappy/src/",
             "Lintol\\Capstone\\": "packages/lintol/capstone/src/"
         }
     },

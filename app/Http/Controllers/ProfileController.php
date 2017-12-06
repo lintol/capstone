@@ -3,10 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Profile;
+use Lintol\Capstone\Models\Profile;
+use Lintol\Capstone\Transformers\ProfileTransformer;
 
 class ProfileController extends Controller
 {
+    /**
+     * Initialize the transformer
+     */
+    public function __construct(ProfileTransformer $transformer)
+    {
+        $this->transformer = $transformer;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -39,15 +48,18 @@ class ProfileController extends Controller
     {
         $profile = new Profile;
         $profile->name = $request->input('name');
-        $profile->creator = $request->input('creator');
+        $profile->version = $request->input('version');
+        $profile->creator_id = $request->input('creatorId');
         $profile->description = $request->input('description');
         $profile->version = $request->input('version');
         $profile->unique_tag = $request->input('uniqueTag');
 
-        if ($profile->save()) {
-            return $profile;
+        if (!$profile->save()) {
+            throw new HttpException(400, "Invalid data");
         }
-        throw new HttpException(400, "Invalid data");
+
+        return fractal($profile, $this->transformer)
+            ->respond();
     }
 
     /**

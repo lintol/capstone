@@ -18,12 +18,14 @@ class CreateProfilesTable extends Migration
             $table->string('name');
 
             $table->uuid('creator_id');
-            $table->foreign('creator_id')->references('id')->on('users')->onDelete('set null');
+            $table->foreign('creator_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->text('description');
             $table->text('version');
             $table->text('unique_tag');
             $table->unique('id');
+
+            $table->timestamps();
         });
     }
 

@@ -167,6 +167,7 @@ return [
         /*
          * Package Service Providers...
          */
+        Spatie\Permission\PermissionServiceProvider::class,
         Lintol\Capstone\CapstoneServiceProvider::class,
 
         /*
