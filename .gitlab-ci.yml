@@ -39,6 +39,8 @@ build:
   script:
   # First we build using an image we will have to download anyway
   - docker run -e COMPOSER_CACHE_DIR="$COMPOSER_CACHE_DIR" --volumes-from $HOSTNAME-build -w `pwd` composer install
+  - tar -xzf frontend-build.tgz && mv dist/static public && rm -f resources/views/welcome.blade.php && mv dist/index.html resources/views/welcome.blade.php
+  - chown -R 33 storage/logs bootstrap/cache
   - docker build -f infrastructure/containers/artisan/Dockerfile -t $CONTAINER_ARTISAN_IMAGE .
   - docker build -f infrastructure/containers/nginx/Dockerfile -t $CONTAINER_NGINX_IMAGE .
   - docker build -f infrastructure/containers/phpfpm/Dockerfile -t $CONTAINER_PHPFPM_IMAGE .
@@ -52,7 +54,7 @@ test:
   stage: test
   script:
   - docker run --entrypoint php $CONTAINER_ARTISAN_IMAGE vendor/phpunit/phpunit/phpunit
-  - docker run --entrypoint vendor/behat/behat/bin/behat $CONTAINER_ARTISAN_IMAGE
+  #- docker run --entrypoint vendor/behat/behat/bin/behat $CONTAINER_ARTISAN_IMAGE
   dependencies: []
 
 release:
@@ -94,13 +96,33 @@ deploy_dev:
   - kubectl config use-context "$CI_PROJECT_ID"
   stage: deploy
   script:
-  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-artisan laravel-artisan-scheduler=$AWS_ECR_URI:artisan-$CI_PIPELINE_ID
+  script:
+  - >-
+    kubectl patch cronjob.v2alpha1.batch $CI_ENVIRONMENT_SLUG-laravel-artisan
+      -p "{
+        \"spec\": {
+          \"jobTemplate\": {
+            \"spec\": {
+              \"template\": {
+                \"spec\": {
+                  \"containers\": [
+                    {
+                      \"name\": \"$CI_ENVIRONMENT_SLUG-laravel-scheduler\",
+                      \"image\": \"$AWS_ECR_URI:artisan-$CI_PIPELINE_ID\"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }"
   - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-artisan laravel-artisan-worker=$AWS_ECR_URI:artisan-$CI_PIPELINE_ID
   - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-nginx nginx=$AWS_ECR_URI:nginx-$CI_PIPELINE_ID
   - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm laravel-phpfpm=$AWS_ECR_URI:phpfpm-$CI_PIPELINE_ID
   environment:
-    name: dev
+    name: development
     url: http://$CI_ENVIRONMENT_SLUG.$CI_TARGET_DOMAIN
   only:
-  - development
+  - master
   dependencies: []

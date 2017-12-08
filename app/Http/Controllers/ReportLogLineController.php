@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Report;
 
-class ReportController extends Controller
+class ReportLogLineController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -14,7 +13,7 @@ class ReportController extends Controller
      */
     public function index()
     {
-        return Report::all(); 
+        return ReportLogLine::all();
     }
 
     /**
@@ -36,18 +35,18 @@ class ReportController extends Controller
     public function store(Request $request)
     {
         //
-        $report = new Report;
-        $report->name = $request->input('name');
-        $report->creator_id = $request->input('user');
-        $report->errors = $request->input('errors');
-        $report->warnings = $request->input('warnings');
-        $report->passes = $request->input('passes');
-        $report->quality_score = $request->input('qualityScore');
-
-        if ($report->save()) {
-            return $report;
+        $reportLogLine = new ReportLogLine;
+        $reportLogLine->ragType = $request->input('ragType');
+        $reportLogLine->message = $request->input('message');
+        $reportLogLine->processor = $request->input('processor');
+        $reportLogLine->detail = $request->input('detail');
+        $reportLogLine->created_at = date('Y-m-d H:i:s');
+        $reportLogLine->updated_at = date('Y-m-d H:i:s');
+        if ($reportLogLine->save()) {
+            return $reportLogLine;
         }
-        throw new HttpException(400, "Invalid data");
+        throw new HttpException(400, "Invalid data ");
+
     }
 
     /**
