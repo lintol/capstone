@@ -43,19 +43,22 @@ class ProcessDataCommand extends Command
      */
     public function handle()
     {
-                        $client = new \GuzzleHttp\Client();
         $validation = App::make(Validation::class);
 
         $path = 'csv_checker';
-        $pData = File::get(resource_path('example/processors/csv_checker.py'));
+        $pData = File::get(resource_path('capstone/examples/processors/csv_checker.py'));
 
-        $processor = App::make(Processor::class);
+        $processor = App::make(Processor::class)->firstOrNew([
+            'unique_tag' => 'ltl-csv-checker'
+        ]);
+        $processor->name = "Lintol Sample CSV Checker";
+        $processor->description = "Example of non-standard CSV checks";
         $processor->module = $path;
         $processor->content = $pData;
         $processor->save();
 
         $path = 'bad.csv';
-        $dData = File::get(resource_path('example/data/bad.csv'));
+        $dData = File::get(resource_path('capstone/examples/data/bad.csv'));
 
         $data = App::make(Data::class);
         $data->filename = $path;
@@ -68,6 +71,7 @@ class ProcessDataCommand extends Command
 
         $validationId = $validation->id;
 
-        ProcessDataJob::dispatch($validationId);
+        ProcessDataJob::dispatch($validationId)
+            ->onConnection('sync');
     }
 }

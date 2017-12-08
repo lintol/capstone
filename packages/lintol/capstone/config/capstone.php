@@ -2,7 +2,7 @@
 
 return [
     'wamp' => [
-        'realm' => 'realm1',
-        'uri' => 'ws://172.18.0.1:8080/ws'
+        'realm' => env('LINTOL_CAPSTONE_REALM', 'realm1'),
+        'url' => env('LINTOL_CAPSTONE_URL', 'ws://172.18.0.1:8080/ws'),
     ]
 ];

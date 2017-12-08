@@ -17,7 +17,7 @@ class CreateProcessorsTable extends Migration
             $table->uuid('id');
             $table->string('name');
 
-            $table->uuid('creator_id');
+            $table->uuid('creator_id')->nullable();
             $table->foreign('creator_id')->references('id')->on('users')->onDelete('set null');
 
             $table->text('description');
@@ -27,7 +27,9 @@ class CreateProcessorsTable extends Migration
             $table->text('content');
 
             $table->timestamps();
+
             $table->unique('id');
+            $table->unique('unique_tag');
         });
     }
 

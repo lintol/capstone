@@ -24,6 +24,7 @@ class CapstoneServiceProvider extends ServiceProvider
             __DIR__ . '/../config/capstone.php' => config_path('capstone.php')
         ], 'config');
 
+        \Log::info(resource_path('capstone/examples'));
         $this->publishes([
             __DIR__ . '/../examples' => resource_path('capstone/examples')
         ], 'examples');
@@ -50,7 +51,10 @@ class CapstoneServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton(WampConnection::class, function ($app) {
-            return new WampConnection;
+            $url = config('capstone.wamp.url', 'realm1');
+            $realm = config('capstone.wamp.realm', 'realm1');
+
+            return new WampConnection($url, $realm);
         });
     }
 

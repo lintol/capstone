@@ -19,6 +19,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Log;
 use Carbon\Carbon;
+use Lintol\Capstone\WampConnection;
 
 class ObserveDataJob implements ShouldQueue
 {
@@ -28,36 +29,25 @@ class ObserveDataJob implements ShouldQueue
 
     protected $processFactory;
 
-    protected $wampConnection;
-
-    /**
-     * Create a new job instance.
-     *
-     * @return void
-     */
-    public function __construct(ValidationProcess $validationProcess, WampConnection $wampConnection)
-    {
-        $this->processFactory = $validationProcess;
-        $this->wampConnection = $wampConnection;
-    }
-
     /**
      * Execute the job.
      *
      * @return void
      */
-    public function handle(ValidationProcess $validationProcess)
+    public function handle(ValidationProcess $processFactory, WampConnection $wampConnection)
     {
-        $this->wampConnection->execute(function (ClientSession $session) {
-                Log::info("[lintol-observe]" . __("Connected and subscribing to result events."));
+        Log::info(__("Subscribing."));
 
-                $session->subscribe('com.ltldoorstep.event_result', function ($res) use ($session) {
-                    $process = $this->processFactory->fromDataSession($res[0], $res[1], $session);
+        $wampConnection->execute(function (ClientSession $session) use ($processFactory) {
+                Log::info("[lintol-observe] " . __("Connected and subscribing to result events."));
 
-                    Log::debug("[lintol-observe]" . __("Validation result event seen."));
+                $session->subscribe('com.ltldoorstep.event_result', function ($res) use ($session, $processFactory) {
+                    $process = $processFactory->fromDataSession($res[0], $res[1], $session);
+
+                    Log::debug("[lintol-observe] " . __("Validation result event seen."));
 
                     if ($process) {
-                        Log::info("[lintol-observe]" . __("Incoming validation is in our database."));
+                        Log::info("[lintol-observe] " . __("Incoming validation is in our database."));
 
                         $process->retrieve();
                     }
@@ -69,7 +59,7 @@ class ObserveDataJob implements ShouldQueue
                         return $this->exampleValidationLaunch($dataUri);
                     }
                 );
-        });
+        }, false);
 
         Log::info(__("Subscription exited."));
     }
@@ -96,6 +86,7 @@ class ObserveDataJob implements ShouldQueue
         $request = new GuzzleHttp\Psr7\Request('GET', $dataUri);
 
         $promise = $client->sendAsync($request)->then(function ($response) use ($dataUri, $validation) {
+
             $path = basename($dataUri);
             $dData = $response->getBody();
 
@@ -108,6 +99,7 @@ class ObserveDataJob implements ShouldQueue
             $validation->save();
 
             ProcessDataJob::dispatch($validation->id);
+
         }, function ($error) {
             throw RuntimeException($error);
         });

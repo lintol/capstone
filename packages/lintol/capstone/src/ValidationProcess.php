@@ -37,7 +37,7 @@ class ValidationProcess
         return new self($validation, $session);
     }
 
-    public function __construct(Validation $validation, ClientSession $session)
+    public function __construct(Validation $validation = null, ClientSession $session = null)
     {
         $this->validation = $validation;
         $this->session = $session;
@@ -52,7 +52,7 @@ class ValidationProcess
     }
 
     public function engage() {
-        return $session->call('com.ltldoorstep.engage');
+        return $this->session->call('com.ltldoorstep.engage');
     }
 
     /**
@@ -114,15 +114,12 @@ class ValidationProcess
 
     /**
      * Run the validation sequence.
-     *
-     * @param $validation
-     * @param $client
      */
-    protected function run()
+    public function run()
     {
-        $process->engage()
-        ->done(
-            function ($res) use ($process) {
+        return $this->engage()
+        ->then(
+            function ($res) {
                 $this->beginValidation($res[0][0], $res[0][1]);
                 return $this->sendProcessor();
             },
@@ -154,7 +151,7 @@ class ValidationProcess
             $this->validation->data_server_id
         );
 
-        return $session->call(
+        return $this->session->call(
             $uri,
             [$this->validation->data_session_id]
         );

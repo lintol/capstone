@@ -18,6 +18,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Log;
+use Lintol\Capstone\WampConnection;
 
 class ProcessDataJob implements ShouldQueue
 {
@@ -34,11 +35,9 @@ class ProcessDataJob implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($validationId, ValidationProcess $validationProcess, WampConnection $wampConnection)
+    public function __construct($validationId)
     {
         $this->validationId = $validationId;
-        $this->processFactory = $validationProcess;
-        $this->wampConnection = $wampConnection;
     }
 
     /**
@@ -46,13 +45,13 @@ class ProcessDataJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle()
+    public function handle(ValidationProcess $processFactory, WampConnection $wampConnection)
     {
         Log::info(__("Job running for validation ") . $this->validationId);
 
-        $this->wampConnection->execute(function (ClientSession $session) {
-            $process = $this->processFactory->make($this->validationId, $session);
-            $process->run();
+        $wampConnection->execute(function (ClientSession $session) use ($processFactory) {
+            $process = $processFactory->make($this->validationId, $session);
+            return $process->run();
         });
 
         Log::info(__("Client exited"));

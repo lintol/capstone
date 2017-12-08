@@ -12,3 +12,4 @@ yarn-error.log
 .env
 infrastructure
 /storage/crossbar
+/resources/capstone

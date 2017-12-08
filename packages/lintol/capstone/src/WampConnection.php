@@ -30,36 +30,47 @@ class WampConnection
      *
      * @return void
      */
-    public function __construct($realm)
+    public function __construct($url, $realm)
     {
+        $this->url = $url;
         $this->realm = $realm;
     }
 
     /**
      * Execute the job.
      *
+     * @param callable $closure Callback to use the session
+     * @param boolean $closeOnComplete Whether to close the session on call-back exit (ignored if session already opened)
      * @return void
      */
-    public function execute(callable $closure)
+    public function execute(callable $closure, $closeOnComplete = true)
     {
         if ($this->session) {
             $closure($this->session);
         } else {
             $client = new Client($this->realm);
-            $client->addTransportProvider(new PawlTransportProvider(''));
+            $client->addTransportProvider(new PawlTransportProvider($this->url));
             $client->setAttemptRetry(false);
 
-            $client->on('open', function (ClientSession $session) use ($closure) {
+            $client->on('open', function (ClientSession $session) use ($closure, $closeOnComplete) {
                 $this->session = $session;
+                $close = $closeOnComplete;
 
                 try {
-                    $closure($session);
+                    $promise = $closure($session);
                 } catch (Exception $e) {
                     Log::error($error);
+                    $close = true;
                 }
 
-                $this->session = null;
-                $session->close();
+                if ($close) {
+                    $this->session = null;
+                    if ($promise) {
+                        $promise->always(function () use ($session) { $session->close(); });
+                    } else {
+                        $session->close();
+                    }
+                }
             });
 
             $client->start();
