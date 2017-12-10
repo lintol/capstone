@@ -8,7 +8,7 @@ Feature: Lintol Capstone API
     And I have an API token
     And I want to store a Profile through the API
     And its properties will be:
-    """DB
+    """JSON
     {
       "creatorId": {KNOWN_ID:User},
       "version": "2",
@@ -21,13 +21,15 @@ Feature: Lintol Capstone API
     Then the response should be successful
     And the response should have an "id" property, which is a uuid
     And the response should contain JSON:
-    """
+    """JSON
     {
-      "creatorId": {KNOWN_ID:User},
-      "version": "2",
-      "name": "My Profil",
-      "description": "Foo Profil",
-      "uniqueTag": "fdsa"
+      "attributes": {
+        "creatorId": {KNOWN_ID:User},
+        "version": "2",
+        "name": "My Profil",
+        "description": "Foo Profil",
+        "uniqueTag": "fdsa"
+      }
     }
     """
 
@@ -39,10 +41,11 @@ Feature: Lintol Capstone API
     {
       "creator_id": {KNOWN_ID:User},
       "name": "My Profil",
-      "description": "Foo Profil"
+      "description": "Foo Profil",
+      "unique_tag": "foobar",
+      "version": "3"
     }
     """
-    And I have this Profile as one of my profiles
     And I want to list Profiles through the API
     When I send a request
     Then the response should be successful
@@ -51,64 +54,43 @@ Feature: Lintol Capstone API
     """
     {
       "id": {KNOWN_ID:Profile},
-      "field_1": "Value",
-      "compound_field_name": "Subthing"
-    }
-    """
-
-    Given I want to list Profile through the API
-    When I send a request with query:
-    """JSON
-    {
-      "relatedToProfileId": "notanid"
-    }
-    """
-    Then the response should be unprocessable because "uuid" has problem "Invalid Profile UUID"
-
-  Scenario: profiles.show
-    Given I am logged in as "coordinator@profile.com", who is an administrator
-    And I have an API token
-    And I already have an Profile, with known ID:
-    """DB
-    {
-      "id": {KNOWN_ID:Profile},
-      "field_1": "Value",
-      "compound_field_name": "Subthing"
-    }
-    """
-    And I have this Profile as one of my profiles
-    And I want to show this Profile through the API
-    And I send a request
-    Then the response should be successful
-    And the response should contain JSON:
-    """JSON
-    {
-      "otherProfileId": {KNOWN_ID:Profile},
-      "fieldInJson": "Value2",
-      "compoundField": {
-        "name": "Superthing"
+      "attributes": {
+        "name": "My Profil",
+        "description": "Foo Profil",
+        "uniqueTag": "foobar",
+        "version": "3"
       }
     }
     """
 
-  Scenario: profiles.destroy
+  Scenario: profiles.show
     Given I am logged in as "coordinator@profile.com", who is an administrator
     And I have an API token
-    And I already have an Profile, with known ID:
+    And I already have a Profile, with known ID:
     """DB
     {
-      "field_1": "Value",
-      "compound_field_name": "Subthing"
+      "creator_id": {KNOWN_ID:User},
+      "name": "My Profil",
+      "description": "Foo Profil",
+      "unique_tag": "foobar",
+      "version": "3"
     }
     """
-    And I have this Profile as one of my profiles
-    And I want to destroy this Profile through the API
+    And I want to show this Profile through the API
     And I send a request
     Then the response should be successful
-
-    Given I want to show this Profile through the API
-    And I send a request
-    Then the response should be missing
+    And the response should contain JSON:
+    """
+    {
+      "id": {KNOWN_ID:Profile},
+      "attributes": {
+        "name": "My Profil",
+        "description": "Foo Profil",
+        "uniqueTag": "foobar",
+        "version": "3"
+      }
+    }
+    """
 
   Scenario: profiles.update
     Given I am logged in as "coordinator@profile.com", who is an administrator
@@ -116,16 +98,19 @@ Feature: Lintol Capstone API
     And I already have an Profile, with known ID:
     """DB
     {
-      "field_1": "Value",
-      "compound_field_name": "Subthing"
+      "creator_id": {KNOWN_ID:User},
+      "name": "My Profil",
+      "description": "Foo Profil",
+      "unique_tag": "foobar",
+      "version": "3"
     }
     """
-    And I have this Profile as one of my profiles
     And I want to update this Profile through the API
     And its properties will be:
     """JSON
     {
-      "fieldAsJson": {KNOWN_ID:Profile}
+      "name": "No Profil",
+      "description": "Bar Profil"
     }
     """
     When I send a request
@@ -133,9 +118,12 @@ Feature: Lintol Capstone API
     And the response should contain JSON:
     """JSON
     {
-      "fieldAsJson": {KNOWN_ID:Profile},
-      "compoundField": {
-        "name": "Subthing
+      "attributes": {
+        "creatorId": {KNOWN_ID:User},
+        "version": "3",
+        "name": "No Profil",
+        "description": "Bar Profil",
+        "uniqueTag": "foobar"
       }
     }
     """
@@ -144,11 +132,14 @@ Feature: Lintol Capstone API
     And I send a request
     Then the response should be successful
     And the response should contain JSON:
-    """
+    """JSON
     {
-      "fieldAsJson": {KNOWN_ID:Profile},
-      "compoundField": {
-        "name": "Subthing
+      "attributes": {
+        "creatorId": {KNOWN_ID:User},
+        "version": "3",
+        "name": "No Profil",
+        "description": "Bar Profil",
+        "uniqueTag": "foobar"
       }
     }
     """

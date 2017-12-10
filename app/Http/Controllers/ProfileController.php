@@ -23,19 +23,10 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        //
-        return Profile::all();
-    }
+        $profiles = Profile::all();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-        return view('profiles.create');
+        return fractal($profiles, $this->transformer)
+            ->respond();
     }
 
     /**
@@ -47,6 +38,7 @@ class ProfileController extends Controller
     public function store(Request $request)
     {
         $profile = new Profile;
+
         $profile->name = $request->input('name');
         $profile->version = $request->input('version');
         $profile->creator_id = $request->input('creatorId');
@@ -55,7 +47,7 @@ class ProfileController extends Controller
         $profile->unique_tag = $request->input('uniqueTag');
 
         if (!$profile->save()) {
-            throw new HttpException(400, "Invalid data");
+            abort(400, "Invalid data");
         }
 
         return fractal($profile, $this->transformer)
@@ -70,22 +62,10 @@ class ProfileController extends Controller
      */
     public function show($id)
     {
-        //
-        if (!$id) {
-           throw new HttpException(400, "Invalid id");
-        }
-        return Profile::find($id);
-    }
+        $profile = Profile::findOrFail($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        return fractal($profile, $this->transformer)
+            ->respond();
     }
 
     /**
@@ -97,27 +77,15 @@ class ProfileController extends Controller
      */
     public function update(Request $request, $id)
     {
-        /*if (!$id) {
-            throw new HttpException(400, "Invalid id");
-        }*/
-        $profile = Profile::find($id);
+        $profile = Profile::findOrFail($id);
         $profile->name = $request->input('name');
         $profile->description = $request->input('description');
 
         if ($profile->save()) {
-            return $profile;
+            return fractal($profile, $this->transformer)
+                ->respond();
         }
-        throw new HttpException(400, "Invalid data");
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        abort(400, __("Invalid data"));
     }
 }

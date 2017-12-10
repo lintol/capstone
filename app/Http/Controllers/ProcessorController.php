@@ -3,10 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Processor;
+use Lintol\Capstone\Models\Processor;
+use Lintol\Capstone\Transformers\ProcessorTransformer;
 
 class ProcessorController extends Controller
 {
+    /**
+     * Initialize the transformer
+     */
+    public function __construct(ProcessorTransformer $transformer)
+    {
+        $this->transformer = $transformer;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,17 +23,10 @@ class ProcessorController extends Controller
      */
     public function index()
     {
-        return Processor::all(); 
-    }
+        $processors = Processor::all();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
+        return fractal($processors, $this->transformer)
+            ->respond();
     }
 
     /**
@@ -37,71 +39,20 @@ class ProcessorController extends Controller
     {
         $processor = new Processor;
 
+        // TODO: incorporate bedappy sanitization pattern
+        //
         $processor->name = $request->input('name');
-        $processor->creator = $request->input('creator');
+        $processor->creator_id = $request->input('creatorId');
         $processor->description = $request->input('description');
-        $processor->unique_Tag = $request->input('uniqueTag');
+        $processor->module = $request->input('module');
+        $processor->content = $request->input('content');
+        $processor->unique_tag = $request->input('uniqueTag');
 
         if ($processor->save()) {
-            return $processor;
+            return fractal($processor, $this->transformer)
+                ->respond();
         }
 
         throw new HttpException(400, "Invalid data");
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-        if (!$id) {
-            throw new HttpException(400, "Invalid id");
-        }
-        $processor = Processor::find($id);
-        $processor->name = $request->input('name');
-        $processor->description = $request->input('description');
-        $processor->updated_at = date('Y-m-d H:i:s');
-        if ($processor->save()) {
-            return $processor;
-        }
-        throw new HttpException(400, "Invalid data");
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
     }
 }
