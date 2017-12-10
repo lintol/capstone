@@ -17,7 +17,7 @@ class CreateProfilesTable extends Migration
             $table->uuid('id');
             $table->string('name');
 
-            $table->uuid('creator_id');
+            $table->uuid('creator_id')->nullable();
             $table->foreign('creator_id')->references('id')->on('users')->onDelete('cascade');
 
             $table->text('description');

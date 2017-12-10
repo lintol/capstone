@@ -17,7 +17,7 @@ class CreateReportsTable extends Migration
             $table->uuid('id');
             $table->text('name');
 
-            $table->uuid('owner_id');
+            $table->uuid('owner_id')->nullable();
             $table->foreign('owner_id')->references('id')->on('users')->onDelete('set null');
 
             $table->uuid('validation_id')->nullable();

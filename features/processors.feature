@@ -13,7 +13,7 @@ Feature: Lintol Capstone API
       "creatorId": {KNOWN_ID:User},
       "name": "behat processor [test]",
       "description": "processes csv files",
-      "uniqueTag": "csv-101",
+      "uniqueTag": "behat-csv-101",
       "module": "csv_processor",
       "content": "import foobar"
     }
@@ -28,7 +28,7 @@ Feature: Lintol Capstone API
         "creatorId": {KNOWN_ID:User},
         "name": "behat processor [test]",
         "description": "processes csv files",
-        "uniqueTag": "csv-101",
+        "uniqueTag": "behat-csv-101",
         "module": "csv_processor",
         "content": "import foobar"
       }
@@ -44,7 +44,7 @@ Feature: Lintol Capstone API
       "creator_id": {KNOWN_ID:User},
       "name": "behat processor [test]",
       "description": "processes csv files",
-      "unique_tag": "csv-101",
+      "unique_tag": "behat-csv-101",
       "module": "csv_processor",
       "content": "import foobar"
     }
@@ -61,7 +61,7 @@ Feature: Lintol Capstone API
         "creatorId": {KNOWN_ID:User},
         "name": "behat processor [test]",
         "description": "processes csv files",
-        "uniqueTag": "csv-101",
+        "uniqueTag": "behat-csv-101",
         "module": "csv_processor",
         "content": "import foobar"
       }
