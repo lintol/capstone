@@ -1,0 +1,75 @@
+version: "2"
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./infrastructure/../../storage/db:/data
+    environment:
+      PGDATA: /data
+    env_file:
+      - ./infrastructure/config/secrets/laravel.env
+  phpfpm:
+    image: flaxandteal/docker-laravel-phpfpm:fpm-7.1.6
+    links:
+      - db:db
+      - redis:redis
+    volumes:
+      - ./infrastructure/..:/data/www
+      - ./infrastructure/..:/var/www/app
+    env_file:
+      - ./infrastructure/config/secrets/laravel.env
+      - ./infrastructure/config/secrets/redis.env
+    environment:
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
+      CAPSTONE_WITHOUT_AUTH: 1
+  nginx:
+    image: nginx:stable
+    volumes:
+      - ./infrastructure/config/nginx/laravel:/etc/nginx/conf.d/default.conf
+      - ./infrastructure/certificates:/secrets
+      - ./infrastructure/..:/var/www/app
+    env_file:
+      - ./infrastructure/config/secrets/laravel.env
+    ports:
+      - "80:80"
+    links:
+      - phpfpm:phpfpm
+    environment:
+      LARAVEL_ROOT: "/var/www/app"
+  artisan_subscriber:
+    image: flaxandteal/docker-laravel-artisan:fpm-7.1.6
+    volumes:
+      - ./infrastructure/../../storage/artisan:/data/www
+      - ./infrastructure/..:/var/www/app
+    env_file:
+      - ./infrastructure/config/secrets/laravel.env
+      - ./infrastructure/config/secrets/redis.env
+    environment:
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
+    links:
+      - db:db
+      - redis:redis
+    command:
+      - "ltl:observe"
+  artisan_worker:
+    image: flaxandteal/docker-laravel-artisan:fpm-7.1.6
+    volumes:
+      - ./infrastructure/../../storage/artisan:/data/www
+      - ./infrastructure/..:/var/www/app
+    env_file:
+      - ./infrastructure/config/secrets/laravel.env
+      - ./infrastructure/config/secrets/redis.env
+    environment:
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
+    links:
+      - db:db
+      - redis:redis
+    command:
+      - "queue:work"
+  redis:
+    image: redis
+    env_file:
+      - ./infrastructure/config/secrets/redis.env

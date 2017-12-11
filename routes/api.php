@@ -17,6 +17,22 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::resource('profiles','ProfileController');
-Route::resource('processors','ProcessorController');
-Route::resource('reports','ReportController');
+$group = [
+    'prefix' => 'v1.0'
+];
+
+if (!env('CAPSTONE_WITHOUT_AUTH', false)) {
+    $group['middleware'] = 'auth:api';
+}
+
+Route::group($group, function () {
+    Route::resource('profiles','ProfileController', [
+        'only' => ['index', 'show', 'update', 'store']
+    ]);
+    Route::resource('processors','ProcessorController', [
+        'only' => ['index', 'store']
+    ]);
+    Route::resource('reports','ReportController', [
+        'only' => ['index', 'show']
+    ]);
+});

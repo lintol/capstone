@@ -6,11 +6,25 @@
     "type": "project",
     "require": {
         "php": ">=7.0.8",
+        "alsofronie/eloquent-uuid": "^1.0",
         "fideloper/proxy": "~3.3",
+        "guzzlehttp/guzzle": "^6.3",
+        "imbo/behat-api-extension": "^2.0",
         "laravel/framework": "5.5.*",
-        "laravel/tinker": "~1.0"
+        "laravel/passport": "^4.0",
+        "laravel/tinker": "~1.0",
+        "predis/predis": "^1.1",
+        "spatie/laravel-fractal": "^5.3",
+        "spatie/laravel-permission": "^2.7",
+        "voryx/thruway": "^0.5.0"
     },
     "require-dev": {
+        "behat/behat": "^3.3",
+        "behat/mink": "^1.7",
+        "behat/mink-extension": "^2.2",
+        "behat/mink-goutte-driver": "^1.2",
+        "laracasts/behat-laravel-extension": "^1.0",
+
         "filp/whoops": "~2.0",
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
@@ -22,7 +36,10 @@
             "database/factories"
         ],
         "psr-4": {
-            "App\\": "app/"
+            "App\\": "app/",
+            "Seeders\\": "database/seeds/",
+            "Flaxandteal\\Bedappy\\": "packages/flaxandteal/bedappy/src/",
+            "Lintol\\Capstone\\": "packages/lintol/capstone/src/"
         }
     },
     "autoload-dev": {
