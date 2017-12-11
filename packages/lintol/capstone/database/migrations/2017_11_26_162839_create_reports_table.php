@@ -14,14 +14,24 @@ class CreateReportsTable extends Migration
     public function up()
     {
         Schema::create('reports', function (Blueprint $table) {
-            $table->increments('id');
+            $table->uuid('id');
             $table->text('name');
-            $table->text('user');
+
+            $table->uuid('owner_id')->nullable();
+            $table->foreign('owner_id')->references('id')->on('users')->onDelete('set null');
+
+            $table->uuid('validation_id')->nullable();
+            $table->foreign('validation_id')->references('id')->on('validations')->onDelete('set null');
+
+            $table->json('content');
+
             $table->integer('errors');
             $table->integer('warnings');
             $table->integer('passes');
-            $table->integer('qualityScore');
+            $table->integer('quality_score');
+
             $table->timestamps();
+            $table->unique('id');
         });
     }
 

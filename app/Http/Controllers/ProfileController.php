@@ -3,10 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Profile;
+use Lintol\Capstone\Models\Profile;
+use Lintol\Capstone\Transformers\ProfileTransformer;
 
 class ProfileController extends Controller
 {
+    /**
+     * Initialize the transformer
+     */
+    public function __construct(ProfileTransformer $transformer)
+    {
+        $this->transformer = $transformer;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -14,19 +23,10 @@ class ProfileController extends Controller
      */
     public function index()
     {
-        //
-        return Profile::all();
-    }
+        $profiles = Profile::all();
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-        return view('profiles.create');
+        return fractal($profiles, $this->transformer)
+            ->respond();
     }
 
     /**
@@ -38,17 +38,20 @@ class ProfileController extends Controller
     public function store(Request $request)
     {
         $profile = new Profile;
+
         $profile->name = $request->input('name');
-        $profile->creator = $request->input('creator');
+        $profile->version = $request->input('version');
+        $profile->creator_id = $request->input('creatorId');
         $profile->description = $request->input('description');
         $profile->version = $request->input('version');
-        $profile->uniqueTag = $request->input('uniqueTag');
-        $profile->created_at = date('Y-m-d H:i:s');
-        $profile->updated_at = date('Y-m-d H:i:s');
-        if ($profile->save()) {
-            return $profile;
+        $profile->unique_tag = $request->input('uniqueTag');
+
+        if (!$profile->save()) {
+            abort(400, "Invalid data");
         }
-        throw new HttpException(400, "Invalid data");
+
+        return fractal($profile, $this->transformer)
+            ->respond();
     }
 
     /**
@@ -59,22 +62,10 @@ class ProfileController extends Controller
      */
     public function show($id)
     {
-        //
-        if (!$id) {
-           throw new HttpException(400, "Invalid id");
-        }
-        return Profile::find($id);
-    }
+        $profile = Profile::findOrFail($id);
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
+        return fractal($profile, $this->transformer)
+            ->respond();
     }
 
     /**
@@ -86,27 +77,15 @@ class ProfileController extends Controller
      */
     public function update(Request $request, $id)
     {
-        /*if (!$id) {
-            throw new HttpException(400, "Invalid id");
-        }*/
-        $profile = Profile::find($id);
+        $profile = Profile::findOrFail($id);
         $profile->name = $request->input('name');
         $profile->description = $request->input('description');
-        $profile->updated_at = date('Y-m-d H:i:s');
-        if ($profile->save()) {
-            return $profile;
-        }
-        throw new HttpException(400, "Invalid data");
-    }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        if ($profile->save()) {
+            return fractal($profile, $this->transformer)
+                ->respond();
+        }
+
+        abort(400, __("Invalid data"));
     }
 }

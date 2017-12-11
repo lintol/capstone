@@ -1,0 +1,21 @@
+default:
+  extensions:
+    Laracasts\Behat\ServiceContainer\BehatExtension: ~
+    Imbo\BehatApiExtension\ServiceContainer\BehatApiExtension: ~
+    Flaxandteal\Bedappy\ServiceContainer\BedappyExtension:
+      rest:
+        apiPrefix: api/v1.0
+        modelPrefix: Lintol\Capstone\Models\
+        userModel: App\User
+    Behat\MinkExtension\ServiceContainer\MinkExtension:
+      default_session: laravel
+      laravel: ~
+      sessions:
+        api:
+          goutte: ~
+
+  suites:
+    default:
+      contexts:
+        - Flaxandteal\Bedappy\Context\ApiContext
+        - Behat\MinkExtension\Context\MinkContext

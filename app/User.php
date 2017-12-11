@@ -4,10 +4,13 @@ namespace App;
 
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Alsofronie\Uuid\UuidModelTrait;
+use Laravel\Passport\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use UuidModelTrait, Notifiable, HasRoles, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
