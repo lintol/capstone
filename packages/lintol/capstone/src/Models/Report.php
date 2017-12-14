@@ -27,10 +27,17 @@ class Report extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function make($report)
+    public function make($result)
     {
         $report = new self;
-        $report->content = $report;
+        $report->name = '(none)';
+        $report->content = json_decode($result);
+
+        $report->errors = 0;
+        $report->warnings = 0;
+        $report->passes = 0;
+        $report->quality_score = 0;
+
         return $report;
     }
 

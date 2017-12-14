@@ -26,6 +26,6 @@ class Validation extends Model
 
     public function report()
     {
-        return $this->belongsTo(Report::class);
+        return $this->hasOne(Report::class);
     }
 }

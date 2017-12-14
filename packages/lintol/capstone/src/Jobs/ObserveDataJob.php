@@ -5,9 +5,9 @@ namespace Lintol\Capstone\Jobs;
 use File;
 use GuzzleHttp;
 use App;
-use App\Models\Validation;
-use App\Models\Processor;
-use App\Models\Data;
+use Lintol\Capstone\Models\Validation;
+use Lintol\Capstone\Models\Processor;
+use Lintol\Capstone\Models\Data;
 use Lintol\Capstone\ValidationProcess;
 use Thruway\ClientSession;
 use Thruway\Peer\Client;
@@ -71,9 +71,12 @@ class ObserveDataJob implements ShouldQueue
         $validation = App::make(Validation::class);
 
         $path = 'good';
-        $pData = File::get(__DIR__ . '../../example/processors/good.py');
+        $pData = File::get(__DIR__ . '/../../examples/processors/good.py');
 
-        $processor = App::make(Processor::class);
+        $processor = App::make(Processor::class)->firstOrNew(['unique_tag' => 'ltl-goodtables']);
+        $processor->name = "Example Goodtables";
+        $processor->description = "Example showing cross-over with Goodtables";
+        $processor->unique_tag = 'ltl-goodtables';
         $processor->module = $path;
         $processor->content = $pData;
         $processor->save();

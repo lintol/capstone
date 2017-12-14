@@ -2,9 +2,13 @@
 
 namespace Lintol\Capstone;
 
+use Log;
+use RuntimeException;
+use Event;
 use Carbon\Carbon;
 use Thruway\ClientSession;
 use Lintol\Capstone\Models\Validation;
+use Lintol\Capstone\Models\Report;
 use Lintol\Capstone\Events\ResultRetrievedEvent;
 
 class ValidationProcess
@@ -41,6 +45,7 @@ class ValidationProcess
     {
         $this->validation = $validation;
         $this->session = $session;
+        $this->reportFactory = app()->make(Report::class);
     }
 
     public function beginValidation($serverId, $sessionId) {
@@ -73,10 +78,10 @@ class ValidationProcess
         $future = $this->session->call(
             $this->makeUri(
                 'processor.post',
-                $validation->doorstep_server_id
+                $this->validation->doorstep_server_id
             ),
             [
-                $validation->doorstep_session_id,
+                $this->validation->doorstep_session_id,
                 $processor->module,
                 $processor->content
             ]
@@ -91,10 +96,10 @@ class ValidationProcess
         $future = $this->session->call(
             $this->makeUri(
                 'data.post',
-                $validation->doorstep_server_id
+                $this->validation->doorstep_server_id
             ),
             [
-                $validation->doorstep_session_id,
+                $this->validation->doorstep_session_id,
                 $data->filename,
                 $data->content
             ]
@@ -124,6 +129,7 @@ class ValidationProcess
                 return $this->sendProcessor();
             },
             function ($error) {
+                Log::info($error);
                 throw RuntimeException($error);
             }
         )->then(
@@ -131,6 +137,7 @@ class ValidationProcess
                 return $this->sendData();
             },
             function ($error) {
+                Log::info($error);
                 throw RuntimeException($error);
             }
         )->then(
@@ -140,6 +147,7 @@ class ValidationProcess
                 Log::info(__("Validation process initiated for ") . $this->validation->id);
             },
             function ($error) {
+                Log::info($error);
                 throw RuntimeException($error);
             }
         );
@@ -148,32 +156,28 @@ class ValidationProcess
     protected function getReport() {
         $uri = $this->makeUri(
             'report.get',
-            $this->validation->data_server_id
+            $this->validation->doorstep_server_id
         );
 
         return $this->session->call(
             $uri,
-            [$this->validation->data_session_id]
+            [$this->validation->doorstep_session_id]
         );
     }
 
     protected function outputReport($report) {
         $report = $this->reportFactory->make($report);
 
-        $this->validation->report->associate($report);
+        $report->validation()->associate($this->validation);
         $this->validation->completed_at = Carbon::now();
         $this->validation->save();
-
-        $this->report->validation()->associate($validation);
+        $report->save();
     }
 
     /**
      * Run the output sequence.
-     *
-     * @param $validation
-     * @param $client
      */
-    protected function retrieve(Validation $validation)
+    public function retrieve()
     {
         $this->getReport()
         ->then(
@@ -181,11 +185,13 @@ class ValidationProcess
                 return $this->outputReport($res);
             },
             function ($error) {
+                Log::info($error);
                 throw RuntimeException($error);
             }
         )
-        ->done(
-            Event::fire(new ResultRetrievedEvent)
-        );
+        ->done(function ($res) {
+            Log::info("Completed: " . $this->validation->id);
+            Event::fire(new ResultRetrievedEvent($this->validation->id));
+        });
     }
 }

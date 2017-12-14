@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Listeners;
+namespace Lintol\Capstone\Listeners;
 
-use App\Events\ResultRetrievedEvent;
+use Log;
+use Lintol\Capstone\WampConnection;
+use Lintol\Capstone\Events\ResultRetrievedEvent;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Lintol\Capstone\Models\Validation;
@@ -27,7 +29,8 @@ class ResultRetrievedListener
      */
     public function handle(ResultRetrievedEvent $event)
     {
-        $validation = Validation::find($event->validationId);
+        Log::info('Publishing com.ltlcapstone.validation.' . $event->validationId . '.event_complete');
+        $validation = Validation::findOrFail($event->validationId);
 
         if (!$validation) {
             throw RuntimeException(__("Validation ID not found"));
@@ -38,8 +41,8 @@ class ResultRetrievedListener
 
             return $session->publish(
                 'com.ltlcapstone.validation.' . $validation->id . '.event_complete',
-                [$validation->report]
+                [$validation->report->content]
             );
-        });
+        }, false);
     }
 }
