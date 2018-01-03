@@ -14,7 +14,11 @@ class RulesEngine
     {
         foreach (self::$rules as $ruleClass) {
             $rule = app()->make($ruleClass);
-            $rule->apply($metadata, $rules);
+            if (!$rule->apply($metadata, $rules)) {
+                return false;
+            }
         }
+
+        return true;
     }
 }
