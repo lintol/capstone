@@ -2,10 +2,13 @@
 
 namespace Lintol\Capstone\Console\Commands;
 
+use Log;
 use App;
 use File;
 use Lintol\Capstone\Models\Validation;
 use Lintol\Capstone\Models\Processor;
+use Lintol\Capstone\Models\ProcessorConfiguration;
+use Lintol\Capstone\Models\Profile;
 use Lintol\Capstone\Models\Data;
 use Illuminate\Console\Command;
 use Lintol\Capstone\Jobs\ProcessDataJob;
@@ -43,19 +46,56 @@ class ProcessDataCommand extends Command
      */
     public function handle()
     {
+        $validationId = $this->exampleValidationLaunch();
+
+        ProcessDataJob::dispatch($validationId)
+            ->onConnection('sync');
+    }
+
+    public function exampleValidationLaunch()
+    {
         $validation = App::make(Validation::class);
 
-        $path = 'csv_checker';
-        $pData = File::get(resource_path('capstone/examples/processors/csv_checker.py'));
+        $path = 'good';
+        $pData = File::get(__DIR__ . '/../../../examples/processors/good.py');
 
-        $processor = App::make(Processor::class)->firstOrNew([
-            'unique_tag' => 'ltl-csv-checker'
-        ]);
-        $processor->name = "Lintol Sample CSV Checker";
-        $processor->description = "Example of non-standard CSV checks";
-        $processor->module = $path;
-        $processor->content = $pData;
-        $processor->save();
+        $tag = 'frictionlessdata/goodtables-py:1';
+
+        $profile = App::make(Profile::class)->firstOrNew(['unique_tag' => 'test-goodtables-1']);
+        if (true || !$profile) {
+            $profile->name = "Test Goodtables";
+            $profile->description = "Testing goodtables";
+            $profile->version = '1';
+            $profile->unique_tag = 'test-goodtables-1';
+            $profile->save();
+
+            $configuration = App::make(ProcessorConfiguration::class);
+            $configuration->configuration = [];
+            $configuration->metadata = [];
+            $configuration->rules = ['fileType' => '/csv/'];
+
+            $configuration->profile()->associate($profile);
+            $configuration->save();
+
+            $processor = App::make(Processor::class)->firstOrNew(['unique_tag' => $tag]);
+
+            if (!$processor->id) {
+                $processor->name = "Example Goodtables";
+                $processor->description = "Example showing cross-over with Goodtables";
+                $processor->unique_tag = $tag;
+                $processor->module = $path;
+                $processor->content = $pData;
+                $processor->save();
+            }
+            $configuration->processor()->associate($processor);
+            $configuration->save();
+        }
+
+        $configuration = $profile->configurations[0];
+
+        $validation->configuration()->associate($configuration);
+        $validation->buildMetadata(['test123']);
+        $validation->save();
 
         $path = 'bad.csv';
         $dData = File::get(resource_path('capstone/examples/data/bad.csv'));
@@ -66,12 +106,8 @@ class ProcessDataCommand extends Command
         $data->save();
 
         $validation->data()->associate($data);
-        $validation->processor()->associate($processor);
         $validation->save();
 
-        $validationId = $validation->id;
-
-        ProcessDataJob::dispatch($validationId)
-            ->onConnection('sync');
+        return $validation->id;
     }
 }

@@ -5,9 +5,9 @@ namespace Lintol\Capstone\Jobs;
 use File;
 use GuzzleHttp;
 use App;
-use App\Models\Validation;
-use App\Models\Processor;
-use App\Models\Data;
+use Lintol\Capstone\Models\Validation;
+use Lintol\Capstone\Models\Processor;
+use Lintol\Capstone\Models\Data;
 use Lintol\Capstone\ValidationProcess;
 use Thruway\ClientSession;
 use Thruway\Peer\Client;
@@ -56,7 +56,8 @@ class ObserveDataJob implements ShouldQueue
                 $session->register('com.ltlcapstone.validation',
                     function ($res) use ($session) {
                         $dataUri = $res[0];
-                        return $this->exampleValidationLaunch($dataUri);
+                        $metadata = $res[1];
+                        return $this->exampleValidationLaunch($dataUri, $metadata);
                     }
                 );
         }, false);
@@ -64,20 +65,50 @@ class ObserveDataJob implements ShouldQueue
         Log::info(__("Subscription exited."));
     }
 
-    public function exampleValidationLaunch($dataUri)
+    public function exampleValidationLaunch($dataUri, $metadata)
     {
         Log::info(__("Validation requested of ") . $dataUri);
 
         $validation = App::make(Validation::class);
 
         $path = 'good';
-        $pData = File::get(__DIR__ . '../../example/processors/good.py');
+        $pData = File::get(__DIR__ . '/../../examples/processors/good.py');
 
-        $processor = App::make(Processor::class);
-        $processor->module = $path;
-        $processor->content = $pData;
-        $processor->save();
-        $validation->processor()->associate($processor);
+        $tag = 'frictionlessdata/goodtables-py:1';
+        $processor = App::make(Processor::class)->firstOrNew(['unique_tag' => $tag]);
+
+        if (!$processor->id) {
+            $processor->name = "Example Goodtables";
+            $processor->description = "Example showing cross-over with Goodtables";
+            $processor->unique_tag = $tag;
+            $processor->module = $path;
+            $processor->content = $pData;
+            $processor->save();
+
+            $configuration = App::make(Configuration::class);
+            $configuration->configuration = [];
+            $configuration->metadata = [];
+            $configuration->rules = ['fileType' => '/csv/'];
+            $configuration->processor()->associate($processor);
+            $configuration->save();
+        }
+
+        $configuration = $processor->configuration;
+
+        $profile = App::make(Profile::class)->firstOrNew(['unique_tag' => 'test-goodtables-1']);
+        if (!$profile) {
+            $profile->name = "Test Goodtables";
+            $profile->description = "Testing goodtables";
+            $profile->version = '1';
+            $profile->unique_tag = 'test-goodtables-1';
+            $profile->save();
+
+            $configuration->profile()->associate($profile);
+            $configuration->save();
+        }
+
+        $validation->configuration()->associate($configuration);
+        $validation->buildMetadata($metadata);
         $validation->save();
 
         Log::info('Requesting data from ' . $dataUri);

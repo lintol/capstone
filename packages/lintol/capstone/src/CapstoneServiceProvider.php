@@ -24,7 +24,6 @@ class CapstoneServiceProvider extends ServiceProvider
             __DIR__ . '/../config/capstone.php' => config_path('capstone.php')
         ], 'config');
 
-        \Log::info(resource_path('capstone/examples'));
         $this->publishes([
             __DIR__ . '/../examples' => resource_path('capstone/examples')
         ], 'examples');

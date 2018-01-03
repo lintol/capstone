@@ -9,14 +9,18 @@ class Validation extends Model
 {
     use UuidModelTrait;
 
+    protected $casts = [
+        'metadata' => 'json'
+    ];
+
     const STATUS_UNKNOWN = 0;
     const STATUS_SUCCEEDED = 1;
     const STATUS_FAILED = 2;
     const STATUS_RUNNING = 3;
 
-    public function processor()
+    public function configuration()
     {
-        return $this->belongsTo(Processor::class);
+        return $this->belongsTo(ProcessorConfiguration::class);
     }
 
     public function data()
@@ -26,6 +30,18 @@ class Validation extends Model
 
     public function report()
     {
-        return $this->belongsTo(Report::class);
+        return $this->hasOne(Report::class);
+    }
+
+    public function buildMetadata($metadata)
+    {
+        $metadata = array_merge(
+            $this->configuration->processor->metadata,
+            $this->configuration->metadata
+        );
+        $metadata['runtime'] = $metadata;
+        $this->metadata = $metadata;
+
+        return $this->metadata;
     }
 }
