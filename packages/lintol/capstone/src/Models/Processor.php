@@ -10,18 +10,17 @@ class Processor extends Model
 {
     use UuidModelTrait;
 
-     protected $fillable = [
+    protected $casts = [
+        'metadata' => 'json'
+    ];
+
+    protected $fillable = [
          'name',
          'description',
          'unique_tag',
          'module',
          'content'
     ];
-
-    public function validation()
-    {
-        return $this->hasMany(Validation::class);
-    }
 
     public function creator()
     {

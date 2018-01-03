@@ -25,6 +25,7 @@ class CreateProcessorsTable extends Migration
 
             $table->string('module');
             $table->text('content');
+            $table->json('metadata');
 
             $table->timestamps();
 

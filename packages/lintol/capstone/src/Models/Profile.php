@@ -17,6 +17,11 @@ class Profile extends Model
          'unique_tag'
     ];
 
+    public function configurations()
+    {
+        return $this->hasMany(ProcessorConfiguration::class);
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class);
