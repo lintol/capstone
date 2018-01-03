@@ -1,0 +1,52 @@
+@startuml
+
+together {
+  class ProcessorConfiguration {
+    rules: json
+    configuration: json
+    user_configuration_storage: json
+    definition: json
+  }
+
+  class Processor {
+    rules: json
+    definition: json
+    configuration_options: json
+    configuration_defaults: json
+  }
+
+  class Profile {
+    rules: json
+  }
+}
+
+class ValidationRun {
+  settings: json
+  completion_status: enum
+  doorstep_server_id: uuid
+  doorstep_session_id: uuid
+  doorstep_definition: json
+  output: text
+
+  requested_at: timestamp
+  completed_at: timestamp
+  initiated_at: timestamp
+}
+
+class Report {
+  errors: integer
+  warnings: integer
+  passes: integer
+  quality_score: integer
+  content: json
+}
+
+class Data
+
+Processor "1" -- "*" ProcessorConfiguration
+Profile "1" -- "*" ProcessorConfiguration
+Profile "1" -- "*" ValidationRun
+ValidationRun "1" -- "0..1" Report
+Data "1" -- "*" ValidationRun
+
+@enduml
