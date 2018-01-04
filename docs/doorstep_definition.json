@@ -1,0 +1,19 @@
+{
+    "settings": {
+        "fileType": "csv"
+    },
+    "definitions": {
+        "1234processorconfigurationid": {
+            "configuration": {
+                "errors_as_warnings": 1,
+                "delimiter": "\t"
+            },
+            "definition": {
+                "docker": {
+                    "image": "lintol/ds-csvlint",
+                    "revision": "latest"
+                }
+            }
+        }
+    }
+}

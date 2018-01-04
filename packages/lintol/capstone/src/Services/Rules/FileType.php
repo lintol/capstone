@@ -6,8 +6,13 @@ class FileType
 {
     public function apply(array $metadata, array $rules)
     {
-        if (in_array('fileType', $metadata) && in_array('fileType', $rules)) {
-            return (bool)preg_match($rules['fileType'], $metadata);
+        if (in_array('fileType', $rules)) {
+            if (in_array('fileType', $metadata)) {
+                return (bool)preg_match($rules['fileType'], $metadata['fileType']);
+            }
+            return false;
         }
+
+        return true;
     }
 }
