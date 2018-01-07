@@ -41,8 +41,8 @@ class Report extends Model
         return $report;
     }
 
-    public function validation()
+    public function run()
     {
-        return $this->belongsTo(Validation::class);
+        return $this->belongsTo(ValidationRun::class);
     }
 }

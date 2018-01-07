@@ -3,18 +3,29 @@
 namespace Lintol\Capstone\Services;
 
 use Lintol\Capstone\Services\Rules\FileType;
+use Lintol\Capstone\Services\Rules\NameMatch;
 
 class RulesEngine
 {
-    public $rules = [
-        FileType::class
+    public static $rules = [
+        FileType::class,
+        NameMatch::class
     ];
 
-    public function apply(array $rules)
+    public $ruleObjs = [];
+
+    public function __construct()
     {
-        foreach (self::$rules as $ruleClass) {
-            $rule = app()->make($ruleClass);
-            if (!$rule->apply($metadata, $rules)) {
+        $ruleObjs = [];
+        foreach (self::$rules as $rule) {
+            $ruleObjs[$rule] = app()->make($rule);
+        }
+    }
+
+    public function apply(array $definition, array $rules)
+    {
+        foreach ($this->ruleObjs as $rule) {
+            if (!$rule->apply($definition, $rules)) {
                 return false;
             }
         }

@@ -4,6 +4,7 @@ namespace Lintol\Capstone;
 
 use Event;
 use Lintol\Capstone\Events\ResultRetrievedEvent;
+use Lintol\Capstone\Models\ProcessorConfiguration;
 use Lintol\Capstone\Listeners\ResultRetrievedListener;
 use Lintol\Capstone\Console\Commands\ObserveDataCommand;
 use Lintol\Capstone\Console\Commands\ProcessDataCommand;
@@ -55,6 +56,8 @@ class CapstoneServiceProvider extends ServiceProvider
 
             return new WampConnection($url, $realm);
         });
+
+        ProcessorConfiguration::observe(ProcessorConfigurationObserver::class);
     }
 
     /**

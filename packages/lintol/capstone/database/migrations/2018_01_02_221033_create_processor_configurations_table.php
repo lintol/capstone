@@ -48,16 +48,21 @@ class CreateProcessorConfigurationsTable extends Migration
      */
     public function down()
     {
+        try {
+            Schema::table('validations', function (Blueprint $table) {
+                $table->dropForeign('validations_configuration_id_foreign');
+            });
+        } catch (\Throwable $e) {
+            DB::rollback();
+            Schema::table('validations', function (Blueprint $table) {
+                $table->dropForeign('validation_runs_configuration_id_foreign');
+            });
+        }
+
         Schema::table('validations', function (Blueprint $table) {
-            $table->dropForeign('validations_configuration_id_foreign');
             $table->dropColumn('configuration_id');
         });
 
         Schema::drop('processor_configurations');
-
-        Schema::table('validations', function (Blueprint $table) {
-            $table->uuid('processor_id')->nullable();
-            $table->foreign('processor_id')->references('id')->on('processors')->onDelete('cascade');
-        });
     }
 }

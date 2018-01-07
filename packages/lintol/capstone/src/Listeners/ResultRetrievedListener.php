@@ -7,7 +7,7 @@ use Lintol\Capstone\WampConnection;
 use Lintol\Capstone\Events\ResultRetrievedEvent;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Lintol\Capstone\Models\Validation;
+use Lintol\Capstone\Models\ValidationRun;
 
 class ResultRetrievedListener
 {
@@ -30,10 +30,10 @@ class ResultRetrievedListener
     public function handle(ResultRetrievedEvent $event)
     {
         Log::info('Publishing com.ltlcapstone.validation.' . $event->validationId . '.event_complete');
-        $validation = Validation::findOrFail($event->validationId);
+        $validation = ValidationRun::findOrFail($event->validationId);
 
         if (!$validation) {
-            throw RuntimeException(__("Validation ID not found"));
+            throw RuntimeException(__("Validation Run ID not found"));
         }
 
         $this->wampConnection->execute(function ($session) use ($validation) {
