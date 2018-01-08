@@ -11,7 +11,10 @@ class Processor extends Model
     use UuidModelTrait;
 
     protected $casts = [
-        'metadata' => 'json'
+        'rules' => 'json',
+        'definition' => 'json',
+        'configuration_options' => 'json',
+        'configuration_defaults' => 'json',
     ];
 
     protected $fillable = [
@@ -19,11 +22,20 @@ class Processor extends Model
          'description',
          'unique_tag',
          'module',
-         'content'
+         'content',
+         'rules',
+         'definition',
+         'configuration_options',
+         'configuration_defaults'
     ];
 
     public function creator()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function configurations()
+    {
+        return $this->hasMany(ProcessorConfiguration::class);
     }
 }

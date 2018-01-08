@@ -5,13 +5,16 @@ namespace Lintol\Capstone\Models;
 use Illuminate\Database\Eloquent\Model;
 use Alsofronie\Uuid\UuidModelTrait;
 
-class Data extends Model
+class Rule extends Model
 {
     use UuidModelTrait;
 
     public $fillable = [
-        'filename',
-        'content'
+        'definition'
+    ];
+
+    public $casts = [
+        'definition' => 'json'
     ];
 
     public function run()

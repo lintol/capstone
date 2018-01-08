@@ -11,14 +11,16 @@ class ProcessorConfiguration extends Model
     use UuidModelTrait;
 
     protected $casts = [
-        'metadata' => 'json',
+        'user_configuration_storage' => 'json',
+        'definition' => 'json',
         'configuration' => 'json',
         'rules' => 'json'
     ];
 
-     protected $fillable = [
+    protected $fillable = [
+         'user_configuration_storage',
          'configuration',
-         'metadata',
+         'definition',
          'rules'
     ];
 
@@ -32,8 +34,11 @@ class ProcessorConfiguration extends Model
         return $this->belongsTo(Profile::class);
     }
 
-    public function validation()
+    public function buildDefinition()
     {
-        return $this->hasMany(Validation::class);
+        return [
+            'configuration' => $this->configuration,
+            'definition' => $this->definition
+        ];
     }
 }

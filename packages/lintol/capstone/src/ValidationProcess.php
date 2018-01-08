@@ -7,19 +7,19 @@ use RuntimeException;
 use Event;
 use Carbon\Carbon;
 use Thruway\ClientSession;
-use Lintol\Capstone\Models\Validation;
+use Lintol\Capstone\Models\ValidationRun;
 use Lintol\Capstone\Models\Report;
 use Lintol\Capstone\Events\ResultRetrievedEvent;
 
 class ValidationProcess
 {
-    protected $validation;
+    protected $run;
 
     protected $clientSession;
 
     public function fromDataSession($serverId, $sessionId, ClientSession $session)
     {
-        $validation = Validation::where('doorstep_server_id', '=', $serverId)
+        $validation = ValidationRun::where('doorstep_server_id', '=', $serverId)
             ->where('doorstep_session_id', '=', $sessionId)
             ->first();
 
@@ -32,31 +32,33 @@ class ValidationProcess
 
     public function make($validationId, ClientSession $session)
     {
-        $validation = Validation::find($validationId);
+        $validation = ValidationRun::find($validationId);
 
         if (!$validation) {
-            throw RuntimeException(__("Validation ID not found"));
+            throw new \RuntimeException(__("Validation ID not found"));
         }
 
         return new self($validation, $session);
     }
 
-    public function __construct(Validation $validation = null, ClientSession $session = null)
+    public function __construct(ValidationRun $validation = null, ClientSession $session = null)
     {
-        $this->validation = $validation;
+        $this->run = $validation;
         $this->session = $session;
         $this->reportFactory = app()->make(Report::class);
     }
 
-    public function beginValidation($serverId, $sessionId) {
-        $this->validation->doorstep_server_id = $serverId;
-        $this->validation->doorstep_session_id = $sessionId;
-        $this->validation->requested_at = Carbon::now();
-        $this->validation->completion_status = Validation::STATUS_RUNNING;
-        $this->validation->save();
+    public function beginValidation($serverId, $sessionId)
+    {
+        $this->run->doorstep_server_id = $serverId;
+        $this->run->doorstep_session_id = $sessionId;
+        $this->run->requested_at = Carbon::now();
+        $this->run->completion_status = ValidationRun::STATUS_RUNNING;
+        $this->run->save();
     }
 
-    public function engage() {
+    public function engage()
+    {
         return $this->session->call('com.ltldoorstep.engage');
     }
 
@@ -72,37 +74,39 @@ class ValidationProcess
         return 'com.ltldoorstep.' . $serverId . '.' . $endpoint;
     }
 
-    public function sendProcessor() {
-        $configuration = $this->validation->configuration;
+    public function sendProcessor()
+    {
+        $configuration = $this->run->profile->configurations[0];
         $processor = $configuration->processor;
-        $metadata = $this->validation->metadata;
+        $definition = $this->run->doorstep_definition;
 
         $future = $this->session->call(
             $this->makeUri(
                 'processor.post',
-                $this->validation->doorstep_server_id
+                $this->run->doorstep_server_id
             ),
             [
-                $this->validation->doorstep_session_id,
+                $this->run->doorstep_session_id,
                 $processor->module,
                 $processor->content,
-                $configuration->metadata
+                $configuration->definition
             ]
         );
 
         return $future;
     }
 
-    public function sendData() {
-        $data = $this->validation->data;
+    public function sendData()
+    {
+        $data = $this->run->data;
 
         $future = $this->session->call(
             $this->makeUri(
                 'data.post',
-                $this->validation->doorstep_server_id
+                $this->run->doorstep_server_id
             ),
             [
-                $this->validation->doorstep_session_id,
+                $this->run->doorstep_session_id,
                 $data->filename,
                 $data->content
             ]
@@ -111,13 +115,15 @@ class ValidationProcess
         return $future;
     }
 
-    public function markInitiated() {
-        $this->validation->initiated_at = Carbon::now();
-        $this->validation->save();
+    public function markInitiated()
+    {
+        $this->run->initiated_at = Carbon::now();
+        $this->run->save();
     }
 
-    public function getValidationId() {
-        return $this->validation->id;
+    public function getValidationId()
+    {
+        return $this->run->id;
     }
 
     /**
@@ -125,6 +131,7 @@ class ValidationProcess
      */
     public function run()
     {
+        \Log::info('running...');
         return $this->engage()
         ->then(
             function ($res) {
@@ -133,7 +140,7 @@ class ValidationProcess
             },
             function ($error) {
                 Log::info($error);
-                throw RuntimeException($error);
+                throw new \RuntimeException($error);
             }
         )->then(
             function ($res) {
@@ -141,39 +148,41 @@ class ValidationProcess
             },
             function ($error) {
                 Log::info($error);
-                throw RuntimeException($error);
+                throw new \RuntimeException($error);
             }
         )->then(
             function ($res) {
                 $this->markInitiated();
 
-                Log::info(__("Validation process initiated for ") . $this->validation->id);
+                Log::info(__("Validation process initiated for ") . $this->run->id);
             },
             function ($error) {
                 Log::info($error);
-                throw RuntimeException($error);
+                throw new \RuntimeException($error);
             }
         );
     }
 
-    protected function getReport() {
+    protected function getReport()
+    {
         $uri = $this->makeUri(
             'report.get',
-            $this->validation->doorstep_server_id
+            $this->run->doorstep_server_id
         );
 
         return $this->session->call(
             $uri,
-            [$this->validation->doorstep_session_id]
+            [$this->run->doorstep_session_id]
         );
     }
 
-    protected function outputReport($report) {
+    protected function outputReport($report)
+    {
         $report = $this->reportFactory->make($report);
 
-        $report->validation()->associate($this->validation);
-        $this->validation->completed_at = Carbon::now();
-        $this->validation->save();
+        $report->run()->associate($this->run);
+        $this->run->completed_at = Carbon::now();
+        $this->run->save();
         $report->save();
     }
 
@@ -189,12 +198,12 @@ class ValidationProcess
             },
             function ($error) {
                 Log::info($error);
-                throw RuntimeException($error);
+                throw new \RuntimeException($error);
             }
         )
         ->done(function ($res) {
-            Log::info("Completed: " . $this->validation->id);
-            Event::fire(new ResultRetrievedEvent($this->validation->id));
+            Log::info("Completed: " . $this->run->id);
+            Event::fire(new ResultRetrievedEvent($this->run->id));
         });
     }
 }

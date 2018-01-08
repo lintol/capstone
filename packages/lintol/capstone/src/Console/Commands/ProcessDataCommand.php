@@ -5,7 +5,7 @@ namespace Lintol\Capstone\Console\Commands;
 use Log;
 use App;
 use File;
-use Lintol\Capstone\Models\Validation;
+use Lintol\Capstone\Models\ValidationRun;
 use Lintol\Capstone\Models\Processor;
 use Lintol\Capstone\Models\ProcessorConfiguration;
 use Lintol\Capstone\Models\Profile;
@@ -29,6 +29,8 @@ class ProcessDataCommand extends Command
      */
     protected $description = 'Process a dataset';
 
+    protected $rulesService;
+
     /**
      * Create a new command instance.
      *
@@ -46,56 +48,41 @@ class ProcessDataCommand extends Command
      */
     public function handle()
     {
-        $validationId = $this->exampleValidationLaunch();
+        $runs = $this->exampleValidationLaunch();
 
-        ProcessDataJob::dispatch($validationId)
-            ->onConnection('sync');
+        $runs->each(function ($run) {
+            \Log::info($run->id);
+            ProcessDataJob::dispatch($run->id)
+                ->onConnection('sync');
+        });
     }
 
     public function exampleValidationLaunch()
     {
-        $validation = App::make(Validation::class);
-
         $path = 'good';
-        $pData = File::get(__DIR__ . '/../../../examples/processors/good.py');
+        $pData = File::get(__DIR__ . '/../../../examples/processors/goodtables/good.py');
 
         $tag = 'frictionlessdata/goodtables-py:1';
 
         $profile = App::make(Profile::class)->firstOrNew(['unique_tag' => 'test-goodtables-1']);
-        if (true || !$profile) {
-            $profile->name = "Test Goodtables";
-            $profile->description = "Testing goodtables";
-            $profile->version = '1';
-            $profile->unique_tag = 'test-goodtables-1';
-            $profile->save();
+        $profile->name = "Test Goodtables";
+        $profile->description = "Testing goodtables";
+        $profile->version = '1';
+        $profile->unique_tag = 'test-goodtables-1';
+        $profile->rules = ['fileType' => 'csv', 'name' => '/Goodtables/'];
+        $profile->save();
 
-            $configuration = App::make(ProcessorConfiguration::class);
-            $configuration->configuration = [];
-            $configuration->metadata = [];
-            $configuration->rules = ['fileType' => '/csv/'];
+        $profile->configurations()->delete();
+        $configuration = App::make(ProcessorConfiguration::class);
+        $configuration->configuration = [];
+        $configuration->definition = [];
 
-            $configuration->profile()->associate($profile);
-            $configuration->save();
+        $configuration->profile()->associate($profile);
 
-            $processor = App::make(Processor::class)->firstOrNew(['unique_tag' => $tag]);
+        $processor = App::make(Processor::class)->whereUniqueTag($tag)->firstOrFail();
 
-            if (!$processor->id) {
-                $processor->name = "Example Goodtables";
-                $processor->description = "Example showing cross-over with Goodtables";
-                $processor->unique_tag = $tag;
-                $processor->module = $path;
-                $processor->content = $pData;
-                $processor->save();
-            }
-            $configuration->processor()->associate($processor);
-            $configuration->save();
-        }
-
-        $configuration = $profile->configurations[0];
-
-        $validation->configuration()->associate($configuration);
-        $validation->buildMetadata(['test123']);
-        $validation->save();
+        $configuration->processor()->associate($processor);
+        $configuration->save();
 
         $path = 'bad.csv';
         $dData = File::get(resource_path('capstone/examples/data/bad.csv'));
@@ -105,9 +92,24 @@ class ProcessDataCommand extends Command
         $data->content = $dData;
         $data->save();
 
-        $validation->data()->associate($data);
-        $validation->save();
+        $settings = ['fileType' => 'csv', 'name' => 'Goodtables test'];
+        $profiles = App::make(Profile::class)->match($settings);
+        $runs = $profiles->map(function ($profile) use ($data, $settings) {
+            $run = App::make(ValidationRun::class);
 
-        return $validation->id;
+            $run->profile()->associate($profile);
+            if (!$run->buildDefinition($settings)) {
+                return null;
+            }
+
+            $run->save();
+
+            $run->data()->associate($data);
+            $run->save();
+
+            return $run;
+        })->filter();
+
+        return $runs;
     }
 }
