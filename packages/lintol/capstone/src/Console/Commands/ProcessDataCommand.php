@@ -51,7 +51,6 @@ class ProcessDataCommand extends Command
         $runs = $this->exampleValidationLaunch();
 
         $runs->each(function ($run) {
-            \Log::info($run->id);
             ProcessDataJob::dispatch($run->id)
                 ->onConnection('sync');
         });
@@ -74,9 +73,6 @@ class ProcessDataCommand extends Command
 
         $profile->configurations()->delete();
         $configuration = App::make(ProcessorConfiguration::class);
-        $configuration->configuration = [];
-        $configuration->definition = [];
-
         $configuration->profile()->associate($profile);
 
         $processor = App::make(Processor::class)->whereUniqueTag($tag)->firstOrFail();
@@ -84,8 +80,8 @@ class ProcessDataCommand extends Command
         $configuration->processor()->associate($processor);
         $configuration->save();
 
-        $path = 'bad.csv';
-        $dData = File::get(resource_path('capstone/examples/data/bad.csv'));
+        $path = 'awful.csv';
+        $dData = File::get(resource_path('capstone/examples/data/awful.csv'));
 
         $data = App::make(Data::class);
         $data->filename = $path;
