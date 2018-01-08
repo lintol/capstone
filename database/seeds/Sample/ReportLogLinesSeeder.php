@@ -3,6 +3,7 @@
 namespace Seeders\Sample;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ReportLogLinesSeeder extends Seeder
 {

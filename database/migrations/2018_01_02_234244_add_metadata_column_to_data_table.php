@@ -11,12 +11,12 @@ class AddMetadataColumnToDataTable extends Migration
      *
      * @return void
      */
-    public function up()
+    /* public function up()
     {
         Schema::table('data', function (Blueprint $table) {
             $table->json('metadata')->default('{}');
         });
-    }
+    } */
 
     /**
      * Reverse the migrations.

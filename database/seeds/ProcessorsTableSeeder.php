@@ -36,7 +36,7 @@ class ProcessorsTableSeeder extends Seeder
         $processor->creator()->associate($dataOwner);
         $processor->save();
 
-        $processor = Processor::firstOrNew([
+        /*$processor = Processor::firstOrNew([
             'unique_tag' => 'frictionlessdata/goodtables-py:1',
         ]);
         $processor->fill([
@@ -52,6 +52,6 @@ class ProcessorsTableSeeder extends Seeder
             ]
         ]);
         $processor->creator()->associate($dataOwner);
-        $processor->save();
+        $processor->save();*/
     }
 }
