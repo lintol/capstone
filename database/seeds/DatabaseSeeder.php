@@ -11,6 +11,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->call(Lintol\Capstone\Seeds\ProcessorsTableSeeder::class);
         $this->call(Seeders\RolesPermissionsSeeder::class);
     }
 }
