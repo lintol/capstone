@@ -1,6 +1,6 @@
 <?php
 
-namespace Seeders\Sample;
+namespace Lintol\Capstone\Seeds\Sample;
 
 use Illuminate\Database\Seeder;
 use Lintol\Capstone\Models\Report;

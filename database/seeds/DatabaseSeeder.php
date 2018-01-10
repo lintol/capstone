@@ -11,7 +11,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call(Lintol\Capstone\Seeds\ProcessorsTableSeeder::class);
-        $this->call(Seeders\RolesPermissionsSeeder::class);
+        $this->call(Lintol\Capstone\Seeds\ProcessorsTableSeeder::class,
+        Seeders\RolesPermissionsSeeder::class);
+        $this->command->info("Set up Data seeded");
+        
+        /* Sample Data */ 
+        $this->call(Lintol\Capstone\Seeds\Sample\ProfilesTableSeeder::class,
+        Lintol\Capstone\Seeds\Sample\ReportsTableSeeder::class);
+        $this->command->info("Sample Data Seeded");
     }
 }
