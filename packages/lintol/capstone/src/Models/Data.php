@@ -14,6 +14,10 @@ class Data extends Model
         'content'
     ];
 
+    public $casts = [
+        'settings' => 'json'
+    ];
+
     public function run()
     {
         return $this->hasMany(ValidationRun::class);

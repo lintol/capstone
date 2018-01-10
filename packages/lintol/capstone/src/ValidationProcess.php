@@ -9,6 +9,8 @@ use Carbon\Carbon;
 use Thruway\ClientSession;
 use Lintol\Capstone\Models\ValidationRun;
 use Lintol\Capstone\Models\Report;
+use Lintol\Capstone\Models\Profile;
+use Lintol\Capstone\Jobs\ProcessDataJob;
 use Lintol\Capstone\Events\ResultRetrievedEvent;
 
 class ValidationProcess
@@ -28,6 +30,29 @@ class ValidationProcess
         }
 
         return new self($validation, $session);
+    }
+
+    public static function launch($data)
+    {
+        $profiles = app()->make(Profile::class)->match($data->settings);
+        $profiles->map(function ($profile) use ($data) {
+            $run = app()->make(ValidationRun::class);
+
+            $run->data()->associate($data);
+            $run->profile()->associate($profile);
+            $settings = $data->settings;
+            if (!$run->buildDefinition($settings)) {
+                return null;
+            }
+
+            $run->save();
+
+            return $run;
+        })
+        ->filter()
+        ->each(function ($run) {
+            ProcessDataJob::dispatch($run->id);
+        });
     }
 
     public function make($validationId, ClientSession $session)
