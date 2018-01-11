@@ -26,13 +26,16 @@ if (!env('CAPSTONE_WITHOUT_AUTH', false)) {
 }
 
 Route::group($group, function () {
-    Route::resource('profiles','ProfileController', [
+    Route::resource('profiles', 'ProfileController', [
         'only' => ['index', 'show', 'update', 'store']
     ]);
-    Route::resource('processors','ProcessorController', [
+    Route::resource('processors', 'ProcessorController', [
         'only' => ['index', 'store']
     ]);
-    Route::resource('reports','ReportController', [
+    Route::resource('reports', 'ReportController', [
         'only' => ['index', 'show']
+    ]);
+    Route::resource('data-resources', 'DataController', [
+        'only' => ['index', 'store']
     ]);
 });
