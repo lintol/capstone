@@ -25,7 +25,8 @@ class ProfileController extends Controller
     {
         $profiles = Profile::all();
 
-        return fractal($profiles, $this->transformer)
+        return fractal()
+            ->collection($profiles, $this->transformer, 'profile')
             ->respond();
     }
 
@@ -50,7 +51,8 @@ class ProfileController extends Controller
             abort(400, "Invalid data");
         }
 
-        return fractal($profile, $this->transformer)
+        return fractal()
+            ->item($profile, $this->transformer, 'profile')
             ->respond();
     }
 
@@ -64,7 +66,8 @@ class ProfileController extends Controller
     {
         $profile = Profile::findOrFail($id);
 
-        return fractal($profile, $this->transformer)
+        return fractal()
+            ->item($profile, $this->transformer, 'profile')
             ->respond();
     }
 
@@ -82,7 +85,8 @@ class ProfileController extends Controller
         $profile->description = $request->input('description');
 
         if ($profile->save()) {
-            return fractal($profile, $this->transformer)
+            return fractal()
+                ->item($profile, $this->transformer, 'profile')
                 ->respond();
         }
 

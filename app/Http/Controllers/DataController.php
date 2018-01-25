@@ -27,7 +27,8 @@ class DataController extends Controller
     {
         $data = Data::all();
 
-        return fractal($data, $this->transformer)
+        return fractal()
+            ->item($data, $this->transformer, 'dataResource')
             ->respond();
     }
 
@@ -71,7 +72,8 @@ class DataController extends Controller
         $promise->wait();
 
         if ($data->save()) {
-            return fractal($data, $this->transformer)
+            return fractal()
+                ->item($data, $this->transformer, 'dataResource')
                 ->respond();
         }
 
