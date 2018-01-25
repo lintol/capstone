@@ -26,7 +26,7 @@ class ProcessorController extends Controller
         $processors = Processor::all();
 
         return fractal()
-            ->item($processors, $this->transformer, 'processor')
+            ->collection($processors, $this->transformer, 'processor')
             ->respond();
     }
 
