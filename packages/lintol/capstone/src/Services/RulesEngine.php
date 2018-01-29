@@ -4,21 +4,22 @@ namespace Lintol\Capstone\Services;
 
 use Lintol\Capstone\Services\Rules\FileType;
 use Lintol\Capstone\Services\Rules\NameMatch;
+use Lintol\Capstone\Services\Rules\DataProfileIdMatch;
 
 class RulesEngine
 {
     public static $rules = [
         FileType::class,
-        NameMatch::class
+        NameMatch::class,
+        DataProfileIdMatch::class
     ];
 
     public $ruleObjs = [];
 
     public function __construct()
     {
-        $ruleObjs = [];
         foreach (self::$rules as $rule) {
-            $ruleObjs[$rule] = app()->make($rule);
+            $this->ruleObjs[$rule] = app()->make($rule);
         }
     }
 
@@ -26,8 +27,10 @@ class RulesEngine
     {
         foreach ($this->ruleObjs as $rule) {
             if (!$rule->apply($definition, $rules)) {
+                \Log::info(get_class($rule) . ' failed');
                 return false;
             }
+            \Log::info(get_class($rule) . ' passed');
         }
 
         return true;

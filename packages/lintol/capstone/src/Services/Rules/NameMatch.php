@@ -6,8 +6,8 @@ class NameMatch
 {
     public function apply(array $metadata, array $rules)
     {
-        if (in_array('name', $rules)) {
-            if (in_array('name', $metadata)) {
+        if (array_key_exists('name', $rules)) {
+            if (array_key_exists('name', $metadata)) {
                 return (bool)preg_match($rules['name'], $metadata['name']);
             }
             return false;

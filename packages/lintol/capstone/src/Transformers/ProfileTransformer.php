@@ -7,6 +7,10 @@ use Lintol\Capstone\Models\Profile;
 
 class ProfileTransformer extends Fractal\TransformerAbstract
 {
+    protected $defaultIncludes = [
+        'configurations'
+    ];
+
     public function transform(Profile $profile)
     {
         return [
@@ -17,5 +21,13 @@ class ProfileTransformer extends Fractal\TransformerAbstract
             'creatorId' => $profile->creator_id,
             'uniqueTag' => $profile->unique_tag
         ];
+    }
+
+    public function includeConfigurations(Profile $profile)
+    {
+        return $this->collection(
+            $profile->configurations,
+            new ProcessorConfigurationTransformer
+        );
     }
 }

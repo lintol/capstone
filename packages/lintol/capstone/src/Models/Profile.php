@@ -56,7 +56,10 @@ class Profile extends Model
         $this->rulesService = app()->make(RulesService::class);
 
         return $this->configurations->filter(function ($configuration) use ($definition) {
-            return $this->rulesService->filter($definition, $configuration->rules);
+            $result = $this->rulesService->filter($definition, $configuration->rules);
+            if ($result)
+              \Log::info('Configuration ' . $configuration->id . ' passed');
+            return $result;
         });
     }
 

@@ -6,8 +6,8 @@ class FileType
 {
     public function apply(array $metadata, array $rules)
     {
-        if (in_array('fileType', $rules)) {
-            if (in_array('fileType', $metadata)) {
+        if (array_key_exists('fileType', $rules)) {
+            if (array_key_exists('fileType', $metadata)) {
                 return (bool)preg_match($rules['fileType'], $metadata['fileType']);
             }
             return false;

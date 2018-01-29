@@ -41,13 +41,13 @@ class DataController extends Controller
     {
         $data = app()->make(Data::class);
         $data->settings = [
-            'name' => $data->name
+          'name' => $request->input('uri'),
+          'dataProfileId' => $request->input('profileId')
         ];
         $data->source_uri = $request->input('uri');
 
         $client = new GuzzleHttp\Client();
         $request = new GuzzleHttp\Psr7\Request('GET', $data->source_uri);
-        \Log::info($data);
 
         $promise = $client->sendAsync($request)->then(function ($response) use ($data) {
             $path = basename($data->source_uri);
@@ -55,13 +55,13 @@ class DataController extends Controller
 
             $data->filename = $path;
             $data->name = $path;
-            $data->format = substr($path, strpos('.', $path) - strlen($path) + 1, 3);
+            $pathParts = pathinfo($path);
+            $data->format = $pathParts['extension'];
             $settings = $data->settings;
             $settings['fileType'] = $data->format;
             $data->settings = $settings;
             $data->content = $dData;
             $data->save();
-            \Log::info($data);
 
             ValidationProcess::launch($data);
         }, function ($error) {

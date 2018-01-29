@@ -14,7 +14,6 @@ class UpdateProcessorsFields extends Migration
     public function up()
     {
         Schema::table('processors', function (Blueprint $table) {
-            $table->dropColumn('metadata');
             $table->json('rules')->default('{}');
             $table->json('definition')->default('{}');
             $table->json('configuration_options')->default('{}');
@@ -30,7 +29,6 @@ class UpdateProcessorsFields extends Migration
     public function down()
     {
         Schema::table('processors', function (Blueprint $table) {
-            $table->json('metadata')->default('{}');
             $table->dropColumn('rules');
             $table->dropColumn('definition');
             $table->dropColumn('configuration_options');

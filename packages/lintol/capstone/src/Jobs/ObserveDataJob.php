@@ -72,51 +72,31 @@ class ObserveDataJob implements ShouldQueue
 
         Log::info('Requesting data from ' . $dataUri);
 
+        $data = app()->make(Data::class);
+        $data->name = $dataUri;
+        $data->settings = $settings;
+        $data->source_uri = $dataUri;
+
         $client = new GuzzleHttp\Client();
-        $request = new GuzzleHttp\Psr7\Request('GET', $dataUri);
+        $request = new GuzzleHttp\Psr7\Request('GET', $data->source_uri);
 
-        $promise = $client->sendAsync($request)->then(function ($response) use ($dataUri, $validation) {
-
-            $path = basename($dataUri);
+        $promise = $client->sendAsync($request)->then(function ($response) use ($data) {
+            $path = basename($data->source_uri);
             $dData = $response->getBody();
 
-            $data = App::make(Data::class);
             $data->filename = $path;
+            $data->name = $path;
+            $data->format = $data->settings['fileType'];
             $data->content = $dData;
             $data->save();
 
-            $validation->data()->associate($data);
-            $validation->save();
-
-            $settings = ['fileType' => 'csv', 'name' => 'Goodtables test'];
-            $profiles = App::make(Profile::class)->match($settings);
-            $profiles->map(function ($profile) use ($data, $settings) {
-                $run = App::make(ValidationRun::class);
-
-                $run->profile()->associate($profile);
-                if (!$run->buildDefinition($settings)) {
-                    return null;
-                }
-
-                $run->save();
-
-                $run->data()->associate($data);
-                $run->save();
-
-                return $run;
-            })
-            ->filter()
-            ->each(function ($run) {
-                ProcessDataJob::dispatch($run->id);
-            });
+            return ValidationProcess::launch($data);
         }, function ($error) {
-            throw RuntimeException($error);
+            abort(400, __("Invalid data URI request"));
         });
 
-        Log::info('Requested data');
+        $runs = $promise->wait();
 
-        $promise->wait();
-
-        return $validation->id;
+        return $runs->first()->id;
     }
 }

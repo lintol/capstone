@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Lintol\Capstone\Models\ProcessorConfiguration;
 use Lintol\Capstone\Models\Profile;
 use Lintol\Capstone\Transformers\ProfileTransformer;
+use Lintol\Capstone\Observer\ProcessorConfigurationObserver;
 
 class ProfileController extends Controller
 {
@@ -48,6 +50,21 @@ class ProfileController extends Controller
 
         if (!$profile->save()) {
             abort(400, "Invalid data");
+        }
+
+        if ($request->input('configurations')) {
+          foreach ($request->input('configurations') as $configurationObj) {
+            $configuration = new ProcessorConfiguration;
+            $configuration->processor_id = $configurationObj['attributes']['processor']['id'];
+            $configuration->profile_id = $profile->id;
+
+            // TODO: return to observer
+            $configuration->rules = $configuration->processor->rules;
+            $configuration->definition = $configuration->processor->definition;
+
+            $configuration->save();
+            \Log::info('sent');
+          }
         }
 
         return fractal($profile, $this->transformer)

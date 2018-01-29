@@ -28,7 +28,7 @@ class ProcessorsTableSeeder extends Seeder
             'description' => 'ODI tool to processes tabular data',
             'module' => 'cl',
             'content' => '',
-            'rules' => ['name' => '/[Ll]int/', 'fileType' => 'csv'],
+            'rules' => ['fileType' => '/csv/'],
             'definition' => [
                 'docker' => [
                     'image' => 'lintol/ds-csvlint',
@@ -47,7 +47,7 @@ class ProcessorsTableSeeder extends Seeder
             'description' => 'CSV checking tool from Frictionless Data project',
             'module' => 'good',
             'content' => File::get($processorsPath . 'goodtables/good.py'),
-            'rules' => ['name' => '/[Gg]ood[Tt]ables/', 'fileType' => 'csv'],
+            'rules' => ['fileType' => '/csv/'],
             'definition' => [
                 'docker' => [
                     'image' => 'lintol/doorstep',
@@ -66,7 +66,7 @@ class ProcessorsTableSeeder extends Seeder
             'description' => 'Tool for searching for Personally-Identifiable Information within CSV data',
             'module' => 'pii',
             'content' => File::get($processorsPath . 'pii/pii.py'),
-            'rules' => ['name' => '/PII/', 'fileType' => 'csv'],
+            'rules' => ['fileType' => '/csv/'],
             'definition' => [
                 'docker' => [
                     'image' => 'lintol/doorstep',
@@ -85,7 +85,7 @@ class ProcessorsTableSeeder extends Seeder
             'description' => 'GeoJSON boundary checker to make sure data is within given boundaries',
             'module' => 'boundary_checker',
             'content' => File::get($processorsPath . 'boundary_checker.py'),
-            'rules' => ['name' => '/[Bb]oundar/', 'fileType' => 'csv'],
+            'rules' => ['fileType' => '/csv/'],
             'definition' => [
                 'docker' => [
                     'image' => 'lintol/doorstep',
@@ -104,7 +104,7 @@ class ProcessorsTableSeeder extends Seeder
             'description' => 'Check that CSV data about countries matches gov.uk register entries',
             'module' => 'registers',
             'content' => File::get($processorsPath . 'registers.py'),
-            'rules' => ['name' => '/[Cc]ountr/', 'fileType' => 'csv'],
+            'rules' => ['fileType' => '/csv/'],
             'definition' => [
                 'docker' => [
                     'image' => 'lintol/doorstep',

@@ -15,3 +15,4 @@ infrastructure
 /resources/capstone
 *SFConflict*
 ~
+/storage/db

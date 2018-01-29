@@ -25,7 +25,11 @@ class RulesService
     {
         return $profiles
             ->map(function ($profile) use ($definition) {
-                if ($this->filter($definition, $profile->rules)) {
+                $rules = $profile->rules;
+                $rules['dataProfileId'] = $profile->id;
+
+                if ($this->filter($definition, $rules)) {
+                    \Log::info('Profile ' . $profile->id . ' passed');
                     return $profile;
                 }
                 return null;

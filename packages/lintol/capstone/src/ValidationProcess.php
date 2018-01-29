@@ -35,7 +35,7 @@ class ValidationProcess
     public static function launch($data)
     {
         $profiles = app()->make(Profile::class)->match($data->settings);
-        $profiles->map(function ($profile) use ($data) {
+        $runs = $profiles->map(function ($profile) use ($data) {
             $run = app()->make(ValidationRun::class);
 
             $run->data()->associate($data);
@@ -49,10 +49,12 @@ class ValidationProcess
 
             return $run;
         })
-        ->filter()
-        ->each(function ($run) {
+        ->filter();
+
+        $runs->each(function ($run) {
             ProcessDataJob::dispatch($run->id);
         });
+        return $runs;
     }
 
     public function make($validationId, ClientSession $session)
