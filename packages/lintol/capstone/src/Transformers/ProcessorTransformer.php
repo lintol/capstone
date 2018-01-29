@@ -15,8 +15,7 @@ class ProcessorTransformer extends Fractal\TransformerAbstract
             'description' => $processor->description,
             'creatorId' => $processor->creator_id,
             'uniqueTag' => $processor->unique_tag,
-            'module' => $processor->module,
-            'content' => $processor->content
+            'module' => $processor->module
         ];
     }
 }

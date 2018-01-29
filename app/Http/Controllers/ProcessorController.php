@@ -25,7 +25,8 @@ class ProcessorController extends Controller
     {
         $processors = Processor::all();
 
-        return fractal($processors, $this->transformer)
+        return fractal()
+            ->collection($processors, $this->transformer, 'processor')
             ->respond();
     }
 
@@ -49,7 +50,8 @@ class ProcessorController extends Controller
         $processor->unique_tag = $request->input('uniqueTag');
 
         if ($processor->save()) {
-            return fractal($processor, $this->transformer)
+            return fractal()
+                ->item($processor, $this->transformer, 'processor')
                 ->respond();
         }
 
