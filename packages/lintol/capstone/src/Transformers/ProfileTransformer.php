@@ -27,7 +27,8 @@ class ProfileTransformer extends Fractal\TransformerAbstract
     {
         return $this->collection(
             $profile->configurations,
-            new ProcessorConfigurationTransformer
+            new ProcessorConfigurationTransformer,
+            'processorConfigurations'
         );
     }
 }

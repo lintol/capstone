@@ -26,7 +26,7 @@ class ReportController extends Controller
         $reports = Report::all(); 
 
         return fractal()
-            ->collection($reports, $this->transformer, 'report')
+            ->collection($reports, $this->transformer, 'reports')
             ->respond();
     }
 
@@ -41,7 +41,7 @@ class ReportController extends Controller
         $report = Report::findOrFail($id);
 
         return fractal()
-            ->item($report, $this->transformer, 'report')
+            ->item($report, $this->transformer, 'reports')
             ->respond();
     }
 }

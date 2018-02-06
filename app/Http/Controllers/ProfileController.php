@@ -28,7 +28,7 @@ class ProfileController extends Controller
         $profiles = Profile::all();
 
         return fractal()
-            ->collection($profiles, $this->transformer, 'profile')
+            ->collection($profiles, $this->transformer, 'profiles')
             ->respond();
     }
 
@@ -69,7 +69,7 @@ class ProfileController extends Controller
         }
 
         return fractal()
-            ->item($profile, $this->transformer, 'profile')
+            ->item($profile, $this->transformer, 'profiles')
             ->respond();
     }
 
@@ -84,7 +84,7 @@ class ProfileController extends Controller
         $profile = Profile::findOrFail($id);
 
         return fractal()
-            ->item($profile, $this->transformer, 'profile')
+            ->item($profile, $this->transformer, 'profiles')
             ->respond();
     }
 
@@ -103,7 +103,7 @@ class ProfileController extends Controller
 
         if ($profile->save()) {
             return fractal()
-                ->item($profile, $this->transformer, 'profile')
+                ->item($profile, $this->transformer, 'profiles')
                 ->respond();
         }
 

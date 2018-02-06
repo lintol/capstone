@@ -21,6 +21,6 @@ class ProcessorConfigurationTransformer extends Fractal\TransformerAbstract
 
     public function includeProcessor(ProcessorConfiguration $configuration)
     {
-        return $this->item($configuration->processor, new ProcessorTransformer);
+        return $this->item($configuration->processor, new ProcessorTransformer, 'processors');
     }
 }
