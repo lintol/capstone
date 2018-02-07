@@ -10,11 +10,16 @@ Feature: Lintol Capstone API
     And its properties will be:
     """JSON
     {
-      "creatorId": {KNOWN_ID:User},
-      "version": "2",
-      "name": "My Profil",
-      "description": "Foo Profil",
-      "uniqueTag": "fdsa"
+      "data": {
+        "id": "asdf",
+        "type": "foobars",
+        "attributes": {
+          "version": "2",
+          "name": "My Profil",
+          "description": "Foo Profil",
+          "uniqueTag": "fdsa"
+        }
+      }
     }
     """
     When I send a request
@@ -24,7 +29,6 @@ Feature: Lintol Capstone API
     """JSON
     {
       "attributes": {
-        "creatorId": {KNOWN_ID:User},
         "version": "2",
         "name": "My Profil",
         "description": "Foo Profil",

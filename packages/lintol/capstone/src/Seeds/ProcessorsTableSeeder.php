@@ -29,6 +29,23 @@ class ProcessorsTableSeeder extends Seeder
             'module' => 'cl',
             'content' => '',
             'rules' => ['fileType' => '/csv/'],
+            'configuration_defaults' => json_encode([
+                'delimiter' => 'comma'
+            ]),
+            'configuration_options' => json_encode([
+                'fields' => [
+                    [
+                      'type' => 'select',
+                      'label' => 'Delimiter',
+                      'model' => 'delimiter',
+                      'required' => true,
+                      'values' => [
+                        [ 'id' => 'comma', 'name' => 'Comma' ],
+                        [ 'id' => 'tab', 'name' => 'Tab'  ]
+                      ]
+                    ]
+                ]
+            ]),
             'definition' => [
                 'docker' => [
                     'image' => 'lintol/ds-csvlint',
@@ -48,6 +65,23 @@ class ProcessorsTableSeeder extends Seeder
             'module' => 'good',
             'content' => File::get($processorsPath . 'goodtables/good.py'),
             'rules' => ['fileType' => '/csv/'],
+            'configuration_defaults' => json_encode([
+                'delimiter' => 'comma'
+            ]),
+            'configuration_options' => json_encode([
+                'fields' => [
+                    [
+                      'type' => 'select',
+                      'label' => 'Delimiter',
+                      'model' => 'delimiter',
+                      'required' => true,
+                      'values' => [
+                        [ 'id' => 'comma', 'name' => 'Comma' ],
+                        [ 'id' => 'tab', 'name' => 'Tab'  ]
+                      ]
+                    ]
+                ]
+            ]),
             'definition' => [
                 'docker' => [
                     'image' => 'lintol/doorstep',
@@ -81,17 +115,35 @@ class ProcessorsTableSeeder extends Seeder
             'unique_tag' => 'lintol/ds-boundary-checker-py:1',
         ]);
         $processor->fill([
-            'name' => 'Boundary Checker',
+            'name' => 'Boundary Checker (impr)',
             'description' => 'GeoJSON boundary checker to make sure data is within given boundaries',
-            'module' => 'boundary_checker',
-            'content' => File::get($processorsPath . 'boundary_checker.py'),
+            'module' => 'boundary_checker_impr',
+            'content' => File::get($processorsPath . 'boundary_checker_impr.py'),
             'rules' => ['fileType' => '/csv/'],
             'definition' => [
                 'docker' => [
                     'image' => 'lintol/doorstep',
                     'revision' => 'latest'
                 ]
-            ]
+            ],
+            'configuration_defaults' => json_encode([
+                'boundary' => 'GB-FMO'
+            ]),
+            'configuration_options' => json_encode([
+                'fields' => [
+                    [
+                      'type' => 'select',
+                      'label' => 'Boundary',
+                      'model' => 'boundary',
+                      'required' => true,
+                      'values' => [
+                        [ 'id' => 'GB-NIR', 'name' => 'Northern Ireland' ],
+                        [ 'id' => 'GB-NIR:City:Belfast', 'name' => 'Belfast'  ],
+                        [ 'id' => 'GB-FMO', 'name' => 'Fermanagh & Omagh' ]
+                      ]
+                    ]
+                ]
+            ])
         ]);
         $processor->creator()->associate($dataOwner);
         $processor->save();

@@ -28,6 +28,11 @@ class Profile extends Model
         return $this->hasMany(ProcessorConfiguration::class);
     }
 
+    public function filters()
+    {
+        return [];
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class);
@@ -36,6 +41,11 @@ class Profile extends Model
     public function runs()
     {
         return $this->hasMany(ValidationRun::class);
+    }
+
+    public static function rules()
+    {
+        return [];
     }
 
     public function match($definition)
@@ -57,8 +67,6 @@ class Profile extends Model
 
         return $this->configurations->filter(function ($configuration) use ($definition) {
             $result = $this->rulesService->filter($definition, $configuration->rules);
-            if ($result)
-              \Log::info('Configuration ' . $configuration->id . ' passed');
             return $result;
         });
     }

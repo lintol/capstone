@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use DB;
 use Illuminate\Http\Request;
 use Lintol\Capstone\Models\ProcessorConfiguration;
 use Lintol\Capstone\Models\Profile;
@@ -40,32 +41,27 @@ class ProfileController extends Controller
      */
     public function store(Request $request)
     {
-        $profile = new Profile;
+        // $this->authorize('create', Profile::class);
 
-        $profile->name = $request->input('name');
-        $profile->version = $request->input('version');
-        $profile->creator_id = $request->input('creatorId');
-        $profile->description = $request->input('description');
-        $profile->version = $request->input('version');
-        $profile->unique_tag = $request->input('uniqueTag');
+        $input = $request->json()->all();
 
-        if (!$profile->save()) {
-            abort(400, "Invalid data");
-        }
+        $profile = $this->transformer->parse($input);
 
-        if ($request->input('configurations')) {
-          foreach ($request->input('configurations') as $configurationObj) {
-            $configuration = new ProcessorConfiguration;
-            $configuration->processor_id = $configurationObj['attributes']['processor']['id'];
-            $configuration->profile_id = $profile->id;
+        DB::beginTransaction();
 
-            // TODO: return to observer
-            $configuration->rules = $configuration->processor->rules;
-            $configuration->definition = $configuration->processor->definition;
+        try {
+            if (!$profile->save()) {
+                abort(400, "Invalid profile data");
+            }
 
-            $configuration->save();
-            \Log::info('sent');
-          }
+            if (!$profile->configurations()->saveMany($profile->configurations)) {
+                abort(400, "Invalid configuration data");
+            }
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollback();
+            throw $e;
         }
 
         return fractal()
@@ -98,10 +94,12 @@ class ProfileController extends Controller
     public function update(Request $request, $id)
     {
         $profile = Profile::findOrFail($id);
-        $profile->name = $request->input('name');
-        $profile->description = $request->input('description');
 
-        if ($profile->save()) {
+        $input = $request->json()->all();
+
+        $profile = $this->transformer->parse($input, $profile);
+
+        if ($profile->push()) {
             return fractal()
                 ->item($profile, $this->transformer, 'profiles')
                 ->respond();

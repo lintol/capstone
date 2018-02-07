@@ -7,6 +7,7 @@ default:
         apiPrefix: api/v1.0
         modelPrefix: Lintol\Capstone\Models\
         userModel: App\User
+        useJsonTypeForForms: true
     Behat\MinkExtension\ServiceContainer\MinkExtension:
       default_session: laravel
       laravel: ~

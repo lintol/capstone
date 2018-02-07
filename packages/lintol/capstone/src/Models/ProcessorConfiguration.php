@@ -11,7 +11,6 @@ class ProcessorConfiguration extends Model
     use UuidModelTrait;
 
     protected $casts = [
-        'user_configuration_storage' => 'json',
         'definition' => 'json',
         'configuration' => 'json',
         'rules' => 'json'
@@ -19,10 +18,21 @@ class ProcessorConfiguration extends Model
 
     protected $fillable = [
          'user_configuration_storage',
+         'processor_id',
          'configuration',
          'definition',
          'rules'
     ];
+
+    public function filters()
+    {
+        return [];
+    }
+
+    public function rules()
+    {
+        return [];
+    }
 
     public function processor()
     {
@@ -36,6 +46,8 @@ class ProcessorConfiguration extends Model
 
     public function buildDefinition()
     {
+        $this->configuration = json_decode($this->user_configuration_storage);
+
         return [
             'configuration' => $this->configuration,
             'definition' => $this->definition

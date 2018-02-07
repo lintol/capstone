@@ -13,10 +13,14 @@
         "laravel/framework": "5.5.*",
         "laravel/passport": "^4.0",
         "laravel/tinker": "~1.0",
+        "php-http/guzzle6-adapter": "^1.1",
         "predis/predis": "^1.1",
         "spatie/laravel-fractal": "^5.3",
         "spatie/laravel-permission": "^2.7",
-        "voryx/thruway": "^0.5.0"
+        "thruway/pawl-transport": "^0.5.0",
+        "voryx/thruway": "^0.5.0",
+        "waavi/sanitizer": "^1.0",
+        "woohoolabs/yang": "^1.2"
     },
     "require-dev": {
         "behat/behat": "^3.3",

@@ -2,11 +2,33 @@
 
 namespace Lintol\Capstone\Transformers;
 
+use App;
+use Exception;
 use League\Fractal;
 use Lintol\Capstone\Models\Profile;
 
-class ProfileTransformer extends Fractal\TransformerAbstract
+class ProfileTransformer extends Transformer
 {
+    public static function inputMapping()
+    {
+        return [
+            'name' => 'name',
+            'description' => 'description',
+            'version' => 'version',
+            'uniqueTag' => 'unique_tag',
+            'rules' => 'rules'
+        ];
+    }
+
+    public static function sideMapping()
+    {
+        return [
+            'configurations' => 'configurations'
+        ];
+    }
+
+    protected static $model = 'profiles';
+
     protected $defaultIncludes = [
         'configurations'
     ];

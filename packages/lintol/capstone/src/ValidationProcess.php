@@ -107,6 +107,7 @@ class ValidationProcess
         $processor = $configuration->processor;
         $definition = $this->run->doorstep_definition;
 
+        \Log::info($definition);
         $future = $this->session->call(
             $this->makeUri(
                 'processor.post',
