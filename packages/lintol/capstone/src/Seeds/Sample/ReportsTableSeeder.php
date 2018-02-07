@@ -166,14 +166,55 @@ class ReportsTableSeeder extends Seeder
         $report->save();
 
         $report = Report::firstOrNew([
-            'name' => 'Data Profile Name [test3]',
+            'name' => 'Data Profile Name [Map]',
         ]);
         $report->fill([
             'errors' => '7',
             'warnings' => '44',
             'passes' => '3',
             'quality_score' => '30',
-            'content' => []
+            'content' => '{
+               "table-count" : 1,
+               "warnings" : [],
+               "error-count" : 1,
+              "supplementary": [
+                 {
+                    "type" : "boundary",
+                    "source" : "http://github.com/lintol/boundaries-library/raw/osni-northern-ireland-lowres.geojson",
+                    "name" : "OSNI Northern Ireland Boundary",
+                    "encoding" : "utf-8"
+                 }
+              ],
+               "tables" : [
+                  {
+                     "schema" : null,
+                     "time" : 0.032,
+                     "source" : "data/awful.geojson",
+                     "encoding" : "utf-8",
+                     "scheme" : "file",
+                     "errors" : [
+                        {
+                           "processor": "boundary-checker-geojson",
+                           "code" : "boundary-failed",
+                           "message" : "Header in column 4 is duplicated to header in column(s) 2",
+                           "item-index" : 15
+                        }
+                     ],
+                     "format" : "geojson",
+                     "row-count" : 5,
+                     "valid" : false,
+                     "headers" : [
+                        "ID",
+                        "Location",
+                        "Name"
+                     ],
+                     "error-count" : 1
+                  }
+               ],
+               "preset" : "geojson",
+               "valid" : false,
+               "time" : 0.035
+            }'
         ]);
         $report->owner()->associate($dataOwner);
         $report->save();
