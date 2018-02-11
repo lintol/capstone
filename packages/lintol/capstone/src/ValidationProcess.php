@@ -42,11 +42,13 @@ class ValidationProcess
             $run->profile()->associate($profile);
             $settings = $data->settings;
             if (!$run->buildDefinition($settings)) {
+                \Log::info(__("Definition not built"));
                 return null;
             }
 
             $run->save();
 
+            \Log::info(__("Definition built"));
             return $run;
         })
         ->filter();
@@ -107,7 +109,6 @@ class ValidationProcess
         $processor = $configuration->processor;
         $definition = $this->run->doorstep_definition;
 
-        \Log::info($definition);
         $future = $this->session->call(
             $this->makeUri(
                 'processor.post',
@@ -115,9 +116,8 @@ class ValidationProcess
             ),
             [
                 $this->run->doorstep_session_id,
-                $processor->module,
-                $processor->content,
-                $configuration->definition
+                [$processor->module => $processor->content],
+                $definition
             ]
         );
 

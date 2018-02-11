@@ -39,6 +39,7 @@ class ValidationRun extends Model
         $definitions = $this->profile->buildDefinitions($settings);
 
         if (!$definitions) {
+            \Log::info(__("No profile definition"));
             return false;
         }
 

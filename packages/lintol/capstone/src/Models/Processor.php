@@ -12,7 +12,8 @@ class Processor extends Model
 
     protected $casts = [
         'rules' => 'json',
-        'definition' => 'json'
+        'definition' => 'json',
+        'supplementary_links' => 'json'
     ];
 
     protected $fillable = [
@@ -23,6 +24,7 @@ class Processor extends Model
          'content',
          'rules',
          'definition',
+         'supplementary_links',
          'configuration_options',
          'configuration_defaults'
     ];

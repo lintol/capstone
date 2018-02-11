@@ -26,7 +26,7 @@ class ProcessorsTableSeeder extends Seeder
         $processor->fill([
             'name' => 'CSV Checking by CSVLint',
             'description' => 'ODI tool to processes tabular data',
-            'module' => 'cl',
+            'module' => 'cl.py',
             'content' => '',
             'rules' => ['fileType' => '/csv/'],
             'configuration_defaults' => json_encode([
@@ -62,7 +62,7 @@ class ProcessorsTableSeeder extends Seeder
         $processor->fill([
             'name' => 'CSV Checking by GoodTables',
             'description' => 'CSV checking tool from Frictionless Data project',
-            'module' => 'good',
+            'module' => 'good.py',
             'content' => File::get($processorsPath . 'goodtables/good.py'),
             'rules' => ['fileType' => '/csv/'],
             'configuration_defaults' => json_encode([
@@ -98,7 +98,7 @@ class ProcessorsTableSeeder extends Seeder
         $processor->fill([
             'name' => 'Personally-Identifiable Information Spotter',
             'description' => 'Tool for searching for Personally-Identifiable Information within CSV data',
-            'module' => 'pii',
+            'module' => 'pii.py',
             'content' => File::get($processorsPath . 'pii/pii.py'),
             'rules' => ['fileType' => '/csv/'],
             'definition' => [
@@ -117,7 +117,7 @@ class ProcessorsTableSeeder extends Seeder
         $processor->fill([
             'name' => 'Boundary Checker (impr)',
             'description' => 'GeoJSON boundary checker to make sure data is within given boundaries',
-            'module' => 'boundary_checker_impr',
+            'module' => 'boundary_checker_impr.py',
             'content' => File::get($processorsPath . 'boundary_checker_impr.py'),
             'rules' => ['fileType' => '/csv/'],
             'definition' => [
@@ -126,8 +126,14 @@ class ProcessorsTableSeeder extends Seeder
                     'revision' => 'latest'
                 ]
             ],
+            'supplementary_links' => [
+              'GB-NIR' => 'https://raw.githubusercontent.com/lintol/doorstep/master/example/data/osni-ni-outline-lowres.geojson',
+              'GB-NIR:Settlement:Belfast' => 'https://raw.githubusercontent.com/lintol/doorstep/master/example/data/settlement-boundaries/belfast-settlement-development.geojson',
+              'GB-NIR:Settlement:Strabane' => 'https://raw.githubusercontent.com/lintol/doorstep/master/example/data/settlement-boundaries/strabane-settlement-development.geojson',
+              'GB-NIR:Settlement:Enniskillen' => 'https://raw.githubusercontent.com/lintol/doorstep/master/example/data/settlement-boundaries/enniskillen-settlement-development.geojson'
+            ],
             'configuration_defaults' => json_encode([
-                'boundary' => 'GB-FMO'
+                'boundary' => '$GB-FMO'
             ]),
             'configuration_options' => json_encode([
                 'fields' => [
@@ -137,9 +143,10 @@ class ProcessorsTableSeeder extends Seeder
                       'model' => 'boundary',
                       'required' => true,
                       'values' => [
-                        [ 'id' => 'GB-NIR', 'name' => 'Northern Ireland' ],
-                        [ 'id' => 'GB-NIR:City:Belfast', 'name' => 'Belfast'  ],
-                        [ 'id' => 'GB-FMO', 'name' => 'Fermanagh & Omagh' ]
+                        [ 'id' => '$->GB-NIR', 'name' => 'Northern Ireland' ],
+                        [ 'id' => '$->GB-NIR:Settlement:Belfast', 'name' => 'Belfast'  ],
+                        [ 'id' => '$->GB-NIR:Settlement:Enniskillen', 'name' => 'Enniskillen'  ],
+                        [ 'id' => '$->GB-NIR:Settlement:Strabane', 'name' => 'Strabane'  ],
                       ]
                     ]
                 ]
@@ -154,7 +161,7 @@ class ProcessorsTableSeeder extends Seeder
         $processor->fill([
             'name' => 'gov.uk Register Checker - Countries',
             'description' => 'Check that CSV data about countries matches gov.uk register entries',
-            'module' => 'registers',
+            'module' => 'registers.py',
             'content' => File::get($processorsPath . 'registers.py'),
             'rules' => ['fileType' => '/csv/'],
             'definition' => [
