@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         /* Sample Data */ 
         $this->call(Lintol\Capstone\Seeds\Sample\ProfilesTableSeeder::class);
         $this->call(Lintol\Capstone\Seeds\Sample\ReportsTableSeeder::class);
+        $this->call(Lintol\Capstone\Seeds\Sample\DataResourceSeeder::class);
         $this->command->info("Sample Data Seeded");
         
     }

@@ -35,7 +35,7 @@ Route::group($group, function () {
     Route::resource('reports', 'ReportController', [
         'only' => ['index', 'show']
     ]);
-    Route::resource('dataResources', 'DataController', [
+    Route::resource('dataResources', 'DataResourceController', [
         'only' => ['index', 'store']
     ]);
 });
