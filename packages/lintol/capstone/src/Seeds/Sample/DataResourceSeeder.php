@@ -20,7 +20,7 @@ class DataResourceSeeder extends Seeder
             'filename' => 'waste-sites.geojson',
             'url' => 'https://www.opendatani.gov.uk/dataset/4c9ae0a2-0238-459e-8b4d-1172bec9dc3c/resource/51556b4d-85bd-4625-936d-840724f3a877/download/waste-sites.geojson',
             'filetype' => 'geojson',
-            'status' => 'profile run',
+            'status' => 'report run',
             'stored' => 'CKAN',
             'reportid' => ''
         ]);
@@ -30,7 +30,7 @@ class DataResourceSeeder extends Seeder
             'filename' => 'noids-2017-18-wk-52.csv',
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
-            'status' => 'profile run',
+            'status' => 'report run',
             'stored' => 'External Link',
             'reportid' => ''
         ]);
@@ -46,7 +46,7 @@ class DataResourceSeeder extends Seeder
             'filename' => 'noids-2017-18-wk-51.csv',
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
-            'status' => 'profile run',
+            'status' => 'archived',
             'stored' => 'External Link',
             'reportid' => ''
         ]);
@@ -56,7 +56,7 @@ class DataResourceSeeder extends Seeder
             'filename' => 'noids-2017-18-wk-50.csv',
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
-            'status' => 'not run',
+            'status' => 'invalid link',
             'stored' => 'External Link',
             'reportid' => ''
         ]);
@@ -65,7 +65,7 @@ class DataResourceSeeder extends Seeder
             'filename' => 'noids-2017-18-wk-49.csv',
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
-            'status' => 'profile run',
+            'status' => 'valid link',
             'stored' => 'External Link',
             'reportid' => ''
         ]);
@@ -74,7 +74,7 @@ class DataResourceSeeder extends Seeder
             'filename' => 'noids-2017-18-wk-48.csv',
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
-            'status' => 'not run',
+            'status' => 'report run',
             'stored' => 'External Link',
             'reportid' => ''
         ]);
@@ -83,7 +83,7 @@ class DataResourceSeeder extends Seeder
             'filename' => 'noids-2017-18-wk-47.csv',
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
-            'status' => 'profile run',
+            'status' => 'valid link',
             'stored' => 'External Link',
             'reportid' => ''
         ]);
@@ -92,7 +92,7 @@ class DataResourceSeeder extends Seeder
             'filename' => 'noids-2017-18-wk-46.csv',
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
-            'status' => 'profile run',
+            'status' => 'valid link',
             'stored' => 'External Link',
             'reportid' => ''
         ]);
@@ -101,7 +101,7 @@ class DataResourceSeeder extends Seeder
             'filename' => 'noids-2017-18-wk-45.csv',
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
-            'status' => 'not run',
+            'status' => 'valid link',
             'stored' => 'External Link',
             'reportid' => ''
         ]);
