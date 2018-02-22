@@ -25,6 +25,7 @@ class CreateReportsTable extends Migration
 
             $table->json('content');
 
+            $table->text('profile');
             $table->integer('errors');
             $table->integer('warnings');
             $table->integer('passes');

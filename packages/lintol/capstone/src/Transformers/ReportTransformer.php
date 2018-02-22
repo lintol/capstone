@@ -12,11 +12,14 @@ class ReportTransformer extends Fractal\TransformerAbstract
         return [
             'id' => $report->id,
             'name' => $report->name,
+            'profile' => $report->profile,
             'errors' => $report->errors,
             'warnings' => $report->warnings,
             'passes' => $report->passes,
             'qualityScore' => $report->quality_score,
-            'content' => $report->content
+            'content' => $report->content,
+            'user' => $report->owner_id,
+            'createdAt' => $report->created_at
         ];
     }
 }
