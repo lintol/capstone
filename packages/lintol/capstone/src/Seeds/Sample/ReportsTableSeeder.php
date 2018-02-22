@@ -21,6 +21,7 @@ class ReportsTableSeeder extends Seeder
             'name' => 'Data Profile Name [test1]',
         ]);
         $report->fill([
+            'profile' => 'CSV Profile',
             'errors' => '7',
             'warnings' => '44',
             'passes' => '44',
@@ -95,6 +96,7 @@ class ReportsTableSeeder extends Seeder
             'name' => 'Data Profile Name [test2]',
         ]);
         $report->fill([
+            'profile' => 'CSV Profile',
             'errors' => '7',
             'warnings' => '44',
             'passes' => '10',
@@ -169,6 +171,7 @@ class ReportsTableSeeder extends Seeder
             'name' => 'Data Profile Name [Map]',
         ]);
         $report->fill([
+            'profile' => 'CSV Profile',
             'errors' => '7',
             'warnings' => '44',
             'passes' => '3',
@@ -223,6 +226,7 @@ class ReportsTableSeeder extends Seeder
             'name' => 'Data Profile Name [test4]',
         ]);
         $report->fill([
+            'profile' => 'JSON Profile',
             'errors' => '50',
             'warnings' => '44',
             'passes' => '0',
@@ -236,6 +240,7 @@ class ReportsTableSeeder extends Seeder
             'name' => 'Data Profile Name [test5]',
         ]);
         $report->fill([
+            'profile' => 'JSON Profile',
             'errors' => '7',
             'warnings' => '40',
             'passes' => '1',
