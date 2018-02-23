@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Lintol\Capstone\Models\DataResource;
 use Illuminate\Http\Request;
 use Lintol\Capstone\Transformers\DataResourceTransformer;
+use Illuminate\Support\Facades\Log;
 
 class DataResourceController extends Controller
 {
@@ -21,8 +22,10 @@ class DataResourceController extends Controller
     public function index()
     {
         //
-        $data = DataResource::all();
-
+        $data = DataResource::paginate(25);
+        $data->setPath('/dataResources/');
+        
+        
         return fractal()
             ->collection($data, $this->transformer, 'dataResources')
             ->respond();
@@ -47,6 +50,22 @@ class DataResourceController extends Controller
     public function store(Request $request)
     {
         //
+        Log::info('This is some useful information.');
+        Log::info($request);
+        $dataResource = new DataResource;
+        $dataResource->filename = $request->filename;
+        $dataResource->stored = $request->stored;
+        $dataResource->url = $request->url;
+        $dataResource->filetype = $request->filetype;
+        $dataResource->user = $request->user;
+        Log::info('');
+     
+        if ($dataResource->save()) {
+            return fractal()
+                ->item($dataResource,$this->transformer)
+                ->respond();
+        }
+        
     }
 
     /**

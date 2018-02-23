@@ -14,6 +14,7 @@ class DataResource extends Model
          'filetype',
          'status',
          'stored',
+         'user',
          'reportid'
     ];
 
