@@ -22,7 +22,8 @@ class DataResourceSeeder extends Seeder
             'filetype' => 'geojson',
             'status' => 'report run',
             'stored' => 'CKAN',
-            'reportid' => ''
+            'reportid' => '',
+            'user' => 'martin'
         ]);
         $dataResource->save();
 
@@ -32,7 +33,8 @@ class DataResourceSeeder extends Seeder
             'filetype' => 'csv',
             'status' => 'report run',
             'stored' => 'External Link',
-            'reportid' => ''
+            'reportid' => '',
+            'user' => 'martin'
         ]);
         /* $profile = Profile::firstOrNew([
             'name' => 'csv profile [test]',
@@ -48,7 +50,8 @@ class DataResourceSeeder extends Seeder
             'filetype' => 'csv',
             'status' => 'archived',
             'stored' => 'External Link',
-            'reportid' => ''
+            'reportid' => '',
+            'user' => 'martin'
         ]);
         $dataResource->save();
 
@@ -58,7 +61,8 @@ class DataResourceSeeder extends Seeder
             'filetype' => 'csv',
             'status' => 'invalid link',
             'stored' => 'External Link',
-            'reportid' => ''
+            'reportid' => '',
+            'user' => 'martin'
         ]);
         $dataResource->save();
         $dataResource = DataResource::firstOrNew([
@@ -67,7 +71,8 @@ class DataResourceSeeder extends Seeder
             'filetype' => 'csv',
             'status' => 'valid link',
             'stored' => 'External Link',
-            'reportid' => ''
+            'reportid' => '',
+            'user' => 'martin'
         ]);
         $dataResource->save();
         $dataResource = DataResource::firstOrNew([
@@ -76,7 +81,8 @@ class DataResourceSeeder extends Seeder
             'filetype' => 'csv',
             'status' => 'report run',
             'stored' => 'External Link',
-            'reportid' => ''
+            'reportid' => '',
+            'user' => 'martin'
         ]);
         $dataResource->save();
         $dataResource = DataResource::firstOrNew([
@@ -85,7 +91,8 @@ class DataResourceSeeder extends Seeder
             'filetype' => 'csv',
             'status' => 'valid link',
             'stored' => 'External Link',
-            'reportid' => ''
+            'reportid' => '',
+            'user' => 'martin'
         ]);
         $dataResource->save();
         $dataResource = DataResource::firstOrNew([
@@ -94,7 +101,8 @@ class DataResourceSeeder extends Seeder
             'filetype' => 'csv',
             'status' => 'valid link',
             'stored' => 'External Link',
-            'reportid' => ''
+            'reportid' => '',
+            'user' => 'martin'
         ]);
         $dataResource->save();
         $dataResource = DataResource::firstOrNew([
@@ -103,7 +111,8 @@ class DataResourceSeeder extends Seeder
             'filetype' => 'csv',
             'status' => 'valid link',
             'stored' => 'External Link',
-            'reportid' => ''
+            'reportid' => '',
+            'user' => 'martin'
         ]);
         $dataResource->save();
     }

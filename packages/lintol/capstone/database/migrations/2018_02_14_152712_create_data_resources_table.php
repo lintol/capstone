@@ -18,9 +18,10 @@ class CreateDataResourcesTable extends Migration
             $table->string('filename');
             $table->string('url');
             $table->string('filetype');
-            $table->string('status');
+            $table->string('status')->default('new resource');
             $table->string('stored');
-            $table->string('reportid');
+            $table->string('reportid')->nullable($value = true);
+            $table->string('user');
             $table->timestamps();
         });
     }

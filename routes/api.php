@@ -38,4 +38,7 @@ Route::group($group, function () {
     Route::resource('dataResources', 'DataResourceController', [
         'only' => ['index', 'store']
     ]);
+    /* Route::get('dataResources', function () {
+      return Lintol\Capstone\Models\DataResource::paginate();
+    }); */
 });
