@@ -36,7 +36,7 @@ Route::group($group, function () {
         'only' => ['index', 'show']
     ]);
     Route::resource('dataResources', 'DataResourceController', [
-        'only' => ['index', 'store', 'update']
+        'only' => ['index', 'store', 'update', 'destroy']
     ]);
     /* Will enable when pagination in the front end is working 
     Route::get('dataResources', function () {

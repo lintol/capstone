@@ -55,7 +55,6 @@ class DataResourceController extends Controller
         $dataResource->url = $request->url;
         $dataResource->filetype = $request->filetype;
         $dataResource->user = $request->user;
-        Log::info('');
      
         if ($dataResource->save()) {
             return fractal()
@@ -97,7 +96,7 @@ class DataResourceController extends Controller
     public function update(Request $request, DataResource $dataResource)
     {
         //
-        $dataResource2 = Employee::findOrFail($dataResource->id);
+        $dataResource2 = DataResource::findOrFail($dataResource->id);
         $dataResource2->archived = $dataResource->archived;
         $dataResource2->save();
      
@@ -112,5 +111,8 @@ class DataResourceController extends Controller
     public function destroy(DataResource $dataResource)
     {
         //
+        $resource = DataResource::findOrFail($dataResource->id);
+        $resource->delete();
+        
     }
 }
