@@ -49,9 +49,6 @@ class DataResourceController extends Controller
      */
     public function store(Request $request)
     {
-        //
-        Log::info('This is some useful information.');
-        Log::info($request);
         $dataResource = new DataResource;
         $dataResource->filename = $request->filename;
         $dataResource->stored = $request->stored;
@@ -100,6 +97,10 @@ class DataResourceController extends Controller
     public function update(Request $request, DataResource $dataResource)
     {
         //
+        $dataResource2 = Employee::findOrFail($dataResource->id);
+        $dataResource2->archived = $dataResource->archived;
+        $dataResource2->save();
+     
     }
 
     /**
