@@ -22,6 +22,7 @@ class CreateDataResourcesTable extends Migration
             $table->string('stored');
             $table->string('reportid')->nullable($value = true);
             $table->string('user');
+            $table->string('archived')->default(false);;
             $table->timestamps();
         });
     }
