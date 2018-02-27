@@ -46,6 +46,9 @@ class ProfileController extends Controller
         $input = $request->json()->all();
 
         $profile = $this->transformer->parse($input);
+        $profile->configurations->each(function ($configuration) {
+          $configuration->updateDefinition();
+        });
 
         DB::beginTransaction();
 

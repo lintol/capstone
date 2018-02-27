@@ -26,7 +26,7 @@ class ProcessorsTableSeeder extends Seeder
         $processor->fill([
             'name' => 'CSV Checking by CSVLint',
             'description' => 'ODI tool to processes tabular data',
-            'module' => 'cl.py',
+            'module' => 'cl.rb',
             'content' => '',
             'rules' => ['fileType' => '/csv/'],
             'configuration_defaults' => json_encode([
@@ -93,17 +93,25 @@ class ProcessorsTableSeeder extends Seeder
         $processor->save();
 
         $processor = Processor::firstOrNew([
-            'unique_tag' => 'lintol/ds-pii:1',
+            'unique_tag' => 'lintol/ds-pii-legacy:1',
         ]);
         $processor->fill([
             'name' => 'Personally-Identifiable Information Spotter',
             'description' => 'Tool for searching for Personally-Identifiable Information within CSV data',
+<<<<<<< HEAD
             'module' => 'pii.py',
             'content' => File::get($processorsPath . 'pii/pii.py'),
+||||||| merged common ancestors
+            'module' => 'pii',
+            'content' => File::get($processorsPath . 'pii/pii.py'),
+=======
+            'module' => 'pii_legacy.py',
+            'content' => File::get($processorsPath . 'pii_legacy.py'),
+>>>>>>> wip/working-test-platform
             'rules' => ['fileType' => '/csv/'],
             'definition' => [
                 'docker' => [
-                    'image' => 'lintol/doorstep',
+                    'image' => 'lintol/ds-pii-legacy',
                     'revision' => 'latest'
                 ]
             ]

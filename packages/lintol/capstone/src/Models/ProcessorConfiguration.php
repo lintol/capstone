@@ -44,6 +44,14 @@ class ProcessorConfiguration extends Model
         return $this->belongsTo(Profile::class);
     }
 
+    public function updateDefinition()
+    {
+        if ($this->processor) {
+            $this->rules = $this->processor->rules;
+            $this->definition = $this->processor->definition;
+        }
+    }
+
     public function buildDefinition()
     {
         $this->configuration = json_decode($this->user_configuration_storage);
@@ -75,6 +83,8 @@ class ProcessorConfiguration extends Model
             'definition' => $this->definition,
             'supplementary' => $supplementary,
             'module' => $module
+            'definition' => $this->definition,
+            'module' => $this->processor->module
         ];
     }
 }

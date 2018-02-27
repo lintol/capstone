@@ -35,7 +35,11 @@ Route::group($group, function () {
     Route::resource('reports', 'ReportController', [
         'only' => ['index', 'show']
     ]);
-    Route::resource('dataResources', 'DataController', [
-        'only' => ['index', 'store']
+    Route::resource('dataResources', 'DataResourceController', [
+        'only' => ['index', 'store', 'update', 'destroy']
     ]);
+    /* Will enable when pagination in the front end is working 
+    Route::get('dataResources', function () {
+      return Lintol\Capstone\Models\DataResource::paginate();
+    }); */
 });
