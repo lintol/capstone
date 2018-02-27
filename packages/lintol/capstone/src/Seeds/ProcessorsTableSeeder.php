@@ -26,7 +26,7 @@ class ProcessorsTableSeeder extends Seeder
         $processor->fill([
             'name' => 'CSV Checking by CSVLint',
             'description' => 'ODI tool to processes tabular data',
-            'module' => 'cl',
+            'module' => 'cl.rb',
             'content' => '',
             'rules' => ['fileType' => '/csv/'],
             'configuration_defaults' => json_encode([
@@ -62,7 +62,7 @@ class ProcessorsTableSeeder extends Seeder
         $processor->fill([
             'name' => 'CSV Checking by GoodTables',
             'description' => 'CSV checking tool from Frictionless Data project',
-            'module' => 'good',
+            'module' => 'good.py',
             'content' => File::get($processorsPath . 'goodtables/good.py'),
             'rules' => ['fileType' => '/csv/'],
             'configuration_defaults' => json_encode([
@@ -93,17 +93,17 @@ class ProcessorsTableSeeder extends Seeder
         $processor->save();
 
         $processor = Processor::firstOrNew([
-            'unique_tag' => 'lintol/ds-pii:1',
+            'unique_tag' => 'lintol/ds-pii-legacy:1',
         ]);
         $processor->fill([
             'name' => 'Personally-Identifiable Information Spotter',
             'description' => 'Tool for searching for Personally-Identifiable Information within CSV data',
-            'module' => 'pii',
-            'content' => File::get($processorsPath . 'pii/pii.py'),
+            'module' => 'pii_legacy.py',
+            'content' => File::get($processorsPath . 'pii_legacy.py'),
             'rules' => ['fileType' => '/csv/'],
             'definition' => [
                 'docker' => [
-                    'image' => 'lintol/doorstep',
+                    'image' => 'lintol/ds-pii-legacy',
                     'revision' => 'latest'
                 ]
             ]
@@ -117,7 +117,7 @@ class ProcessorsTableSeeder extends Seeder
         $processor->fill([
             'name' => 'Boundary Checker (impr)',
             'description' => 'GeoJSON boundary checker to make sure data is within given boundaries',
-            'module' => 'boundary_checker_impr',
+            'module' => 'boundary_checker_impr.py',
             'content' => File::get($processorsPath . 'boundary_checker_impr.py'),
             'rules' => ['fileType' => '/csv/'],
             'definition' => [
@@ -154,7 +154,7 @@ class ProcessorsTableSeeder extends Seeder
         $processor->fill([
             'name' => 'gov.uk Register Checker - Countries',
             'description' => 'Check that CSV data about countries matches gov.uk register entries',
-            'module' => 'registers',
+            'module' => 'registers.py',
             'content' => File::get($processorsPath . 'registers.py'),
             'rules' => ['fileType' => '/csv/'],
             'definition' => [

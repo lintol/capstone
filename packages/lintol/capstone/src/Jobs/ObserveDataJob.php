@@ -7,7 +7,7 @@ use GuzzleHttp;
 use App;
 use Lintol\Capstone\Models\ValidationRun;
 use Lintol\Capstone\Models\Processor;
-use Lintol\Capstone\Models\Data;
+use Lintol\Capstone\Models\DataResource;
 use Lintol\Capstone\ValidationProcess;
 use Thruway\ClientSession;
 use Thruway\Peer\Client;
@@ -72,21 +72,21 @@ class ObserveDataJob implements ShouldQueue
 
         Log::info('Requesting data from ' . $dataUri);
 
-        $data = app()->make(Data::class);
+        $data = app()->make(DataResource::class);
         $data->name = $dataUri;
         $data->settings = $settings;
-        $data->source_uri = $dataUri;
+        $data->url = $dataUri;
 
         $client = new GuzzleHttp\Client();
-        $request = new GuzzleHttp\Psr7\Request('GET', $data->source_uri);
+        $request = new GuzzleHttp\Psr7\Request('GET', $data->url);
 
         $promise = $client->sendAsync($request)->then(function ($response) use ($data) {
-            $path = basename($data->source_uri);
+            $path = basename($data->url);
             $dData = $response->getBody();
 
             $data->filename = $path;
             $data->name = $path;
-            $data->format = $data->settings['fileType'];
+            $data->filetype = $data->settings['fileType'];
             $data->content = $dData;
             $data->save();
 

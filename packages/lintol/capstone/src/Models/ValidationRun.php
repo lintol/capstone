@@ -24,9 +24,9 @@ class ValidationRun extends Model
         return $this->belongsTo(Profile::class);
     }
 
-    public function data()
+    public function dataResource()
     {
-        return $this->belongsTo(Data::class);
+        return $this->belongsTo(DataResource::class, 'data_resource_id');
     }
 
     public function report()

@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use GuzzleHttp;
 use Lintol\Capstone\Models\DataResource;
 use Illuminate\Http\Request;
+use Lintol\Capstone\ValidationProcess;
 use Lintol\Capstone\Transformers\DataResourceTransformer;
 use Illuminate\Support\Facades\Log;
 
@@ -49,19 +51,47 @@ class DataResourceController extends Controller
      */
     public function store(Request $request)
     {
-        $dataResource = new DataResource;
-        $dataResource->filename = $request->filename;
-        $dataResource->stored = $request->stored;
-        $dataResource->url = $request->url;
-        $dataResource->filetype = $request->filetype;
-        $dataResource->user = $request->user;
-     
+        $dataResource = app()->make(DataResource::class);
+        $dataResource->settings = [
+          'name' => $request->input('uri'),
+          'dataProfileId' => $request->input('profileId')
+        ];
+        $dataResource->stored = $request->input('stored');
+        $dataResource->url = $request->input('uri');
+        $dataResource->filetype = $request->input('filetype');
+        // $dataResource->user = $request->user;
+
+        $client = new GuzzleHttp\Client();
+        $request = new GuzzleHttp\Psr7\Request('GET', $dataResource->url);
+
+        $promise = $client->sendAsync($request)->then(function ($response) use ($dataResource) {
+            $path = basename($dataResource->url);
+            $dData = $response->getBody();
+
+            $dataResource->filename = $path;
+            $dataResource->name = $path;
+            $pathParts = pathinfo($path);
+            $dataResource->filetype = $pathParts['extension'];
+            $settings = $dataResource->settings;
+            $settings['fileType'] = $dataResource->filetype;
+            $dataResource->settings = $settings;
+            $dataResource->content = $dData;
+            $dataResource->save();
+
+            ValidationProcess::launch($dataResource);
+        }, function ($error) {
+            abort(400, __("Invalid data URI request"));
+        });
+
+        $promise->wait();
+
         if ($dataResource->save()) {
             return fractal()
-                ->item($dataResource,$this->transformer)
+                ->item($dataResource, $this->transformer, 'dataResources')
                 ->respond();
         }
-        
+
+        abort(400, __("Invalid data"));
     }
 
     /**

@@ -14,16 +14,23 @@ class CreateDataResourcesTable extends Migration
     public function up()
     {
         Schema::create('data_resources', function (Blueprint $table) {
-            $table->increments('id');
-            $table->string('filename');
-            $table->string('url');
-            $table->string('filetype');
+            $table->uuid('id');
+
+            $table->string('name')->default('[unnamed data resource]');
+            $table->json('settings')->default('{}');
+            $table->text('content')->nullable();
+
+            $table->string('filename')->nullable();
+            $table->string('url')->nullable();
+            $table->string('filetype')->nullable();
             $table->string('status')->default('new resource');
-            $table->string('stored');
+            $table->string('stored')->nullable();
             $table->string('reportid')->nullable($value = true);
-            $table->string('user');
+            $table->string('user')->nullable();
             $table->string('archived')->default(false);;
             $table->timestamps();
+
+            $table->unique('id');
         });
     }
 
