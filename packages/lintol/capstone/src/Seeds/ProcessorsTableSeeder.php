@@ -98,16 +98,8 @@ class ProcessorsTableSeeder extends Seeder
         $processor->fill([
             'name' => 'Personally-Identifiable Information Spotter',
             'description' => 'Tool for searching for Personally-Identifiable Information within CSV data',
-<<<<<<< HEAD
-            'module' => 'pii.py',
-            'content' => File::get($processorsPath . 'pii/pii.py'),
-||||||| merged common ancestors
-            'module' => 'pii',
-            'content' => File::get($processorsPath . 'pii/pii.py'),
-=======
             'module' => 'pii_legacy.py',
             'content' => File::get($processorsPath . 'pii_legacy.py'),
->>>>>>> wip/working-test-platform
             'rules' => ['fileType' => '/csv/'],
             'definition' => [
                 'docker' => [

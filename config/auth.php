@@ -77,7 +77,7 @@ return [
 
         'ckan_instances' => [
             'driver' => 'eloquent',
-            'model' => App\CkanInstance::class,
+            'model' => Lintol\Capstone\Models\CkanInstance::class,
         ],
         // 'users' => [
         //     'driver' => 'database',

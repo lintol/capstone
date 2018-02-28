@@ -83,8 +83,6 @@ class ProcessorConfiguration extends Model
             'definition' => $this->definition,
             'supplementary' => $supplementary,
             'module' => $module
-            'definition' => $this->definition,
-            'module' => $this->processor->module
         ];
     }
 }

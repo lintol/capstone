@@ -26,8 +26,7 @@ class DataResourceController extends Controller
         //
         $data = DataResource::paginate(25);
         $data->setPath('/dataResources/');
-        
-        
+
         return fractal()
             ->collection($data, $this->transformer, 'dataResources')
             ->respond();

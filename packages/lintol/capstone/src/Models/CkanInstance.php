@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace Lintol\Capstone\Models;
 
 use Alsofronie\Uuid\UuidModelTrait;
 use Illuminate\Foundation\Auth\User as Authenticatable;
