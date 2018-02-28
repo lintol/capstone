@@ -13,7 +13,7 @@ class DataResource extends Model
          'url',
          'filetype',
          'status',
-         'stored',
+         'source',
          'user',
          'archived',
          'reportid'

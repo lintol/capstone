@@ -15,7 +15,7 @@ class DataResourceTransformer extends Fractal\TransformerAbstract
             'url' => $data->url,
             'filetype' => $data->filetype,
             'status' => $data->status,
-            'stored' => $data->stored,
+            'source' => $data->source,
             'user' => $data->user,
             'archived' => $data->archived,
             'reportid' => $data->reportid
