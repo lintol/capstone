@@ -51,17 +51,16 @@ class DataResourceController extends Controller
     {
         $dataResource = new DataResource;
         $dataResource->filename = $request->filename;
-        $dataResource->stored = $request->stored;
+        $dataResource->source = $request->source;
         $dataResource->url = $request->url;
         $dataResource->filetype = $request->filetype;
         $dataResource->user = $request->user;
-     
         if ($dataResource->save()) {
             return fractal()
                 ->item($dataResource,$this->transformer)
                 ->respond();
+             Log::info('Save Success');
         }
-        
     }
 
     /**
