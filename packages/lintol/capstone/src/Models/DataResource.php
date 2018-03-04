@@ -22,6 +22,8 @@ class DataResource extends Model
          'content'
     ];
 
+    public $present = true;
+
     public function creator()
     {
         return $this->belongsTo(User::class);
@@ -34,5 +36,10 @@ class DataResource extends Model
     public function run()
     {
         return $this->hasMany(ValidationRun::class);
+    }
+
+    public function resourceable()
+    {
+        return $this->morphTo();
     }
 }

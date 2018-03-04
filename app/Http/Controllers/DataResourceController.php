@@ -3,18 +3,22 @@
 namespace App\Http\Controllers;
 
 use GuzzleHttp;
+use Illuminate\Pagination\LengthAwarePaginator;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Lintol\Capstone\Models\DataResource;
 use Illuminate\Http\Request;
 use Lintol\Capstone\ValidationProcess;
 use Lintol\Capstone\Transformers\DataResourceTransformer;
 use Illuminate\Support\Facades\Log;
+use Lintol\Capstone\ResourceManager;
 
 class DataResourceController extends Controller
 {
 
-    public function __construct(DataResourceTransformer $transformer)
+    public function __construct(DataResourceTransformer $transformer, ResourceManager $resourceManager)
     {
         $this->transformer = $transformer;
+        $this->resourceManager = $resourceManager;
     }
     /**
      * Display a listing of the resource.
@@ -23,12 +27,35 @@ class DataResourceController extends Controller
      */
     public function index()
     {
-        //
-        $data = DataResource::paginate(25);
-        $data->setPath('/dataResources/');
+        $search = request()->input('search');
+
+        switch (request()->input('provider')) {
+            case '_remote':
+                // Add windowing/pagination to call
+
+                $resourceProvider = $this->resourceManager->getProvider();
+
+                $data = collect();
+                if ($resourceProvider) {
+                    $data = $resourceProvider->getDataResources();
+                }
+
+                $paginator = new LengthAwarePaginator($data, $data->count(), 5);
+                break;
+            default:
+                $query = new DataResource;
+                if ($search) {
+                    $query = $query->where('filename', 'LIKE', '%' . $search . '%');
+                }
+                $paginator = $query->paginate(5);
+        }
+
+        $data = $paginator->getCollection();
+        $paginator->setPath('/dataResources/');
 
         return fractal()
             ->collection($data, $this->transformer, 'dataResources')
+            ->paginateWith(new IlluminatePaginatorAdapter($paginator))
             ->respond();
     }
 

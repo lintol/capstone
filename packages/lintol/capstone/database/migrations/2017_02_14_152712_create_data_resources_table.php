@@ -28,6 +28,10 @@ class CreateDataResourcesTable extends Migration
             $table->string('reportid')->nullable($value = true);
             $table->string('user')->nullable();
             $table->string('archived')->default(false);;
+
+            $table->string('resourceable_type')->nullable();
+            $table->uuid('resourceable_id')->nullable();
+
             $table->timestamps();
 
             $table->unique('id');

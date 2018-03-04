@@ -10,6 +10,7 @@ use Lintol\Capstone\Listeners\ResultRetrievedListener;
 use Lintol\Capstone\Console\Commands\ObserveDataCommand;
 use Lintol\Capstone\Console\Commands\ProcessDataCommand;
 use Lintol\Capstone\WampConnection;
+use Lintol\Capstone\Models\DataResource;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -50,6 +51,10 @@ class CapstoneServiceProvider extends ServiceProvider
             ResultRetrievedEvent::class,
             ResultRetrievedListener::class
         );
+
+        $this->app->singleton(ResourceManager::class, function ($app) {
+            return new ResourceManager();
+        });
 
         $this->app->singleton(WampConnection::class, function ($app) {
             $url = config('capstone.wamp.url', 'realm1');
