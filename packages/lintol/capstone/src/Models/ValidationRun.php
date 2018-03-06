@@ -24,9 +24,9 @@ class ValidationRun extends Model
         return $this->belongsTo(Profile::class);
     }
 
-    public function data()
+    public function dataResource()
     {
-        return $this->belongsTo(Data::class);
+        return $this->belongsTo(DataResource::class, 'data_resource_id');
     }
 
     public function report()
@@ -39,6 +39,7 @@ class ValidationRun extends Model
         $definitions = $this->profile->buildDefinitions($settings);
 
         if (!$definitions) {
+            \Log::info(__("No profile definition"));
             return false;
         }
 

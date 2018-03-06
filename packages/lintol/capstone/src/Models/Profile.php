@@ -65,8 +65,15 @@ class Profile extends Model
     {
         $this->rulesService = app()->make(RulesService::class);
 
+        \Log::info(__("Checking configurations for passes: ") . $this->configurations->count());
+
         return $this->configurations->filter(function ($configuration) use ($definition) {
             $result = $this->rulesService->filter($definition, $configuration->rules);
+            if ($result) {
+              \Log::info(__("Configuration passed rules"));
+            } else {
+              \Log::info(__("Configuration failed rules"));
+            }
             return $result;
         });
     }

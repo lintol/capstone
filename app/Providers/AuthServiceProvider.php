@@ -5,6 +5,7 @@ namespace App\Providers;
 use Laravel\Passport\Passport;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Route;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -27,5 +28,12 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         Passport::routes();
+
+        // Middleware `api` that contains the `custom-provider` middleware group defined on $middlewareGroups above
+        Route::group(['middleware' => 'api'], function () {
+            Passport::routes(function ($router) {
+                return $router->forAccessTokens();
+            });
+        });
     }
 }

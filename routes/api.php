@@ -26,6 +26,8 @@ if (!env('CAPSTONE_WITHOUT_AUTH', false)) {
 }
 
 Route::group($group, function () {
+    Route::get('users/me', 'UserController@me');
+
     Route::resource('profiles', 'ProfileController', [
         'only' => ['index', 'show', 'update', 'store']
     ]);
@@ -42,4 +44,7 @@ Route::group($group, function () {
     Route::get('dataResources', function () {
       return Lintol\Capstone\Models\DataResource::paginate();
     }); */
+    Route::resource('users', 'UserController', [
+        'only' => ['index']
+    ]);
 });

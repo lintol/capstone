@@ -17,8 +17,8 @@ class CreateValidationsTable extends Migration
             $table->uuid('id');
             $table->integer('completion_status')->nullable();
 
-            $table->uuid('data_id')->nullable();
-            $table->foreign('data_id')->references('id')->on('data')->onDelete('cascade');
+            $table->uuid('data_resource_id')->nullable();
+            $table->foreign('data_resource_id')->references('id')->on('data_resources')->onDelete('cascade');
 
             $table->uuid('processor_id')->nullable();
             $table->foreign('processor_id')->references('id')->on('processors')->onDelete('cascade');

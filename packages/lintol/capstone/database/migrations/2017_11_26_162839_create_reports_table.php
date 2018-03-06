@@ -25,11 +25,11 @@ class CreateReportsTable extends Migration
 
             $table->json('content');
 
-            $table->text('profile');
-            $table->integer('errors');
-            $table->integer('warnings');
-            $table->integer('passes');
-            $table->integer('quality_score');
+            $table->text('profile')->default('');
+            $table->integer('errors')->default(0);
+            $table->integer('warnings')->default(0);
+            $table->integer('passes')->default(0);
+            $table->integer('quality_score')->default(100);
 
             $table->timestamps();
             $table->unique('id');

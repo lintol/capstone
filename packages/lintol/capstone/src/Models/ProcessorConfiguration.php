@@ -44,13 +44,45 @@ class ProcessorConfiguration extends Model
         return $this->belongsTo(Profile::class);
     }
 
+    public function updateDefinition()
+    {
+        if ($this->processor) {
+            $this->rules = $this->processor->rules;
+            $this->definition = $this->processor->definition;
+        }
+    }
+
     public function buildDefinition()
     {
         $this->configuration = json_decode($this->user_configuration_storage);
 
+        $supplementary = [];
+        foreach ($this->configuration as $key => $value) {
+          if (strlen($value) > 3 && substr($value, 0, 3) == '$->') {
+            $value = substr($value, 3);
+
+            if ($this->processor) {
+              if (array_key_exists($value, $this->processor->supplementary_links)) {
+                $supplementary[$value] = $this->processor->supplementary_links[$value];
+              } else {
+                $supplementary[$value] = 'error://link-not-found';
+              }
+            } else {
+              $supplementary[$value] = 'error://processor-details-missing';
+            }
+          }
+        }
+
+        $module = null;
+        if ($this->processor && $this->processor->module) {
+          $module = $this->processor->module;
+        }
+
         return [
             'configuration' => $this->configuration,
-            'definition' => $this->definition
+            'definition' => $this->definition,
+            'supplementary' => $supplementary,
+            'module' => $module
         ];
     }
 }

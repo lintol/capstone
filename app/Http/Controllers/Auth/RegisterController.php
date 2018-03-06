@@ -25,9 +25,14 @@ class RegisterController extends Controller
     /**
      * Where to redirect users after registration.
      *
-     * @var string
+     * @return string
      */
-    protected $redirectTo = '/home';
+    protected function redirectPath()
+    {
+        $url = config('capstone.frontend.url', '/');
+
+        return $url;
+    }
 
     /**
      * Create a new controller instance.
