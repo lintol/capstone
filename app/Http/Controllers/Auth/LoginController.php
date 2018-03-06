@@ -70,7 +70,9 @@ class LoginController extends Controller
 
         $driver = Socialite::driver($driverName);
 
-        $driver->setRootUrl($driverServer);
+        if ($driverName == 'ckan') {
+            $driver->setRootUrl($driverServer);
+        }
 
         return $driver->redirect();
     }
@@ -109,6 +111,7 @@ class LoginController extends Controller
                     }
                     break;
                 default:
+                    $resourceable = null;
             }
 
             if ($resourceable) {
