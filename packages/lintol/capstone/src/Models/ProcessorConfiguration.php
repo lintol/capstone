@@ -72,6 +72,9 @@ class ProcessorConfiguration extends Model
             }
           }
         }
+        if (empty($supplementary)) {
+            $supplementary = (object) [];
+        }
 
         $module = null;
         if ($this->processor && $this->processor->module) {

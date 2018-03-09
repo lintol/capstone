@@ -16,7 +16,7 @@ class DataResource extends Model
          'filetype',
          'status',
          'stored',
-         'user',
+         'user_id',
          'archived',
          'reportid',
          'content'
@@ -41,5 +41,10 @@ class DataResource extends Model
     public function resourceable()
     {
         return $this->morphTo();
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

@@ -15,6 +15,10 @@ class DataResourceSeeder extends Seeder
      */
     public function run()
     {
+        $user = User::firstOrCreate([
+            'name' => 'martin'
+        ]);
+
         // $dataOwner = User::whereEmail('do@example.com')->first();
         $dataResource = DataResource::firstOrNew([
             'filename' => 'waste-sites.geojson',
@@ -23,7 +27,7 @@ class DataResourceSeeder extends Seeder
             'status' => 'report run',
             'stored' => 'CKAN',
             'reportid' => '',
-            'user' => 'martin'
+            'user_id' => $user->id
         ]);
         $dataResource->save();
 
@@ -34,7 +38,7 @@ class DataResourceSeeder extends Seeder
             'status' => 'report run',
             'stored' => 'External Link',
             'reportid' => '',
-            'user' => 'martin'
+            'user_id' => $user->id
         ]);
         /* $profile = Profile::firstOrNew([
             'name' => 'csv profile [test]',
@@ -52,7 +56,7 @@ class DataResourceSeeder extends Seeder
             'archived' => 'true',
             'stored' => 'External Link',
             'reportid' => '',
-            'user' => 'martin'
+            'user_id' => $user->id
         ]);
         $dataResource->save();
 
@@ -63,7 +67,7 @@ class DataResourceSeeder extends Seeder
             'status' => 'invalid link',
             'stored' => 'External Link',
             'reportid' => '',
-            'user' => 'martin'
+            'user_id' => $user->id
         ]);
         $dataResource->save();
         $dataResource = DataResource::firstOrNew([
@@ -73,7 +77,7 @@ class DataResourceSeeder extends Seeder
             'status' => 'valid link',
             'stored' => 'External Link',
             'reportid' => '',
-            'user' => 'martin'
+            'user_id' => $user->id
         ]);
         $dataResource->save();
         $dataResource = DataResource::firstOrNew([
@@ -83,7 +87,7 @@ class DataResourceSeeder extends Seeder
             'status' => 'report run',
             'stored' => 'External Link',
             'reportid' => '',
-            'user' => 'martin'
+            'user_id' => $user->id
         ]);
         $dataResource->save();
         $dataResource = DataResource::firstOrNew([
@@ -93,7 +97,7 @@ class DataResourceSeeder extends Seeder
             'status' => 'valid link',
             'stored' => 'External Link',
             'reportid' => '',
-            'user' => 'martin'
+            'user_id' => $user->id
         ]);
         $dataResource->save();
         $dataResource = DataResource::firstOrNew([
@@ -103,7 +107,7 @@ class DataResourceSeeder extends Seeder
             'status' => 'valid link',
             'stored' => 'External Link',
             'reportid' => '',
-            'user' => 'martin'
+            'user_id' => $user->id
         ]);
         $dataResource->save();
         $dataResource = DataResource::firstOrNew([
@@ -113,7 +117,7 @@ class DataResourceSeeder extends Seeder
             'status' => 'valid link',
             'stored' => 'External Link',
             'reportid' => '',
-            'user' => 'martin'
+            'user_id' => $user->id
         ]);
         $dataResource->save();
     }
