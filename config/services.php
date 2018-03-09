@@ -35,4 +35,17 @@ return [
         'secret' => env('STRIPE_SECRET'),
     ],
 
+    'github' => [
+        'client_id' => env('GITHUB_CLIENT_ID'),
+        'client_secret' => env('GITHUB_CLIENT_SECRET'),
+        'redirect' => env('APP_URL') . '/login/github/callback'
+    ],
+
+    'ckan' => [
+        'client_id' => env('CKAN_CLIENT_ID'),
+        'client_secret' => env('CKAN_CLIENT_SECRET'),
+        'url' => env('CKAN_URL'),
+        'redirect' => env('APP_URL') . '/login/ckan/callback'
+    ]
+
 ];

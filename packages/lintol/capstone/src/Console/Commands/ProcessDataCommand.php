@@ -9,7 +9,7 @@ use Lintol\Capstone\Models\ValidationRun;
 use Lintol\Capstone\Models\Processor;
 use Lintol\Capstone\Models\ProcessorConfiguration;
 use Lintol\Capstone\Models\Profile;
-use Lintol\Capstone\Models\Data;
+use Lintol\Capstone\Models\DataResource;
 use Illuminate\Console\Command;
 use Lintol\Capstone\Jobs\ProcessDataJob;
 
@@ -83,7 +83,7 @@ class ProcessDataCommand extends Command
         $path = 'awful.csv';
         $dData = File::get(resource_path('capstone/examples/data/awful.csv'));
 
-        $data = App::make(Data::class);
+        $data = App::make(DataResource::class);
         $data->filename = $path;
         $data->content = $dData;
         $data->save();
@@ -100,7 +100,7 @@ class ProcessDataCommand extends Command
 
             $run->save();
 
-            $run->data()->associate($data);
+            $run->dataResource()->associate($data);
             $run->save();
 
             return $run;

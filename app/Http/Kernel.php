@@ -41,7 +41,13 @@ class Kernel extends HttpKernel
         'api' => [
             'throttle:60,1',
             'bindings',
+            'custom-provider'
         ],
+
+        'custom-provider' => [
+            \SMartins\PassportMultiauth\Http\Middleware\AddCustomProvider::class,
+            \SMartins\PassportMultiauth\Http\Middleware\ConfigAccessTokenCustomProvider::class,
+        ]
     ];
 
     /**

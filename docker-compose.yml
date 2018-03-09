@@ -22,7 +22,7 @@ services:
     environment:
       REDIS_HOST: "redis"
       REDIS_PORT: 6379
-      CAPSTONE_WITHOUT_AUTH: 1
+      CAPSTONE_WITHOUT_AUTH: 0
   nginx:
     image: nginx:stable
     volumes:

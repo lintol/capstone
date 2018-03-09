@@ -14,6 +14,7 @@ class ProcessorConfigurationObserver
      */
     public function saving(ProcessorConfiguration $configuration)
     {
+        \Log::info('saving configuration');
         $processor = $configuration->processor;
         if ($processor) {
             $configuration->rules = $processor->rules;

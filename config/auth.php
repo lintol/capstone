@@ -45,6 +45,11 @@ return [
             'driver' => 'passport',
             'provider' => 'users',
         ],
+
+        'ckan-api' => [
+            'driver' => 'passport',
+            'provider' => 'ckan_instances',
+        ]
     ],
 
     /*
@@ -70,6 +75,10 @@ return [
             'model' => App\User::class,
         ],
 
+        'ckan_instances' => [
+            'driver' => 'eloquent',
+            'model' => Lintol\Capstone\Models\CkanInstance::class,
+        ],
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',
