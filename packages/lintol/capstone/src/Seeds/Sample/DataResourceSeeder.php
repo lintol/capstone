@@ -25,7 +25,7 @@ class DataResourceSeeder extends Seeder
             'url' => 'https://www.opendatani.gov.uk/dataset/4c9ae0a2-0238-459e-8b4d-1172bec9dc3c/resource/51556b4d-85bd-4625-936d-840724f3a877/download/waste-sites.geojson',
             'filetype' => 'geojson',
             'status' => 'report run',
-            'stored' => 'CKAN',
+            'source' => 'CKAN',
             'reportid' => '',
             'user_id' => $user->id
         ]);
@@ -36,7 +36,7 @@ class DataResourceSeeder extends Seeder
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
             'status' => 'report run',
-            'stored' => 'External Link',
+            'source' => 'External Link',
             'reportid' => '',
             'user_id' => $user->id
         ]);
@@ -54,7 +54,7 @@ class DataResourceSeeder extends Seeder
             'filetype' => 'csv',
             'status' => 'archived',
             'archived' => 'true',
-            'stored' => 'External Link',
+            'source' => 'External Link',
             'reportid' => '',
             'user_id' => $user->id
         ]);
@@ -65,7 +65,7 @@ class DataResourceSeeder extends Seeder
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
             'status' => 'invalid link',
-            'stored' => 'External Link',
+            'source' => 'External Link',
             'reportid' => '',
             'user_id' => $user->id
         ]);
@@ -75,7 +75,7 @@ class DataResourceSeeder extends Seeder
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
             'status' => 'valid link',
-            'stored' => 'External Link',
+            'source' => 'External Link',
             'reportid' => '',
             'user_id' => $user->id
         ]);
@@ -85,7 +85,7 @@ class DataResourceSeeder extends Seeder
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
             'status' => 'report run',
-            'stored' => 'External Link',
+            'source' => 'External Link',
             'reportid' => '',
             'user_id' => $user->id
         ]);
@@ -95,7 +95,7 @@ class DataResourceSeeder extends Seeder
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
             'status' => 'valid link',
-            'stored' => 'External Link',
+            'source' => 'External Link',
             'reportid' => '',
             'user_id' => $user->id
         ]);
@@ -105,7 +105,7 @@ class DataResourceSeeder extends Seeder
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
             'status' => 'valid link',
-            'stored' => 'External Link',
+            'source' => 'External Link',
             'reportid' => '',
             'user_id' => $user->id
         ]);
@@ -115,7 +115,7 @@ class DataResourceSeeder extends Seeder
             'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-52.csv',
             'filetype' => 'csv',
             'status' => 'valid link',
-            'stored' => 'External Link',
+            'source' => 'External Link',
             'reportid' => '',
             'user_id' => $user->id
         ]);

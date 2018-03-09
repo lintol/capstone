@@ -104,8 +104,8 @@ class DataResourceController extends Controller
             return fractal()
                 ->item($dataResource, $this->transformer, 'dataResources')
                 ->respond();
+             Log::info('Save Success');
         }
-
         abort(400, __("Invalid data"));
     }
 

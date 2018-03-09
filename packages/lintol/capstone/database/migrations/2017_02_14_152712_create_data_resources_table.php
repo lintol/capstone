@@ -24,7 +24,7 @@ class CreateDataResourcesTable extends Migration
             $table->string('url')->nullable();
             $table->string('filetype')->nullable();
             $table->string('status')->default('new resource');
-            $table->string('stored')->nullable();
+            $table->string('source')->nullable();
             $table->string('reportid')->nullable($value = true);
 
             $table->uuid('user_id')->nullable();
