@@ -53,20 +53,33 @@ class DataResourceSettingController extends Controller
         $dataResources = collect();
 
         $dataResourceUrls->each(function ($dataResourceUrl) use ($profileId, $user, &$dataResources) {
-            $dataResource = $this->resourceManager->find($dataResourceUrl, $user);
+            if ($dataResourceUrl['id']) {
+                if (strpos($dataResourceUrl['id'], 'remote-') === 0) {
+                    $remoteId = substr($dataResourceUrl['id'], 7);
+                    $dataResource = $this->resourceManager->getProvider()->getDataResource($remoteId);
+
+                    if (!$dataResource) {
+                        abort(__("Data resource not found"));
+                    }
+                } else {
+                    $dataResource = DataResource::findOrFail($dataResourceUrl['id']);
+                }
+            } else {
+                $dataResource = $this->resourceManager->find($dataResourceUrl['url'], $user);
+            }
 
             if (!$dataResource) {
-                $dataResource = app()->make(DataResource::class);
                 $dataResource->settings = [
-                  'name' => $dataResourceUrl
+                  'name' => $dataResourceUrl['url']
                 ];
-                if (Auth::user()) {
+
+                if ($user) {
                   $dataResource->user_id = Auth::user()->id;
                 }
 
-                $dataResource->stored = '';
+                $dataResource->source = '';
                 $dataResource->url = $dataResourceUrl;
-                $dataResource->filetype = 'csv'; // TODO: infer this
+                $dataResource->filetype = $dataResourceUrl['filetype'];
             }
             $settings = $dataResource->settings;
             $settings['dataProfileId'] = $profileId;

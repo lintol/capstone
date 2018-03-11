@@ -21,6 +21,7 @@ class CreateDataResourcesTable extends Migration
             $table->text('content')->nullable();
 
             $table->string('filename')->nullable();
+            $table->string('remote_id')->nullable();
             $table->string('url')->nullable();
             $table->string('filetype')->nullable();
             $table->string('status')->default('new resource');

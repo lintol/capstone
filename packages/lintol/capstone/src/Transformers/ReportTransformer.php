@@ -18,7 +18,7 @@ class ReportTransformer extends Fractal\TransformerAbstract
             'passes' => $report->passes,
             'qualityScore' => $report->quality_score,
             'content' => $report->content,
-            'user' => $report->owner_id,
+            'user' => $report->owner ? $report->owner->name : null,
             'createdAt' => $report->created_at
         ];
     }

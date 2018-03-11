@@ -48,7 +48,7 @@ class LoginController extends Controller
     }
 
     protected $socialiteDriver = [
-        'ckan' => 'http://scratch-dev.lintol.io:5000',
+        'ckan' => null,
         'github' => 'https://github.com'
     ];
 
@@ -63,15 +63,28 @@ class LoginController extends Controller
             abort(400, __("No OAuth2 available for this provider"));
         }
 
-        $driverServer = null;
-        if (request()->input('server')) {
-            $driverServer = request()->input('server');
-        }
-
         $driver = Socialite::driver($driverName);
 
         if ($driverName == 'ckan') {
-            $driver->setRootUrl($driverServer);
+            $driverServer = request()->input('server');
+            $validServers = config('capstone.authentication.ckan.valid-servers');
+
+            if (!empty($driverServer) && in_array($driverServer, $validServers)) {
+                $resourceable = CkanInstance::whereUri($driverServer)->first();
+                if (!$resourceable) {
+                    $resourceable = CkanInstance::create([
+                        'name' => 'CKAN:' . $driverServer,
+                        'uri' => $driverServer
+                    ]);
+                }
+
+                $driver->setRootUrl($driverServer);
+
+                $redirectUrl = $driver->getRedirectUrl() . '/' . $resourceable->id;
+                $driver->redirectUrl($redirectUrl);
+            } else {
+                abort(400, __("You must provide a valid CKAN server to authenticate against."));
+            }
         }
 
         return $driver->redirect();
@@ -82,7 +95,7 @@ class LoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function handleProviderCallback($driver)
+    public function handleProviderCallback($driver, $remoteServerId = null)
     {
         if (!array_key_exists($driver, $this->socialiteDriver)) {
             abort(400, __("No OAuth2 available for this provider"));
@@ -90,7 +103,21 @@ class LoginController extends Controller
 
         $driverServer = $this->socialiteDriver[$driver];
 
-        // TODO: may need a stateless() call if API-driven
+        if (!$driverServer) {
+            if ($remoteServerId) {
+              switch ($driver) {
+                  case 'ckan':
+                      $resourceable = CkanInstance::findOrFail($remoteServerId);
+                      $driverServer = $resourceable->uri;
+                      break;
+                  default:
+                      abort(400, __("No valid OAuth2 server known or provided."));
+              }
+            } else {
+                abort(400, __("No valid OAuth2 server known or provided."));
+            }
+        }
+
         $oauthUser = Socialite::driver($driver)->user();
 
         $user = User::findByRemote($driver, $driverServer, $oauthUser, true);
@@ -99,25 +126,9 @@ class LoginController extends Controller
 
         $remoteUser = $user->primaryRemoteUser;
 
-        if (!$remoteUser->resourceable) {
-            switch ($remoteUser->driver) {
-                case 'ckan':
-                    $resourceable = CkanInstance::whereUri($driverServer)->first();
-                    if (!$resourceable) {
-                        $resourceable = CkanInstance::create([
-                            'name' => 'CKAN:' . $driverServer,
-                            'uri' => $driverServer
-                        ]);
-                    }
-                    break;
-                default:
-                    $resourceable = null;
-            }
-
-            if ($resourceable) {
-                $remoteUser->resourceable()->associate($resourceable);
-                $remoteUser->save();
-            }
+        if (!$remoteUser->resourceable && $resourceable) {
+            $remoteUser->resourceable()->associate($resourceable);
+            $remoteUser->save();
         }
 
         Auth::login($user, true);

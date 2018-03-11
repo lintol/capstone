@@ -2,6 +2,7 @@
 
 namespace Lintol\Capstone\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Alsofronie\Uuid\UuidModelTrait;
 
@@ -27,6 +28,17 @@ class ValidationRun extends Model
     public function dataResource()
     {
         return $this->belongsTo(DataResource::class, 'data_resource_id');
+    }
+
+    public function markCompleted()
+    {
+        $this->completed_at = Carbon::now();
+        $this->save();
+
+        if ($this->dataResource) {
+          $this->dataResource->status = 'report run';
+          $this->dataResource->save();
+        }
     }
 
     public function report()
