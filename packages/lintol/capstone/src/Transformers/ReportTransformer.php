@@ -2,11 +2,16 @@
 
 namespace Lintol\Capstone\Transformers;
 
+use App\Transformers\UserTransformer;
 use League\Fractal;
 use Lintol\Capstone\Models\Report;
 
 class ReportTransformer extends Fractal\TransformerAbstract
 {
+    protected $defaultIncludes = [
+        'user'
+    ];
+
     public function transform(Report $report)
     {
         return [
@@ -18,8 +23,20 @@ class ReportTransformer extends Fractal\TransformerAbstract
             'passes' => $report->passes,
             'qualityScore' => $report->quality_score,
             'content' => $report->content,
-            'user' => $report->owner ? $report->owner->name : null,
             'createdAt' => $report->created_at
         ];
+    }
+
+    public function includeUser(Report $report)
+    {
+        if ($report->owner) {
+            return $this->item(
+                $report->owner,
+                new UserTransformer,
+                'users'
+            );
+        }
+
+        return null;
     }
 }

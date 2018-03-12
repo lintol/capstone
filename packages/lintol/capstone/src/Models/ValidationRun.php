@@ -2,6 +2,7 @@
 
 namespace Lintol\Capstone\Models;
 
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
 use Alsofronie\Uuid\UuidModelTrait;
@@ -19,6 +20,11 @@ class ValidationRun extends Model
     const STATUS_SUCCEEDED = 1;
     const STATUS_FAILED = 2;
     const STATUS_RUNNING = 3;
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function profile()
     {

@@ -31,6 +31,8 @@ class UpdateValidationRunsForeignKeys extends Migration
             $table->json('settings')->default('{}');
             $table->uuid('profile_id')->nullable();
             $table->foreign('profile_id')->references('id')->on('profiles')->onDelete('set null');
+            $table->uuid('creator_id')->nullable();
+            $table->foreign('creator_id')->references('id')->on('users')->onDelete('set null');
         });
 
         Schema::table('reports', function (Blueprint $table) {

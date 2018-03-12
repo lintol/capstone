@@ -11,7 +11,7 @@ class UserTransformer extends Fractal\TransformerAbstract
     {
         return [
           'id' => $user->id,
-          'name' => $user->name,
+          'name' => $user->name ? $user->name : $user->nickname,
           'nickname' => $user->nickname,
           'avatar' => $user->avatar,
           'email' => $user->email,

@@ -2,6 +2,7 @@
 
 namespace Lintol\Capstone;
 
+use Auth;
 use Log;
 use RuntimeException;
 use Event;
@@ -34,12 +35,18 @@ class ValidationProcess
 
     public static function launch($data)
     {
+        $user = Auth::user();
+
         $profiles = app()->make(Profile::class)->match($data->settings);
-        $runs = $profiles->map(function ($profile) use ($data) {
+        $runs = $profiles->map(function ($profile) use ($data, $user) {
             $run = app()->make(ValidationRun::class);
 
             $run->dataResource()->associate($data);
             $run->profile()->associate($profile);
+            if ($user) {
+                $run->creator()->associate($user);
+            }
+
             $settings = $data->settings;
             if (!$run->buildDefinition($settings)) {
                 \Log::info(__("Definition not built"));
@@ -206,9 +213,7 @@ class ValidationProcess
 
     protected function outputReport($report)
     {
-        $report = $this->reportFactory->make($report);
-
-        $report->run()->associate($this->run);
+        $report = $this->reportFactory->make($report, $this->run);
 
         $this->run->markCompleted();
 

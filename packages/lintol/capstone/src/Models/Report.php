@@ -27,16 +27,32 @@ class Report extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function make($result)
+    public function make($result, ValidationRun $run)
     {
         $report = new self;
-        $report->name = '(none)';
+
+        if ($run->data_resource_id && $run->profile_id) {
+            $count = $this->whereHas('run', function ($query) use ($run) {
+                return $query->whereDataResourceId($run->data_resource_id)
+                  ->whereProfileId($run->profile_id);
+            })->count();
+
+            $report->name = $run->profile->name . ' | ' . $run->dataResource->filename . ' | ' . ($count + 1);
+        } else {
+            $report->name = '(none)';
+        }
         $report->content = json_decode($result);
 
         $report->errors = 0;
         $report->warnings = 0;
         $report->passes = 0;
         $report->quality_score = 0;
+
+        $report->run()->associate($run);
+
+        if ($run->creator) {
+            $report->owner()->associate($run->creator);
+        }
 
         return $report;
     }
