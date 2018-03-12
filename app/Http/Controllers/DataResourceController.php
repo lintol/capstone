@@ -2,18 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use Auth;
+use Log;
 use GuzzleHttp;
 use Illuminate\Pagination\LengthAwarePaginator;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Lintol\Capstone\Models\DataResource;
 use Illuminate\Http\Request;
-use Lintol\Capstone\ValidationProcess;
 use Lintol\Capstone\Transformers\DataResourceTransformer;
-use Illuminate\Support\Facades\Log;
 use Lintol\Capstone\ResourceManager;
 
 class DataResourceController extends Controller
 {
+    protected $validFilters = ['filetype', 'user_id', 'created_at'];
+    protected $validSortBy = ['filetype', 'filename', 'created_at', 'status', 'user_id'];
 
     public function __construct(DataResourceTransformer $transformer, ResourceManager $resourceManager)
     {
@@ -28,6 +30,40 @@ class DataResourceController extends Controller
     public function index()
     {
         $search = request()->input('search');
+        $filters = request()->input('filters');
+        $sortBy = request()->input('sortBy');
+        $orderDesc = (request()->input('order') == 'desc');
+
+        if ($filters) {
+            $filters = collect(explode(',', $filters))
+              ->map(function ($filterString) {
+                $filter = explode(':', $filterString);
+
+                if (count($filter) !== 2 || !in_array($filter[0], $this->validFilters) || !$filter[1]) {
+                    return null;
+                }
+
+                return [
+                  'filter' => $filter[0],
+                  'value' => $filter[1]
+                ];
+              })
+              ->filter()
+              ->pluck('value', 'filter');
+        } else {
+            $filters = [];
+        }
+
+        $maxPagination = config('capstone.frontend.max-pagination', 250);
+
+        $count = (int) request()->input('count');
+        if (!$count || $count > $maxPagination) {
+            $count = $maxPagination;
+        }
+
+        if (!in_array($sortBy, $this->validSortBy)) {
+          $sortBy = 'filename';
+        }
 
         switch (request()->input('provider')) {
             case '_remote':
@@ -40,14 +76,24 @@ class DataResourceController extends Controller
                     $data = $resourceProvider->getDataResources();
                 }
 
-                $paginator = new LengthAwarePaginator($data, $data->count(), 5);
+                $paginator = new LengthAwarePaginator($data, $data->count(), $count);
                 break;
+            case '_local':
             default:
                 $query = new DataResource;
                 if ($search) {
                     $query = $query->where('filename', 'LIKE', '%' . $search . '%');
                 }
-                $paginator = $query->paginate(5);
+                foreach ($filters as $filter => $value) {
+                    if ($filter == 'created_at') {
+                        $query = $query->whereDate('created_at', '=', $value);
+                    } else {
+                        $query = $query->where($filter, '=', $value);
+                    }
+                }
+
+                $query = $query->orderBy($sortBy, $orderDesc ? 'desc' : 'asc');
+                $paginator = $query->paginate($count);
         }
 
         $data = $paginator->getCollection();
@@ -77,40 +123,31 @@ class DataResourceController extends Controller
      */
     public function store(Request $request)
     {
-        $dataResource = app()->make(DataResource::class);
+        $url = $request->input('url');
+        $user = Auth::user();
+        $dataResource = $this->resourceManager->find($url, $user);
+
+        if (!$dataResource) {
+            $dataResource = app()->make(DataResource::class);
+        }
+
         $dataResource->settings = [
-          'name' => $request->input('uri'),
+          'name' => basename($url),
           'dataProfileId' => $request->input('profileId')
         ];
-        $dataResource->stored = $request->input('stored');
-        $dataResource->url = $request->input('uri');
+
+        $dataResource->source = $request->input('stored');
+        $dataResource->url = $request->input('url');
+
+        if ($user) {
+            $dataResource->user_id = $user->id;
+        }
+
         $dataResource->filetype = $request->input('filetype');
-        // $dataResource->user = $request->user;
 
-        $client = new GuzzleHttp\Client();
-        $request = new GuzzleHttp\Psr7\Request('GET', $dataResource->url);
+        $dataResource = $this->resourceManager->onboard($dataResource);
 
-        $promise = $client->sendAsync($request)->then(function ($response) use ($dataResource) {
-            $path = basename($dataResource->url);
-            $dData = $response->getBody();
-
-            $dataResource->filename = $path;
-            $dataResource->name = $path;
-            $pathParts = pathinfo($path);
-            $dataResource->filetype = $pathParts['extension'];
-            $settings = $dataResource->settings;
-            $settings['fileType'] = $dataResource->filetype;
-            $dataResource->settings = $settings;
-            $dataResource->content = $dData;
-            $dataResource->save();
-
-            ValidationProcess::launch($dataResource);
-        }, function ($error) {
-            abort(400, __("Invalid data URI request"));
-        });
-
-        $promise->wait();
-        if ($dataResource->save()) {
+        if ($dataResource) {
             return fractal()
                 ->item($dataResource, $this->transformer, 'dataResources')
                 ->respond();

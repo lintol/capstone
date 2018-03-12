@@ -32,7 +32,7 @@ services:
     env_file:
       - ./infrastructure/config/secrets/laravel.env
     ports:
-      - "80:80"
+      - "8082:80"
     links:
       - phpfpm:phpfpm
     environment:

@@ -7,9 +7,15 @@ return [
     ],
     'frontend' => [
         'url' => env('LINTOL_FRONTEND_URL', '/'),
-        'proxy' => env('LINTOL_FRONTEND_PROXY', false)
+        'proxy' => env('LINTOL_FRONTEND_PROXY', false),
+        'max-pagination' => 250
     ],
     'encryption' => [
         'blind-index-key' => env('LINTOL_BLIND_INDEX_KEY', config('app.key'))
+    ],
+    'authentication' => [
+        'ckan' => [
+            'valid-servers' => env('LINTOL_CKAN_SERVERS', false) ? explode(';', env('LINTOL_CKAN_SERVERS')) : []
+        ]
     ]
 ];

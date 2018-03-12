@@ -209,8 +209,9 @@ class ValidationProcess
         $report = $this->reportFactory->make($report);
 
         $report->run()->associate($this->run);
-        $this->run->completed_at = Carbon::now();
-        $this->run->save();
+
+        $this->run->markCompleted();
+
         $report->save();
     }
 

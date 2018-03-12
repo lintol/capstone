@@ -23,4 +23,9 @@ class CkanInstance extends Authenticatable
     ];
 
     public $driver = 'ckan';
+
+    public function resources()
+    {
+        return $this->morphMany(DataResource::class, 'resourceable');
+    }
 }

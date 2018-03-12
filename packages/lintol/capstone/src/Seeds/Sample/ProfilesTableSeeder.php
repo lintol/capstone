@@ -4,6 +4,8 @@ namespace Lintol\Capstone\Seeds\Sample;
 
 use Illuminate\Database\Seeder;
 use Lintol\Capstone\Models\Profile;
+use Lintol\Capstone\Models\Processor;
+use Lintol\Capstone\Models\ProcessorConfiguration;
 use App\User;
 
 class ProfilesTableSeeder extends Seeder
@@ -27,6 +29,18 @@ class ProfilesTableSeeder extends Seeder
         ]);
         $profile->creator()->associate($dataOwner);
         $profile->save();
+
+        $processor = Processor::whereUniqueTag('theodi/csvlint.rb:1')->firstOrFail();
+
+        $configuration = $profile->configurations()->whereProcessorId($processor->id)->first();
+        if (!$configuration) {
+            $configuration = new ProcessorConfiguration;
+            $configuration->profile()->associate($profile);
+            $configuration->processor()->associate($processor);
+        }
+        $configuration->updateDefinition();
+
+        $configuration->save();
 
         $profile = Profile::firstOrNew([
             'name' => 'json profile [test]',

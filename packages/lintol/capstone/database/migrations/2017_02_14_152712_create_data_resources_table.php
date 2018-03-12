@@ -21,12 +21,16 @@ class CreateDataResourcesTable extends Migration
             $table->text('content')->nullable();
 
             $table->string('filename')->nullable();
+            $table->string('remote_id')->nullable();
             $table->string('url')->nullable();
             $table->string('filetype')->nullable();
             $table->string('status')->default('new resource');
             $table->string('source')->nullable();
             $table->string('reportid')->nullable($value = true);
-            $table->string('user')->nullable();
+
+            $table->uuid('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users');
+
             $table->string('archived')->default(false);;
 
             $table->string('resourceable_type')->nullable();

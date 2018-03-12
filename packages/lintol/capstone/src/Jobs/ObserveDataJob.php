@@ -121,8 +121,6 @@ class ObserveDataJob implements ShouldQueue
 
         $runIds = $runs->pluck('id');
 
-        Log::info($runIds);
-
         return $runIds;
     }
 

@@ -40,6 +40,9 @@ Route::group($group, function () {
     Route::resource('dataResources', 'DataResourceController', [
         'only' => ['index', 'store', 'update', 'destroy']
     ]);
+    Route::resource('dataResources/settings', 'DataResourceSettingController', [
+        'only' => ['store']
+    ]);
     /* Will enable when pagination in the front end is working 
     Route::get('dataResources', function () {
       return Lintol\Capstone\Models\DataResource::paginate();

@@ -14,6 +14,7 @@
 Route::get('login', function () { return view('login'); })->name('login');
 Route::get('login/{driver}', 'Auth\LoginController@redirectToProvider')->name('login.by-driver');
 Route::get('login/{driver}/callback', 'Auth\LoginController@handleProviderCallback');
+Route::get('login/{driver}/callback/{id}', 'Auth\LoginController@handleProviderCallback');
 Route::get('logout', 'Auth\LoginController@logout');
 
 if (config('capstone.frontend.proxy', false)) {
@@ -25,7 +26,7 @@ if (config('capstone.frontend.proxy', false)) {
         $frontend = config('capstone.frontend.proxy', false);
         $client = new GuzzleHttp\Client();
         $url = $frontend . $any;
-        \Log::info($url);
+
         $response = $client->request('GET', $url);
         $body = $response->getBody();
         $tokenString = '{{ csrf_token()                       }}';

@@ -62,7 +62,6 @@ class CkanResourceProvider implements ResourceProviderInterface
                 ));
             }
 
-            \Log::info($apiKey);
             $this->ckanClient = CkanClient::factory([
                 'baseUrl' => $this->ckanInstance->uri . '/api',
                 'apiKey' => $apiKey
@@ -79,18 +78,19 @@ class CkanResourceProvider implements ResourceProviderInterface
     {
         $this->loadApiKey();
 
-        /* TODO: filter to user */
-        $localData = DataResource::all()->keyBy('uri');
+        $user = Auth::user();
+        $localData = $this->ckanInstance->resources()->whereUserId($user->id)->get()->keyBy('remote_id');
 
         $ckanData = collect($this->ckanClient->ResourceSearch(['query' => 'format:csv'])['result']['results'])
-            ->map(function ($ckanData) use ($localData) {
-                $data = $localData->get($ckanData['url']);
+            ->map(function ($ckanData) use ($localData, $user) {
+                $data = $localData->get($ckanData['id']);
 
                 if (!$data) {
                     $data = new DataResource;
-                    $data->id = 'remote-' . $ckanData['id'];
                     $data->url = $ckanData['url'];
-                    $data->stored = 'CKAN';
+                    $data->user_id = $user->id;
+                    $data->remote_id = $ckanData['id'];
+                    $data->source = 'CKAN';
                     $data->filetype = 'csv';
                     $data->archived = 0;
                     $data->filename = basename($data->url);
@@ -102,6 +102,37 @@ class CkanResourceProvider implements ResourceProviderInterface
             });
 
         return $ckanData;
+    }
+
+    public function getDataResource($id)
+    {
+        $this->loadApiKey();
+
+        $user = Auth::user();
+        $data = $this->ckanInstance->resources()->whereUserId($user->id)->whereRemoteId($id)->first();
+
+        if (!$data) {
+            $data = new DataResource;
+        }
+
+        $ckanData = $this->ckanClient->ResourceShow(['id' => $id]);
+
+        if ($ckanData) {
+            $ckanData = $ckanData['result'];
+            $data->remote_id = $ckanData['id'];
+            $data->url = $ckanData['url'];
+            $data->user_id = $user->id;
+            $data->source = 'CKAN';
+            $data->filetype = 'csv';
+            $data->archived = 0;
+            $data->filename = basename($data->url);
+            $data->status = 'valid link';
+            $data->resourceable()->associate($this->ckanInstance);
+
+            return $data;
+        }
+
+        return null;
     }
 
     public function getUsers() : Collection

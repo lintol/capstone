@@ -93,15 +93,20 @@
     <body>
       <div class="loginBox">
         <div class="box">
-        {{ HTML::image('img/logo.svg', 'alt text', array('class' => 'logo')) }}
+        {{ HTML::image('images/logo.svg', 'Logo for Project Lintol', array('class' => 'logo')) }}
         <p class="instructions" >Please Login with the following services</p>
         <div>
           <button id="githubBtn" class="oAuthButton github" onClick='window.location="{{ URL::route('login.by-driver', ['driver' => 'github']) }}"'>Sign in with Github</button>
-          <button id='ckanSwapBtn' class="oAuthButton ckan" onClick='ckanSwap()'>Sign in with Ckan</button>
+          <button id='ckanSwapBtn' class="oAuthButton ckan" onClick='ckanSwap()'>Sign in with CKAN</button>
           <div id='ckanServerDiv'  style="display: none" class="ckanServerDetails">
              <label class="instructions" for="ckanServer" >Address:</label>
-             <input id='ckanServer' style="display: inline"  name='ckanServer' placeholder="http://ckan-server"/>
-             <button class="ckanLogin ckan" onClick='ckanTarget(document.getElementById("ckanServer").value)'>Login with Ckan</button>
+             <select id='ckanServer' style="display: inline"  name='ckanServer'>
+                <option disabled>(select a valid server)</option>
+             @foreach (config('capstone.authentication.ckan.valid-servers', []) as $server)
+                <option value='{{ $server }}'>{{ $server }}</option>
+             @endforeach
+             </select>
+             <button class="ckanLogin ckan" onClick='ckanTarget(document.getElementById("ckanServer").value)'>Sign in with CKAN</button>
           </div>
         </div>
       </div>
