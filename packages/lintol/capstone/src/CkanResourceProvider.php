@@ -88,7 +88,6 @@ class CkanResourceProvider implements ResourceProviderInterface
                 if (!$data) {
                     $data = new DataResource;
                     $data->url = $ckanData['url'];
-                    $data->user_id = $user->id;
                     $data->remote_id = $ckanData['id'];
                     $data->source = 'CKAN';
                     $data->filetype = 'csv';

@@ -33,6 +33,7 @@ class ResourceManager
             $dataResource->name = $path;
             $pathParts = pathinfo($path);
             $dataResource->filetype = $pathParts['extension'];
+            $dataResource->status = 'new resource';
             $settings = $dataResource->settings;
             $settings['fileType'] = $dataResource->filetype;
             $dataResource->settings = $settings;

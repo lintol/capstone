@@ -103,19 +103,23 @@ class LoginController extends Controller
 
         $driverServer = $this->socialiteDriver[$driver];
 
-        if (!$driverServer) {
-            if ($remoteServerId) {
-              switch ($driver) {
-                  case 'ckan':
-                      $resourceable = CkanInstance::findOrFail($remoteServerId);
-                      $driverServer = $resourceable->uri;
-                      break;
-                  default:
-                      abort(400, __("No valid OAuth2 server known or provided."));
+        $resourceable = null;
+
+        switch ($driver) {
+            case 'ckan':
+              if (!$remoteServerId) {
+                  abort(400, __("No valid OAuth2 server known or provided."));
               }
-            } else {
-                abort(400, __("No valid OAuth2 server known or provided."));
-            }
+              $resourceable = CkanInstance::findOrFail($remoteServerId);
+              $driverServer = $resourceable->uri;
+              break;
+
+            case 'github':
+              $resourceable = null;
+              break;
+
+            default:
+              abort(400, __("No valid OAuth2 server known or provided."));
         }
 
         $oauthUser = Socialite::driver($driver)->user();
