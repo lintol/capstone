@@ -64,7 +64,7 @@ class ProcessorsTableSeeder extends Seeder
             'description' => 'CSV checking tool from Frictionless Data project',
             'module' => 'good.py',
             'content' => File::get($processorsPath . 'goodtables/good.py'),
-            'rules' => ['fileType' => '/csv/'],
+            'rules' => [],
             'configuration_defaults' => json_encode([
                 'delimiter' => 'comma'
             ]),
@@ -100,7 +100,7 @@ class ProcessorsTableSeeder extends Seeder
             'description' => 'Tool for searching for Personally-Identifiable Information within CSV data',
             'module' => 'pii_legacy.py',
             'content' => File::get($processorsPath . 'pii_legacy.py'),
-            'rules' => ['fileType' => '/csv/'],
+            'rules' => [],
             'definition' => [
                 'docker' => [
                     'image' => 'lintol/ds-pii-legacy',
@@ -119,7 +119,7 @@ class ProcessorsTableSeeder extends Seeder
             'description' => 'GeoJSON boundary checker to make sure data is within given boundaries',
             'module' => 'boundary_checker_impr.py',
             'content' => File::get($processorsPath . 'boundary_checker_impr.py'),
-            'rules' => ['fileType' => '/csv/'],
+            'rules' => ['fileType' => '/geojson/'],
             'definition' => [
                 'docker' => [
                     'image' => 'lintol/doorstep',

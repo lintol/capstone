@@ -34,7 +34,7 @@ class DataResourceSeeder extends Seeder
         for ($i = 0 ; $i < 50 ; $i++) {
             $dataResource = DataResource::firstOrNew([
                 'filename' => 'noids-2017-18-wk-' . $i . '.csv',
-                'url' => 'www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-' . $i . '.csv',
+                'url' => 'https://www.opendatani.gov.uk/dataset/6bf61328-a250-44fd-a787-481503f02865/resource/b213ec96-85cb-489c-abaa-fd4b0eb69fb1/download/noids-2017-18-wk-' . $i . '.csv',
                 'filetype' => 'csv',
                 'status' => 'new resource',
                 'source' => 'External Link',
