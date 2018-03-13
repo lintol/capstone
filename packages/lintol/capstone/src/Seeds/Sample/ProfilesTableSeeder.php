@@ -10,6 +10,29 @@ use App\User;
 
 class ProfilesTableSeeder extends Seeder
 {
+    public function createProfile($dataOwner, $props, $procTag)
+    {
+        $profile = Profile::firstOrNew([
+            'name' => $props['name'],
+        ]);
+
+        $profile->fill($props);
+        $profile->creator()->associate($dataOwner);
+        $profile->save();
+
+        $processor = Processor::whereUniqueTag($procTag)->firstOrFail();
+
+        $configuration = $profile->configurations()->whereProcessorId($processor->id)->first();
+        if (!$configuration) {
+            $configuration = new ProcessorConfiguration;
+            $configuration->profile()->associate($profile);
+            $configuration->processor()->associate($processor);
+        }
+        $configuration->updateDefinition();
+
+        $configuration->save();
+    }
+
     /**
      * Run the database seeds.
      *
@@ -19,89 +42,38 @@ class ProfilesTableSeeder extends Seeder
     {
         $dataOwner = User::whereEmail('do@example.com')->first();
 
-        $profile = Profile::firstOrNew([
-            'name' => 'csv profile [test]',
-        ]);
-        $profile->fill([
-            'description' => 'csv description',
-            'version' => 'version 7',
-            'unique_tag' => 'uniq-44',
-        ]);
-        $profile->creator()->associate($dataOwner);
-        $profile->save();
+        $this->createProfile(
+            $dataOwner,
+            [
+                'name' => 'CSV profile [test]',
+                'description' => 'csv description',
+                'version' => 'version 7',
+                'unique_tag' => 'uniq-44'
+            ],
+            'theodi/csvlint.rb:1'
+        );
 
-        $processor = Processor::whereUniqueTag('theodi/csvlint.rb:1')->firstOrFail();
+        $this->createProfile(
+            $dataOwner,
+            [
+                'name' => 'PII Checker [test]',
+                'description' => 'PII description',
+                'version' => 'version 1',
+                'unique_tag' => 'uniq-48',
+            ],
+            'lintol/ds-pii-legacy:1'
+        );
 
-        $configuration = $profile->configurations()->whereProcessorId($processor->id)->first();
-        if (!$configuration) {
-            $configuration = new ProcessorConfiguration;
-            $configuration->profile()->associate($profile);
-            $configuration->processor()->associate($processor);
-        }
-        $configuration->updateDefinition();
-
-        $configuration->save();
-
-        $profile = Profile::firstOrNew([
-            'name' => 'json profile [test]',
-        ]);
-        $profile->fill([
-            'description' => 'json description',
-            'version' => 'version 8',
-            'unique_tag' => 'uniq-43',
-        ]);
-        $profile->creator()->associate($dataOwner);
-        $profile->save();
-
-        $dataOwner = User::whereEmail('do@example.com')->first();
-
-        $profile = Profile::firstOrNew([
-            'name' => 'PII Checker [test]',
-        ]);
-        $profile->fill([
-            'description' => 'PII description',
-            'version' => 'version 1',
-            'unique_tag' => 'uniq-48',
-        ]);
-        $profile->creator()->associate($dataOwner);
-        $profile->save();
-
-        $processor = Processor::whereUniqueTag('lintol/ds-pii-legacy:1')->firstOrFail();
-
-        $configuration = $profile->configurations()->whereProcessorId($processor->id)->first();
-        if (!$configuration) {
-            $configuration = new ProcessorConfiguration;
-            $configuration->profile()->associate($profile);
-            $configuration->processor()->associate($processor);
-        }
-        $configuration->updateDefinition();
-
-        $configuration->save();
-
-        $dataOwner = User::whereEmail('do@example.com')->first();
-
-        $profile = Profile::firstOrNew([
-            'name' => 'Boundary Checker [test]',
-        ]);
-        $profile->fill([
-            'description' => 'Boundary description',
-            'version' => 'version 1',
-            'unique_tag' => 'uniq-48',
-        ]);
-        $profile->creator()->associate($dataOwner);
-        $profile->save();
-
-        $processor = Processor::whereUniqueTag('lintol/ds-boundary-checker-py:1')->firstOrFail();
-
-        $configuration = $profile->configurations()->whereProcessorId($processor->id)->first();
-        if (!$configuration) {
-            $configuration = new ProcessorConfiguration;
-            $configuration->profile()->associate($profile);
-            $configuration->processor()->associate($processor);
-        }
-        $configuration->updateDefinition();
-
-        $configuration->save();
+        $this->createProfile(
+            $dataOwner,
+            [
+                'name' => 'Boundary Checker [test]',
+                'description' => 'Boundary description',
+                'version' => 'version 1',
+                'unique_tag' => 'uniq-50',
+            ],
+            'lintol/ds-boundary-checker-py:1'
+        );
 
     }
 }

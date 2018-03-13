@@ -60,10 +60,11 @@ class Transformer extends Fractal\TransformerAbstract
                 if ($relation->isToOneRelationship()) {
                     throw new Exception("Not yet implemented");
                 } else {
-                    $model->{$relationName}->each(function ($resource) {
-                        \Log::info($resource->id);
+                    while (!$model->{$relationName}->isEmpty()) {
+                        $resource = $model->{$relationName}->pop();
                         $resource->delete();
-                    });
+                    }
+
                     array_map(function ($resource) use ($model, $relationName) {
                         $resource = app(self::$typeToTransformerClass[$resource->type()])->parseResource($resource);
                         $model->{$relationName}->add($resource);
