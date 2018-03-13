@@ -67,6 +67,11 @@ def check_ips(df, rprt):
     return check_regex(df, rprt, re.compile(rx), 'ip', _("Possible IP address found"))
 
 
+def set_properties(df, rprt):
+    rprt.set_properties(headers=list(df.columns))
+    return rprt
+
+
 def check_nltk(df, rprt):
     ner = StanfordNERTagger('classifiers/english.all.3class.distsim.crf.ser.gz')
 
@@ -143,7 +148,8 @@ class PiiProcessor(DoorstepProcessor):
             'postcodes': (check_postcodes, 'read', self.make_report()),
             'regex': (workflow_condense, 'ips', 'email', 'mac', 'postcodes'),
             'nltk': (check_nltk, 'read', 'regex'),
-            'output': (lambda rprt: (None, rprt), 'nltk')
+            'properties': (set_properties, 'read', 'nltk'),
+            'output': (lambda rprt: (None, rprt), 'properties')
         }
 
         # Returns workflow dict
