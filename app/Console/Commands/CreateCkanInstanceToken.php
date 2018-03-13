@@ -40,7 +40,7 @@ class CreateCkanInstanceToken extends Command
     {
         $ckanInstanceId = $this->argument('ckan-instance-id');
 
-        $instance = CkanInstance::find($ckanInstanceId);
+        $instance = CkanInstance::findOrFail($ckanInstanceId);
 
         $accessToken = $instance->createToken('lintol-capstone-api-token')->accessToken;
 

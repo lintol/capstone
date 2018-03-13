@@ -42,10 +42,20 @@ class Report extends Model
             $report->name = '(none)';
         }
         $report->content = json_decode($result);
+        $content = json_decode($report->content, true);
 
-        $report->errors = 0;
-        $report->warnings = 0;
-        $report->passes = 0;
+        if (array_key_exists('error-count', $content)) {
+            $report->errors = (int) $content['error-count'];
+        }
+
+        if (array_key_exists('warning-count', $content)) {
+            $report->warnings = (int) $content['warning-count'];
+        }
+
+        if (array_key_exists('information-count', $content)) {
+            $report->passes = (int) $content['information-count'];
+        }
+
         $report->quality_score = 0;
 
         $report->run()->associate($run);

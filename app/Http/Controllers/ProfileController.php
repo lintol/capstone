@@ -102,12 +102,29 @@ class ProfileController extends Controller
 
         $profile = $this->transformer->parse($input, $profile);
 
-        if ($profile->push()) {
-            return fractal()
-                ->item($profile, $this->transformer, 'profiles')
-                ->respond();
+        $profile->configurations->each(function ($configuration) {
+          $configuration->updateDefinition();
+        });
+
+        DB::beginTransaction();
+
+        try {
+            if (!$profile->save()) {
+                abort(400, "Invalid profile data");
+            }
+
+            if (!$profile->configurations()->saveMany($profile->configurations)) {
+                abort(400, "Invalid configuration data");
+            }
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollback();
+            throw $e;
         }
 
-        abort(400, __("Invalid data"));
+        return fractal()
+            ->item($profile, $this->transformer, 'profiles')
+            ->respond();
     }
 }

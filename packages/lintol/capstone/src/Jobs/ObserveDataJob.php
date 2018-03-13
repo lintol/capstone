@@ -76,11 +76,13 @@ class ObserveDataJob implements ShouldQueue
                         $settings = $res[2];
 
                         try {
-                            $this->exampleValidationLaunch($dataUri, $settings);
+                            $validationIds = $this->exampleValidationLaunch($dataUri, $settings);
                         } catch (\Exception $e) {
                             Log::error($e);
                             throw $e;
                         }
+
+                        return $validationIds;
                     }
                 );
         }, false);
