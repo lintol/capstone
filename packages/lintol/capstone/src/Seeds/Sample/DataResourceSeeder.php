@@ -25,7 +25,29 @@ class DataResourceSeeder extends Seeder
             'url' => 'https://www.opendatani.gov.uk/dataset/4c9ae0a2-0238-459e-8b4d-1172bec9dc3c/resource/51556b4d-85bd-4625-936d-840724f3a877/download/waste-sites.geojson',
             'filetype' => 'geojson',
             'status' => 'report run',
-            'source' => 'CKAN',
+            'source' => 'External Link',
+            'reportid' => '',
+            'user_id' => $user->id
+        ]);
+        $dataResource->save();
+
+        $dataResource = DataResource::firstOrNew([
+            'filename' => 'file_with_long_file_name_to_test_text_wrapping_and_spacing.csv',
+            'url' => 'https://www.opendatani.gov.uk/dataset/4c9ae0a2-0238-459e-8b4d-1172bec9dc3c/resource/51556b4d-85bd-4625-936d-840724f3a877/download/file_with_long_file_name_to_test_text_wrapping_and_spacing.csv',
+            'filetype' => 'csv',
+            'status' => 'report run',
+            'source' => 'External Link',
+            'reportid' => '',
+            'user_id' => $user->id
+        ]);
+        $dataResource->save();
+
+        $dataResource = DataResource::firstOrNew([
+            'filename' => 'really-long-file-name-that-is-100-characters-long-for-odd-open-data.csv',
+            'url' => 'https://www.opendatani.gov.uk/dataset/4c9ae0a2-0238-459e-8b4d-1172bec9dc3c/resource/51556b4d-85bd-4625-936d-840724f3a877/download/really-long-file-name-that-is-100-characters-long-for-odd-open-data.csv',
+            'filetype' => 'csv',
+            'status' => 'report run',
+            'source' => 'External Link',
             'reportid' => '',
             'user_id' => $user->id
         ]);
