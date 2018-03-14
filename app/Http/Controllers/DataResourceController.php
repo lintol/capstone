@@ -147,7 +147,7 @@ class DataResourceController extends Controller
           'dataProfileId' => $request->input('profileId')
         ];
 
-        $dataResource->source = $request->input('stored');
+        $dataResource->source = $request->input('source');
         $dataResource->url = $request->input('url');
 
         if ($user) {
