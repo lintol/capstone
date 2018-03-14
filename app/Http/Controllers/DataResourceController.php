@@ -87,7 +87,7 @@ class DataResourceController extends Controller
                 }
                 foreach ($filters as $filter => $value) {
                     if ($filter == 'created_at') {
-                        $query = $query->whereDate('created_at', '=', $value);
+                        $query = $query->whereDate('created_at', '=', date('Y-m-d', $value));
                     } else {
                         $query = $query->where($filter, '=', $value);
                     }
