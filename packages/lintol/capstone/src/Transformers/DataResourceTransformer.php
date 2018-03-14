@@ -21,6 +21,7 @@ class DataResourceTransformer extends Fractal\TransformerAbstract
             'filetype' => $data->filetype,
             'status' => $data->status,
             'source' => $data->source,
+            'created_at' => $data->created_at,
             'archived' => $data->archived,
             'providerId' => $data->resourceable ? $data->resourceable->id : null,
             'providerType' => $data->resourceable ? $data->resourceable->driver : null,
