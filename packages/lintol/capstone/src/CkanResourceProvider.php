@@ -2,6 +2,7 @@
 
 namespace Lintol\Capstone;
 
+use Carbon\Carbon;
 use Auth;
 use Socialite;
 use Silex\ckan\CkanClient;
@@ -95,11 +96,14 @@ class CkanResourceProvider implements ResourceProviderInterface
                     $data->filename = basename($data->url);
                     $data->status = 'valid link';
                     $data->resourceable = $this->ckanInstance;
+                    $data->created_at = $ckanData['created'] ? Carbon::parse($ckanData['created']) : null;
+                    $data->updated_at = $ckanData['last_modified'] ? Carbon::parse($ckanData['last_modified']) : null;
                 }
 
                 return $data;
             });
 
+        \Log::info($ckanData);
         return $ckanData;
     }
 
