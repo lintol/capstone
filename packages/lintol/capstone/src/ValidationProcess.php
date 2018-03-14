@@ -41,6 +41,7 @@ class ValidationProcess
         $runs = $profiles->map(function ($profile) use ($data, $user) {
             $run = app()->make(ValidationRun::class);
 
+            $run->requested_at = Carbon::now();
             $run->dataResource()->associate($data);
             $run->profile()->associate($profile);
             if ($user) {
@@ -88,14 +89,15 @@ class ValidationProcess
     {
         $this->run->doorstep_server_id = $serverId;
         $this->run->doorstep_session_id = $sessionId;
-        $this->run->requested_at = Carbon::now();
+        $this->run->initiated_at = Carbon::now();
         $this->run->completion_status = ValidationRun::STATUS_RUNNING;
         $this->run->save();
     }
 
     public function engage()
     {
-        return $this->session->call('com.ltldoorstep.engage');
+        $call = $this->session->call('com.ltldoorstep.engage');
+        return $call;
     }
 
     /**
@@ -170,6 +172,7 @@ class ValidationProcess
         return $this->engage()
         ->then(
             function ($res) {
+                \Log::info('engaged...');
                 $this->beginValidation($res[0][0], $res[0][1]);
                 return $this->sendProcessor();
             },
@@ -179,6 +182,7 @@ class ValidationProcess
             }
         )->then(
             function ($res) {
+                \Log::info('sending data...');
                 return $this->sendData();
             },
             function ($error) {
