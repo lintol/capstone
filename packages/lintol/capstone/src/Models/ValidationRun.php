@@ -11,6 +11,14 @@ class ValidationRun extends Model
 {
     use UuidModelTrait;
 
+    protected $dates = [
+        'created_at',
+        'updated_at',
+        'requested_at',
+        'initiated_at',
+        'completed_at'
+    ];
+
     protected $casts = [
         'settings' => 'json',
         'doorstep_definition' => 'json'
