@@ -54,7 +54,7 @@
                border: 1px solid #D4D4D4;
                background-color: #FFFFFF;
                width: 508px;
-               height: 250px;
+               height: 300px;
                margin: 181px  auto 0px;
             }
             .oAuthButton {
