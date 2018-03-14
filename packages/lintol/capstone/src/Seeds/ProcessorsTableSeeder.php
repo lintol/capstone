@@ -63,7 +63,7 @@ class ProcessorsTableSeeder extends Seeder
             'name' => 'CSV Checking by GoodTables',
             'description' => 'CSV checking tool from Frictionless Data project',
             'module' => 'good.py',
-            'content' => File::get($processorsPath . 'goodtables/good.py'),
+            'content' => File::get($processorsPath . 'good.py'),
             'rules' => [],
             'configuration_defaults' => json_encode([
                 'delimiter' => 'comma'
@@ -127,10 +127,10 @@ class ProcessorsTableSeeder extends Seeder
                 ]
             ],
             'supplementary_links' => [
-              'GB-NIR' => 'https://raw.githubusercontent.com/lintol/doorstep/master/example/data/osni-ni-outline-lowres.geojson',
-              'GB-NIR:Settlement:Belfast' => 'https://raw.githubusercontent.com/lintol/doorstep/master/example/data/settlement-boundaries/belfast-settlement-development.geojson',
-              'GB-NIR:Settlement:Strabane' => 'https://raw.githubusercontent.com/lintol/doorstep/master/example/data/settlement-boundaries/strabane-settlement-development.geojson',
-              'GB-NIR:Settlement:Enniskillen' => 'https://raw.githubusercontent.com/lintol/doorstep/master/example/data/settlement-boundaries/enniskillen-settlement-development.geojson'
+              'GB-NIR' => 'https://s3.eu-west-2.amazonaws.com/resources.lintol.io/osni-ni-outline-lowres.geojson',
+              'GB-NIR:Settlement:Belfast' => 'https://s3.eu-west-2.amazonaws.com/resources.lintol.io/settlement-boundaries/belfast-settlement-development.geojson',
+              'GB-NIR:Settlement:Strabane' => 'https://s3.eu-west-2.amazonaws.com/resources.lintol.io/settlement-boundaries/strabane-settlement-development.geojson',
+              'GB-NIR:Settlement:Enniskillen' => 'https://s3.eu-west-2.amazonaws.com/resources.lintol.io/settlement-boundaries/enniskillen-settlement-development.geojson'
             ],
             'configuration_defaults' => json_encode([
                 'boundary' => '$GB-FMO'
