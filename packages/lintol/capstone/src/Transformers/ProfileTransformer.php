@@ -40,6 +40,8 @@ class ProfileTransformer extends Transformer
             'name' => $profile->name,
             'description' => $profile->description,
             'version' => $profile->version,
+            'created_at' => $profile->created_at,
+            'updated_at' => $profile->updated_at,
             'creatorId' => $profile->creator_id,
             'uniqueTag' => $profile->unique_tag
         ];
