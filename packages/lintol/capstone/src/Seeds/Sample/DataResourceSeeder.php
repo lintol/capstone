@@ -16,7 +16,7 @@ class DataResourceSeeder extends Seeder
     public function run()
     {
         $user = User::firstOrCreate([
-            'name' => 'martin'
+            'name' => 'seeder'
         ]);
 
         // $dataOwner = User::whereEmail('do@example.com')->first();
