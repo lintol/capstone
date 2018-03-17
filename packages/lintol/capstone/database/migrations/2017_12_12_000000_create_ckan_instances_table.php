@@ -20,8 +20,8 @@ class CreateCkanInstancesTable extends Migration
             $table->timestamps();
             $table->unique('id');
 
-            $table->string('client_id')->nullable();
-            $table->string('client_secret')->nullable();
+            $table->text('client_id')->nullable();
+            $table->text('client_secret')->nullable();
         });
     }
 

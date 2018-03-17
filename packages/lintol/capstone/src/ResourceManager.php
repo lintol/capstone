@@ -3,8 +3,11 @@
 namespace Lintol\Capstone;
 
 use Auth;
+use Socialite;
 use Lintol\Capstone\CkanResourceProvider;
 use Lintol\Capstone\Models\DataResource;
+use Crypt;
+use Laravel\Socialite\Two\CkanProvider;
 use GuzzleHttp;
 
 class ResourceManager
@@ -52,6 +55,38 @@ class ResourceManager
         }
 
         return null;
+    }
+
+    public function getOAuthDriver($name, $resourceable = null)
+    {
+        if ($name == 'ckan') {
+            if ($resourceable) {
+                \Log::info($resourceable);
+                $config = config('services.ckan');
+                if ($resourceable->client_id && $resourceable->client_secret) {
+                    $clientId = Crypt::decrypt($resourceable->client_id);
+                    $clientSecret = Crypt::decrypt($resourceable->client_secret);
+                    $config['client_id'] = $clientId;
+                    $config['client_secret'] = $clientSecret;
+                    $config['url'] = $resourceable->uri;
+                }
+                \Log::info($clientId);
+                $driver = Socialite::buildProvider(
+                    CkanProvider::class, $config
+                );
+
+                $driver->setRootUrl($resourceable->uri);
+
+                $redirectUrl = $driver->getRedirectUrl() . '/' . $resourceable->id;
+                $driver->redirectUrl($redirectUrl);
+            } else {
+                abort(400, __("You must provide a valid CKAN server to authenticate against."));
+            }
+        } else {
+            $driver = Socialite::driver($driverName);
+        }
+
+        return $driver;
     }
 
     public function getProvider()

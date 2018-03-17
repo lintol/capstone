@@ -4,6 +4,7 @@ namespace Lintol\Capstone;
 
 use Carbon\Carbon;
 use Auth;
+use Lintol\Capstone\ResourceManager;
 use Socialite;
 use Silex\ckan\CkanClient;
 use Illuminate\Support\Collection;
@@ -23,15 +24,13 @@ class CkanResourceProvider implements ResourceProviderInterface
 
     protected $ckanInstance;
 
-    public function __construct()
+    public function __construct(ResourceManager $resourceManager)
     {
-        $this->driver = Socialite::driver('ckan');
-
-
         /* This should be the only way of setting user credentials */
         $user = Auth::user();
         if ($user && $user->primaryRemoteUser && $user->primaryRemoteUser->driver === 'ckan') {
             $this->remoteUser = $user->primaryRemoteUser;
+            $this->driver = $resourceManager->getOAuthDriver('ckan', $this->remoteUser->resourceable);
         } else {
             throw RuntimeException(__(
                 "Attempt to create a CKAN resource provider " .

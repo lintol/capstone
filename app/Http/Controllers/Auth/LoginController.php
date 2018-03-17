@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Auth;
 use Auth;
 use App\User;
 use Lintol\Capstone\Models\CkanInstance;
+use Lintol\Capstone\ResourceManager;
 use Hash;
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Socialite;
+use Crypt;
+use Laravel\Socialite\Two\CkanProvider;
 
 class LoginController extends Controller
 {
@@ -63,8 +66,6 @@ class LoginController extends Controller
             abort(400, __("No OAuth2 available for this provider"));
         }
 
-        $driver = Socialite::driver($driverName);
-
         if ($driverName == 'ckan') {
             $driverServer = request()->input('server');
             $validServers = config('capstone.authentication.ckan.valid-servers');
@@ -78,13 +79,12 @@ class LoginController extends Controller
                     ]);
                 }
 
-                $driver->setRootUrl($driverServer);
-
-                $redirectUrl = $driver->getRedirectUrl() . '/' . $resourceable->id;
-                $driver->redirectUrl($redirectUrl);
+                $driver = app(ResourceManager::class)->getOAuthDriver($driverName, $resourceable);
             } else {
                 abort(400, __("You must provide a valid CKAN server to authenticate against."));
             }
+        } else {
+            $driver = Socialite::driver($driverName);
         }
 
         return $driver->redirect();
@@ -122,7 +122,7 @@ class LoginController extends Controller
               abort(400, __("No valid OAuth2 server known or provided."));
         }
 
-        $oauthUser = Socialite::driver($driver)->user();
+        $oauthUser = app(ResourceManager::class)->getOAuthDriver($driver, $resourceable)->user();
 
         $user = User::findByRemote($driver, $driverServer, $oauthUser, true);
 
