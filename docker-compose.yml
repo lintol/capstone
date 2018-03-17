@@ -9,20 +9,22 @@ services:
     env_file:
       - ./infrastructure/config/secrets/laravel.env
   phpfpm:
-    image: flaxandteal/docker-laravel-phpfpm:fpm-7.1.6
+    build:
+      context: ./infrastructure/containers/phpfpm
+      dockerfile: Dockerfile.debug
     links:
       - db:db
       - redis:redis
     volumes:
       - ./infrastructure/..:/data/www
       - ./infrastructure/..:/var/www/app
+      - ./infrastructure/storage/phpfpm/xdebug:/tmp/xdebug
     env_file:
       - ./infrastructure/config/secrets/laravel.env
       - ./infrastructure/config/secrets/redis.env
     environment:
       REDIS_HOST: "redis"
       REDIS_PORT: 6379
-      CAPSTONE_WITHOUT_AUTH: 0
   nginx:
     image: nginx:stable
     volumes:
