@@ -11,7 +11,13 @@
 |
 */
 
-Route::get('login', function () { return view('login'); })->name('login');
+Route::get('login', function () {
+    if (Auth::user()) {
+        return redirect('/');
+    }
+
+    return view('login');
+})->name('login');
 Route::get('login/{driver}', 'Auth\LoginController@redirectToProvider')->name('login.by-driver');
 Route::get('login/{driver}/callback', 'Auth\LoginController@handleProviderCallback');
 Route::get('login/{driver}/callback/{id}', 'Auth\LoginController@handleProviderCallback');
