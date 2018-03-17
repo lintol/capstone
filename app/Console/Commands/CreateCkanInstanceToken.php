@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use Crypt;
 use Lintol\Capstone\Models\CkanInstance;
 use Illuminate\Console\Command;
 
@@ -12,7 +13,7 @@ class CreateCkanInstanceToken extends Command
      *
      * @var string
      */
-    protected $signature = 'ltl:ckan-token {ckan-instance-id}';
+    protected $signature = 'ltl:ckan-token {name} {uri} {client-id} {client-secret}';
 
     /**
      * The console command description.
@@ -38,9 +39,18 @@ class CreateCkanInstanceToken extends Command
      */
     public function handle()
     {
-        $ckanInstanceId = $this->argument('ckan-instance-id');
+        $name = $this->argument('name');
+        $uri = $this->argument('uri');
+        $clientId = $this->argument('client-id');
+        $clientSecret = $this->argument('client-secret');
 
-        $instance = CkanInstance::findOrFail($ckanInstanceId);
+        $instance = CkanInstance::firstOrNew([
+            'uri' => $uri
+        ]);
+        $instance->name = $name;
+        $instance->client_id = Crypt::encrypt($clientId);
+        $instance->client_secret = Crypt::encrypt($clientSecret);
+        $instance->save();
 
         $accessToken = $instance->createToken('lintol-capstone-api-token')->accessToken;
 
