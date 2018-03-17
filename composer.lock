@@ -48,16 +48,16 @@
         },
         {
             "name": "beberlei/assert",
-            "version": "v2.9.2",
+            "version": "v2.9.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/beberlei/assert.git",
-                "reference": "2d555f72f3f4ff9e72a7bc17cb8a53c86737c8a0"
+                "reference": "7d8108458bbe3d063dc3315278b2001a7156fade"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/beberlei/assert/zipball/2d555f72f3f4ff9e72a7bc17cb8a53c86737c8a0",
-                "reference": "2d555f72f3f4ff9e72a7bc17cb8a53c86737c8a0",
+                "url": "https://api.github.com/repos/beberlei/assert/zipball/7d8108458bbe3d063dc3315278b2001a7156fade",
+                "reference": "7d8108458bbe3d063dc3315278b2001a7156fade",
                 "shasum": ""
             },
             "require": {
@@ -99,7 +99,7 @@
                 "assertion",
                 "validation"
             ],
-            "time": "2018-01-25T13:33:16+00:00"
+            "time": "2018-03-16T17:46:00+00:00"
         },
         {
             "name": "behat/behat",
@@ -3387,7 +3387,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/lintol/CKAN_PHP.git",
-                "reference": "37ad1e16ec7f6c51932af73ad7b709910775deba"
+                "reference": "f0b5e7a7d71b7f9c49c12d1f76944029110c98ea"
             },
             "require": {
                 "guzzle/guzzle": "*"
@@ -3403,7 +3403,7 @@
                     "Silex\\ckan\\tests": "test/"
                 }
             },
-            "time": "2018-03-03T13:34:29+00:00"
+            "time": "2018-03-17T22:35:30+00:00"
         },
         {
             "name": "smartins/passport-multiauth",
