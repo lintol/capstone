@@ -7,6 +7,7 @@ use Log;
 use RuntimeException;
 use Event;
 use Carbon\Carbon;
+use Throwable;
 use Thruway\ClientSession;
 use Lintol\Capstone\Models\ValidationRun;
 use Lintol\Capstone\Models\Report;
@@ -19,6 +20,8 @@ class ValidationProcess
     protected $run;
 
     protected $clientSession;
+
+    protected $endedInException = false;
 
     public function fromDataSession($serverId, $sessionId, ClientSession $session)
     {
@@ -40,24 +43,35 @@ class ValidationProcess
         $profiles = app()->make(Profile::class)->match($data->settings);
         $runs = $profiles->map(function ($profile) use ($data, $user) {
             $run = app()->make(ValidationRun::class);
-
             $run->requested_at = Carbon::now();
-            $run->dataResource()->associate($data);
-            $run->profile()->associate($profile);
-            if ($user) {
-                $run->creator()->associate($user);
-            }
-
-            $settings = $data->settings;
-            if (!$run->buildDefinition($settings)) {
-                \Log::info(__("Definition not built"));
-                return null;
-            }
-
             $run->save();
 
-            \Log::info(__("Definition built"));
-            return $run;
+            try {
+                if ($user) {
+                    $run->creator()->associate($user);
+                }
+
+                $run->dataResource()->associate($data);
+
+                /* Saving here ensures this information is kept on error */
+                $run->save();
+
+                $run->profile()->associate($profile);
+
+                $settings = $data->settings;
+                if (!$run->buildDefinition($settings)) {
+                    \Log::info(__("Definition not built"));
+                    return null;
+                }
+
+                $run->save();
+
+                \Log::info(__("Definition built"));
+                return $run;
+            } catch (Throwable $e) {
+                $reportFactory = app()->make(Report::class);
+                self::_recordException($reportFactory, $run, get_class($e) . ':' . $e->getCode(), $e->getMessage());
+            }
         })
         ->filter();
 
@@ -65,6 +79,72 @@ class ValidationProcess
             ProcessDataJob::dispatch($run->id);
         });
         return $runs;
+    }
+
+    protected function recordException($e)
+    {
+        if ($e instanceof \Thruway\Message\ErrorMessage) {
+            $code = (string)($e) . ':' . $e->getErrorMsgCode();
+            $message = json_encode([
+                'details' => $e->getDetails(),
+                'arguments' => $e->getArguments(),
+                'keyword arguments' => $e->getArgumentsKw()
+            ]);
+        } elseif ($e instanceof \Throwable) {
+            $code = get_class($e) . ':' . $e->getCode();
+            $message = $e->getMessage();
+        } else {
+            $code = get_class($e);
+            $message = (string)$e;
+        }
+        $this->recordExceptionString($code, $message);
+    }
+
+    protected function recordExceptionString(string $code, string $message)
+    {
+        Log::error($code);
+        Log::error($message);
+        if ($this->endedInException) {
+            Log::info('... already recorded an exception for this validation process');
+        } else {
+            $this->endedInException = true;
+
+            if ($this->run) {
+                self::_recordException($this->reportFactory, $this->run, $code, $message);
+            }
+        }
+    }
+
+    protected static function _recordException(Report $reportFactory, ValidationRun $run, string $code, string $message)
+    {
+        \Log::error('-exception-');
+
+        $content = [
+            'valid' => false,
+            'exception' => true,
+            'error-count' => 1,
+            'tables' => [
+                [
+                    'warnings' => [],
+                    'informations' => [],
+                    'errors' => [
+                        'processor' => '(unidentified)',
+                        'code' => $code,
+                        'message' => $message,
+                        'item' => [
+                            'type' => 'Exception',
+                            'location' => null,
+                            'definition' => null
+                        ]
+                    ]
+                ]
+            ]
+        ];
+        $report = $reportFactory->make($content, $run, true);
+        $run->markCompleted();
+
+        $report->save();
+        $run->save();
     }
 
     public function make($validationId, ClientSession $session)
@@ -114,8 +194,8 @@ class ValidationProcess
 
     public function sendProcessor()
     {
-        $configuration = $this->run->profile->configurations[0];
-        $processor = $configuration->processor;
+        $configurations = $this->run->profile->configurations;
+        $processors = $configurations->pluck('processor');
         $definition = $this->run->doorstep_definition;
 
         $future = $this->session->call(
@@ -125,7 +205,7 @@ class ValidationProcess
             ),
             [
                 $this->run->doorstep_session_id,
-                [$processor->module => $processor->content],
+                $processors->pluck('content', 'module')->toArray(),
                 $definition
             ]
         );
@@ -169,37 +249,50 @@ class ValidationProcess
     public function run()
     {
         \Log::info('running...');
-        return $this->engage()
-        ->then(
-            function ($res) {
-                \Log::info('engaged...');
-                $this->beginValidation($res[0][0], $res[0][1]);
-                return $this->sendProcessor();
-            },
-            function ($error) {
-                Log::info($error);
-                throw new \RuntimeException($error);
-            }
-        )->then(
-            function ($res) {
-                \Log::info('sending data...');
-                return $this->sendData();
-            },
-            function ($error) {
-                Log::info($error);
-                throw new \RuntimeException($error);
-            }
-        )->then(
-            function ($res) {
-                $this->markInitiated();
+        try {
+            $promise = $this->engage()
+            ->then(
+                function ($res) {
+                    \Log::info('engaged...');
+                    $this->beginValidation($res[0][0], $res[0][1]);
+                    return $this->sendProcessor();
+                },
+                function ($error) {
+                    Log::info(get_class($error));
+                    Log::info($error);
+                    $this->recordException($error);
+                    throw new \RuntimeException($error);
+                }
+            )->then(
+                function ($res) {
+                    \Log::info('sending data...');
+                    return $this->sendData();
+                },
+                function ($error) {
+                    Log::info(get_class($error));
+                    Log::info($error);
+                    $this->recordException($error);
+                    throw new \RuntimeException($error);
+                }
+            )->then(
+                function ($res) {
+                    $this->markInitiated();
 
-                Log::info(__("Validation process initiated for ") . $this->run->id);
-            },
-            function ($error) {
-                Log::info($error);
-                throw new \RuntimeException($error);
-            }
-        );
+                    Log::info(__("Validation process initiated for ") . $this->run->id);
+                },
+                function ($error) {
+                    Log::info(get_class($error));
+                    $this->recordException($error);
+                    throw new \RuntimeException($error);
+                }
+            );
+        } catch (Throwable $e) {
+            Log::info(get_class($e));
+            Log::error($e);
+            $this->recordException($e);
+            throw $e;
+        }
+        return $promise;
     }
 
     protected function getReport()
@@ -235,8 +328,9 @@ class ValidationProcess
                 return $this->outputReport($res);
             },
             function ($error) {
-                Log::info($error);
-                throw new \RuntimeException($error);
+                $e = new \RuntimeException($error);
+                $this->recordException($e);
+                throw $e;
             }
         )
         ->done(function ($res) {
