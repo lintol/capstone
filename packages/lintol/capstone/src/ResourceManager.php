@@ -61,7 +61,6 @@ class ResourceManager
     {
         if ($name == 'ckan') {
             if ($resourceable) {
-                \Log::info($resourceable);
                 $config = config('services.ckan');
                 if ($resourceable->client_id && $resourceable->client_secret) {
                     $clientId = Crypt::decrypt($resourceable->client_id);
@@ -70,7 +69,6 @@ class ResourceManager
                     $config['client_secret'] = $clientSecret;
                     $config['url'] = $resourceable->uri;
                 }
-                \Log::info($clientId);
                 $driver = Socialite::buildProvider(
                     CkanProvider::class, $config
                 );
