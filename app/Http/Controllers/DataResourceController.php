@@ -74,7 +74,7 @@ class DataResourceController extends Controller
 
                 $data = collect();
                 if ($resourceProvider) {
-                    $data = $resourceProvider->getDataResources();
+                    $data = $resourceProvider->getDataResources($search, $filters, $sortBy, $orderDesc);
                 }
 
                 $paginator = new LengthAwarePaginator($data, $data->count(), $count);
