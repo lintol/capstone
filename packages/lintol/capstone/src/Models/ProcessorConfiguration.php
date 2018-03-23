@@ -13,6 +13,7 @@ class ProcessorConfiguration extends Model
     protected $casts = [
         'definition' => 'json',
         'configuration' => 'json',
+        'user_configuration_storage' => 'json',
         'rules' => 'json'
     ];
 
@@ -54,9 +55,10 @@ class ProcessorConfiguration extends Model
 
     public function buildDefinition()
     {
-        $this->configuration = json_decode($this->user_configuration_storage);
+        $this->configuration = json_decode(json_encode($this->user_configuration_storage), true);
 
         $supplementary = [];
+        \Log::info($this->configuration);
         foreach ($this->configuration as $key => $value) {
           if (strlen($value) > 3 && substr($value, 0, 3) == '$->') {
             $value = substr($value, 3);

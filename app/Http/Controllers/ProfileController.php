@@ -103,7 +103,7 @@ class ProfileController extends Controller
         $profile = $this->transformer->parse($input, $profile);
 
         $profile->configurations->each(function ($configuration) {
-          $configuration->updateDefinition();
+            $configuration->updateDefinition();
         });
 
         DB::beginTransaction();
