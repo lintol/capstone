@@ -28,7 +28,7 @@ class ProcessorConfigurationTransformer extends Transformer
     {
         return [
             'id' => $configuration->id,
-            'userConfigurationStorage' => json_encode($configuration->user_configuration_storage)
+            'userConfigurationStorage' => json_encode($configuration->user_configuration_storage, JSON_FORCE_OBJECT)
         ];
     }
 
