@@ -109,7 +109,6 @@ class ValidationProcess
             Log::info('... already recorded an exception for this validation process');
         } else {
             $this->endedInException = true;
-
             if ($this->run) {
                 self::_recordException($this->reportFactory, $this->run, $code, $message);
             }
@@ -122,11 +121,13 @@ class ValidationProcess
 
         $content = [
             'valid' => false,
+            'table-count' => 1,
             'exception' => true,
             'error-count' => 1,
             'preset' => 'exception',
             'tables' => [
                 [
+                    'source' => null,
                     'warnings' => [],
                     'informations' => [],
                     'errors' => [
@@ -143,6 +144,9 @@ class ValidationProcess
                 ]
             ]
         ];
+        if ($run->dataResource) {
+            $content['tables'][0]['source'] = $run->dataResource->url;
+        }
         if (is_string($message)) {
             $content['tables'][0]['errors'][0]['message'] = $message;
         } else {
@@ -155,9 +159,10 @@ class ValidationProcess
         }
 
         $report = $reportFactory->make($content, $run, true);
-        $run->markCompleted();
 
         $report->save();
+
+        $run->markCompleted();
         $run->save();
     }
 
@@ -326,9 +331,9 @@ class ValidationProcess
     {
         $report = $this->reportFactory->make($report, $this->run);
 
-        $this->run->markCompleted();
-
         $report->save();
+
+        $this->run->markCompleted();
     }
 
     /**
@@ -354,7 +359,6 @@ class ValidationProcess
         )
         ->done(function ($res) {
             Log::info("Completed: " . $this->run->id);
-            Event::fire(new ResultRetrievedEvent($this->run->id));
         });
     }
 }
