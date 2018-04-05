@@ -29,7 +29,6 @@ class ResultRetrievedListener
      */
     public function handle(ResultRetrievedEvent $event)
     {
-        Log::info('Publishing com.ltlcapstone.validation.' . $event->validationId . '.event_complete');
         $validation = ValidationRun::findOrFail($event->validationId);
 
         if (!$validation) {
@@ -39,9 +38,15 @@ class ResultRetrievedListener
         $this->wampConnection->execute(function ($session) use ($validation) {
             Log::info('Publishing com.ltlcapstone.validation.' . $validation->id . '.event_complete');
 
+            echo 'Publishing com.ltlcapstone.validation.' . $validation->id . '.event_complete';
+            $content = null;
+            if ($validation->report) {
+                $content = $validation->report->content;
+            }
+
             return $session->publish(
                 'com.ltlcapstone.validation.' . $validation->id . '.event_complete',
-                [$validation->report->content]
+                [$content]
             );
         }, false);
     }

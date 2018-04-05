@@ -16,3 +16,5 @@ infrastructure
 *SFConflict*
 ~
 /storage/db
+composer.phar
+/secrets

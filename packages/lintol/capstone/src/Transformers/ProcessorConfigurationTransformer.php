@@ -15,7 +15,9 @@ class ProcessorConfigurationTransformer extends Transformer
     public static function inputMapping()
     {
         return [
-            'userConfigurationStorage' => 'user_configuration_storage',
+            'userConfigurationStorage' => function ($userConfigurationStorage) {
+                return ['user_configuration_storage' => json_decode($userConfigurationStorage)];
+            },
             'processor' => function ($processor) {
                 return ['processor_id' => $processor['id']];
             }
@@ -26,7 +28,7 @@ class ProcessorConfigurationTransformer extends Transformer
     {
         return [
             'id' => $configuration->id,
-            'userConfigurationStorage' => $configuration->user_configuration_storage
+            'userConfigurationStorage' => json_encode($configuration->user_configuration_storage, JSON_FORCE_OBJECT)
         ];
     }
 

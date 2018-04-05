@@ -4,6 +4,7 @@ namespace Lintol\Capstone;
 
 use Carbon\Carbon;
 use Auth;
+use Lintol\Capstone\ResourceManager;
 use Socialite;
 use Silex\ckan\CkanClient;
 use Illuminate\Support\Collection;
@@ -23,15 +24,13 @@ class CkanResourceProvider implements ResourceProviderInterface
 
     protected $ckanInstance;
 
-    public function __construct()
+    public function __construct(ResourceManager $resourceManager)
     {
-        $this->driver = Socialite::driver('ckan');
-
-
         /* This should be the only way of setting user credentials */
         $user = Auth::user();
         if ($user && $user->primaryRemoteUser && $user->primaryRemoteUser->driver === 'ckan') {
             $this->remoteUser = $user->primaryRemoteUser;
+            $this->driver = $resourceManager->getOAuthDriver('ckan', $this->remoteUser->resourceable);
         } else {
             throw RuntimeException(__(
                 "Attempt to create a CKAN resource provider " .
@@ -75,14 +74,49 @@ class CkanResourceProvider implements ResourceProviderInterface
         $this->ckanInstance = $ckanInstance;
     }
 
-    public function getDataResources() : Collection
+    public function getDataResources($search = '', $filters = [], $sortBy = 'name', $orderDesc = false) : Collection
     {
         $this->loadApiKey();
 
         $user = Auth::user();
         $localData = $this->ckanInstance->resources()->whereUserId($user->id)->get()->keyBy('remote_id');
 
-        $ckanData = collect($this->ckanClient->ResourceSearch(['query' => 'format:csv'])['result']['results'])
+        $query = ['url' => '.'];
+        if ($search) {
+            $query['url'] = preg_replace('[^A-Za-z0-9_-.]', '', $search);
+        }
+        $allowedFormats = ['csv', 'json', 'geojson', 'xml'];
+        if (array_key_exists('filetype', $filters) && in_array($filters['filetype'], $allowedFormats)) {
+            $query['format'] = $filters['filetype'];
+        }
+
+        $ckanQuery = [];
+        foreach ($query as $key => $value) {
+            $ckanQuery[] = $key . ':' . $value;
+        }
+        $ckanQuery = ['query' => implode('&', $ckanQuery)];
+
+        if ($sortBy) {
+            switch ($sortBy) {
+                case 'filename':
+                    $ckanQuery['sort'] = 'url';
+                    break;
+                case 'name':
+                    $ckanQuery['sort'] = 'name';
+                    break;
+                default:
+                    $sortBy = null;
+            }
+            if ($sortBy) {
+                if ($orderDesc) {
+                    $ckanQuery['sort'] .= ' dec';
+                } else {
+                    $ckanQuery['sort'] .= ' asc';
+                }
+            }
+        }
+
+        $ckanData = collect($this->ckanClient->ResourceSearch($ckanQuery)['result']['results'])
             ->map(function ($ckanData) use ($localData, $user) {
                 $data = $localData->get($ckanData['id']);
 

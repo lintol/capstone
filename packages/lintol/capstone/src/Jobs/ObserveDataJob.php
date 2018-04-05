@@ -57,6 +57,8 @@ class ObserveDataJob implements ShouldQueue
                     $process = $processFactory->fromDataSession($res[0], $res[1], $session);
 
                     Log::debug("[lintol-observe] " . __("Validation result event seen."));
+                    Log::debug("[lintol-observe] " . __("Server ID: ") . $res[0]);
+                    Log::debug("[lintol-observe] " . __("Session ID: ") . $res[1]);
 
                     if ($process) {
                         Log::info("[lintol-observe] " . __("Incoming validation is in our database."));

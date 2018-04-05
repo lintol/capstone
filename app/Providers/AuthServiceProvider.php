@@ -27,6 +27,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
+        Passport::loadKeysFrom(config('auth.keys.path', storage_path()));
         Passport::routes();
 
         // Middleware `api` that contains the `custom-provider` middleware group defined on $middlewareGroups above

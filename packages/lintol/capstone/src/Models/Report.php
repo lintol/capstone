@@ -27,7 +27,7 @@ class Report extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function make($result, ValidationRun $run)
+    public function make($result, ValidationRun $run, $encode = false)
     {
         $report = new self;
 
@@ -41,7 +41,13 @@ class Report extends Model
         } else {
             $report->name = '(none)';
         }
-        $report->content = json_decode($result);
+
+        if ($encode) {
+            $result = json_encode($result);
+        } else {
+            $result = json_decode($result);
+        }
+        $report->content = $result;
         $content = json_decode($report->content, true);
 
         if (array_key_exists('error-count', $content)) {
@@ -58,6 +64,7 @@ class Report extends Model
 
         $report->quality_score = 0;
 
+        $run->report()->delete();
         $report->run()->associate($run);
 
         if ($run->creator) {

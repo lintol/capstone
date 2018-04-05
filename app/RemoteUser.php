@@ -5,6 +5,7 @@ namespace App;
 use Hash;
 use Socialite;
 use Alsofronie\Uuid\UuidModelTrait;
+use Lintol\Capstone\ResourceManager;
 use Illuminate\Database\Eloquent\Model;
 
 class RemoteUser extends Model
@@ -38,7 +39,7 @@ class RemoteUser extends Model
     public function retrieve()
     {
         if ($this->driver && $this->remote_token) {
-            $remoteUser = Socialite::driver($this->driver)->userFromToken($this->remote_token);
+            $remoteUser = app(ResourceManager::class)->getOAuthDriver($this->driver, $this->resourceable)->userFromToken($this->remote_token);
 
             if ($remoteUser) {
                 $this->remoteId = $remoteUser->getId();

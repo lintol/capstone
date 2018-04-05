@@ -19,6 +19,9 @@ class CreateCkanInstancesTable extends Migration
             $table->string('uri');
             $table->timestamps();
             $table->unique('id');
+
+            $table->text('client_id')->nullable();
+            $table->text('client_secret')->nullable();
         });
     }
 

@@ -4,8 +4,10 @@ namespace Lintol\Capstone\Models;
 
 use App\User;
 use Carbon\Carbon;
+use Event;
 use Illuminate\Database\Eloquent\Model;
 use Alsofronie\Uuid\UuidModelTrait;
+use Lintol\Capstone\Events\ResultRetrievedEvent;
 
 class ValidationRun extends Model
 {
@@ -53,6 +55,9 @@ class ValidationRun extends Model
           $this->dataResource->status = 'report run';
           $this->dataResource->save();
         }
+
+        \Log::info(__("Announcing run ") . $this->id . __(" has finished"));
+        Event::fire(new ResultRetrievedEvent($this->id));
     }
 
     public function report()
