@@ -106,7 +106,7 @@
                 <option value='{{ $server }}'>{{ $server }}</option>
              @endforeach
              </select>
-             <button class="ckanLogin ckan" onClick='ckanTarget(document.getElementById("ckanServer").value)'>Sign in with CKAN</button>
+             <button class="oAuthButton ckan" onClick='ckanTarget(document.getElementById("ckanServer").value)'>Sign in with CKAN</button>
           </div>
         </div>
       </div>
