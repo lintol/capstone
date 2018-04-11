@@ -99,6 +99,7 @@
           <button id="githubBtn" class="oAuthButton github" onClick='window.location="{{ URL::route('login.by-driver', ['driver' => 'github']) }}"'>Sign in with Github</button>
           <button id='ckanSwapBtn' class="oAuthButton ckan" onClick='ckanSwap()'>Sign in with CKAN</button>
           <div id='ckanServerDiv'  style="display: none" class="ckanServerDetails">
+             <button class="oAuthButton ckan" onClick='ckanTarget(document.getElementById("ckanServer").value)'>Sign in with CKAN</button>
              <label class="instructions" for="ckanServer" >Address:</label>
              <select id='ckanServer' style="display: inline"  name='ckanServer'>
                 <option disabled>(select a valid server)</option>
@@ -106,7 +107,6 @@
                 <option value='{{ $server }}'>{{ $server }}</option>
              @endforeach
              </select>
-             <button class="oAuthButton ckan" onClick='ckanTarget(document.getElementById("ckanServer").value)'>Sign in with CKAN</button>
           </div>
         </div>
       </div>
