@@ -38,7 +38,7 @@ build:
     GIT_SUBMODULE_STRATEGY: recursive
   script:
   # First we build using an image we will have to download anyway
-  - docker run -e COMPOSER_CACHE_DIR="$COMPOSER_CACHE_DIR" --volumes-from $HOSTNAME-build -w `pwd` composer install
+  - docker run -e COMPOSER_CACHE_DIR="$COMPOSER_CACHE_DIR" --volumes-from $HOSTNAME-build-4 -w `pwd` composer install
   - tar -xzf frontend-build.tgz && mv dist/static public && rm -f resources/views/welcome.blade.php && mv dist/index.html resources/views/welcome.blade.php
   - chown -R 33 storage/logs bootstrap/cache
   - docker build -f infrastructure/containers/artisan/Dockerfile -t $CONTAINER_ARTISAN_IMAGE .
