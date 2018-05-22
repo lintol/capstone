@@ -81,7 +81,7 @@ class ResourceManager
                 abort(400, __("You must provide a valid CKAN server to authenticate against."));
             }
         } else {
-            $driver = Socialite::driver($driverName);
+            $driver = Socialite::driver($name);
         }
 
         return $driver;
