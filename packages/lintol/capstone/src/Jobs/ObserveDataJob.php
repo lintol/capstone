@@ -104,9 +104,6 @@ class ObserveDataJob implements ShouldQueue
         $data->url = $dataUri;
 
         if (config('capstone.features.redirectable-content', false)) {
-            $client = new GuzzleHttp\Client();
-            $request = new GuzzleHttp\Psr7\Request('GET', $data->url);
-
             $path = basename($data->url);
             $data->filename = $path;
             $data->name = $path;

@@ -28,10 +28,7 @@ class ResourceManager
         $client = new GuzzleHttp\Client();
         $request = new GuzzleHttp\Psr7\Request('GET', $dataResource->url);
 
-        $promise = $client->sendAsync($request)->then(function ($response) use ($dataResource) {
-            $path = basename($dataResource->url);
-            $dData = $response->getBody();
-
+        if (config('capstone.features.redirectable-content', false)) {
             $dataResource->filename = $path;
             $dataResource->name = $path;
             $pathParts = pathinfo($path);
@@ -40,13 +37,31 @@ class ResourceManager
             $settings = $dataResource->settings;
             $settings['fileType'] = $dataResource->filetype;
             $dataResource->settings = $settings;
-            $dataResource->content = $dData;
+            $dataResource->content = $dataResource->url;
             $dataResource->save();
 
-            ValidationProcess::launch($dataResource);
-        }, function ($error) {
-            abort(400, __("Invalid data URI request"));
-        });
+            $promise = ValidationProcess::launch($data);
+        } else {
+            $promise = $client->sendAsync($request)->then(function ($response) use ($dataResource) {
+                $path = basename($dataResource->url);
+                $dData = $response->getBody();
+
+                $dataResource->filename = $path;
+                $dataResource->name = $path;
+                $pathParts = pathinfo($path);
+                $dataResource->filetype = $pathParts['extension'];
+                $dataResource->status = 'new resource';
+                $settings = $dataResource->settings;
+                $settings['fileType'] = $dataResource->filetype;
+                $dataResource->settings = $settings;
+                $dataResource->content = $dData;
+                $dataResource->save();
+
+                ValidationProcess::launch($dataResource);
+            }, function ($error) {
+                abort(400, __("Invalid data URI request"));
+            });
+        }
 
         $promise->wait();
 
