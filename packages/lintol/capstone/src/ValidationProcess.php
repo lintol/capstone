@@ -236,16 +236,27 @@ class ValidationProcess
     {
         $data = $this->run->dataResource;
 
+        if (config('capstone.features.redirectable-content', false)) {
+            $request = [
+                $this->run->doorstep_session_id,
+                $data->filename,
+                $data->content,
+                false
+            ]
+        } else {
+            $request = [
+                $this->run->doorstep_session_id,
+                $data->filename,
+                $data->content
+            ]
+        }
+
         $future = $this->session->call(
             $this->makeUri(
                 'data.post',
                 $this->run->doorstep_server_id
             ),
-            [
-                $this->run->doorstep_session_id,
-                $data->filename,
-                $data->content
-            ]
+            $request
         );
 
         return $future;
