@@ -103,23 +103,34 @@ class ObserveDataJob implements ShouldQueue
         $data->settings = $settings;
         $data->url = $dataUri;
 
-        $client = new GuzzleHttp\Client();
-        $request = new GuzzleHttp\Psr7\Request('GET', $data->url);
+        if (config('capstone.features.redirectable-content', false)) {
+            $client = new GuzzleHttp\Client();
+            $request = new GuzzleHttp\Psr7\Request('GET', $data->url);
 
-        $promise = $client->sendAsync($request)->then(function ($response) use ($data) {
             $path = basename($data->url);
-            $dData = $response->getBody();
-
             $data->filename = $path;
             $data->name = $path;
             $data->filetype = $data->settings['fileType'];
-            $data->content = $dData;
+            $data->content = $data->url;
             $data->save();
 
-            return ValidationProcess::launch($data);
-        }, function ($error) {
-            abort(400, __("Invalid data URI request"));
-        });
+            $promise = ValidationProcess::launch($data);
+        } else {
+            $promise = $client->sendAsync($request)->then(function ($response) use ($data) {
+                $path = basename($data->url);
+                $dData = $response->getBody();
+
+                $data->filename = $path;
+                $data->name = $path;
+                $data->filetype = $data->settings['fileType'];
+                $data->content = $dData;
+                $data->save();
+
+                return ValidationProcess::launch($data);
+            }, function ($error) {
+                abort(400, __("Invalid data URI request"));
+            });
+        }
 
         $runs = $promise->wait();
 
