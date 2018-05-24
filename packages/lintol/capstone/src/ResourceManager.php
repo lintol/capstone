@@ -29,6 +29,7 @@ class ResourceManager
         $request = new GuzzleHttp\Psr7\Request('GET', $dataResource->url);
 
         if (config('capstone.features.redirectable-content', false)) {
+            $path = basename($dataResource->url);
             $dataResource->filename = $path;
             $dataResource->name = $path;
             $pathParts = pathinfo($path);
