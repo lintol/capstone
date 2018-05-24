@@ -241,7 +241,7 @@ class ValidationProcess
                 $this->run->doorstep_session_id,
                 $data->filename,
                 $data->content,
-                false
+                true
             ];
         } else {
             $request = [
