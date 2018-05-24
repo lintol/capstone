@@ -242,13 +242,13 @@ class ValidationProcess
                 $data->filename,
                 $data->content,
                 false
-            ]
+            ];
         } else {
             $request = [
                 $this->run->doorstep_session_id,
                 $data->filename,
                 $data->content
-            ]
+            ];
         }
 
         $future = $this->session->call(
