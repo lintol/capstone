@@ -41,7 +41,7 @@ class ResourceManager
             $dataResource->content = $dataResource->url;
             $dataResource->save();
 
-            $promise = ValidationProcess::launch($data);
+            $promise = ValidationProcess::launch($dataResource);
         } else {
             $promise = $client->sendAsync($request)->then(function ($response) use ($dataResource) {
                 $path = basename($dataResource->url);
