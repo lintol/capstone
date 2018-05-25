@@ -111,7 +111,7 @@ class ObserveDataJob implements ShouldQueue
             $data->content = $data->url;
             $data->save();
 
-            $promise = ValidationProcess::launch($data);
+            $runs = ValidationProcess::launch($data);
         } else {
             $promise = $client->sendAsync($request)->then(function ($response) use ($data) {
                 $path = basename($data->url);
@@ -127,9 +127,9 @@ class ObserveDataJob implements ShouldQueue
             }, function ($error) {
                 abort(400, __("Invalid data URI request"));
             });
-        }
 
-        $runs = $promise->wait();
+            $runs = $promise->wait();
+        }
 
         $runIds = $runs->pluck('id');
 

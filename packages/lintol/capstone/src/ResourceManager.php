@@ -41,7 +41,7 @@ class ResourceManager
             $dataResource->content = $dataResource->url;
             $dataResource->save();
 
-            $promise = ValidationProcess::launch($dataResource);
+            ValidationProcess::launch($dataResource);
         } else {
             $promise = $client->sendAsync($request)->then(function ($response) use ($dataResource) {
                 $path = basename($dataResource->url);
@@ -58,13 +58,13 @@ class ResourceManager
                 $dataResource->content = $dData;
                 $dataResource->save();
 
-                ValidationProcess::launch($dataResource);
+                return ValidationProcess::launch($dataResource);
             }, function ($error) {
                 abort(400, __("Invalid data URI request"));
             });
-        }
 
-        $promise->wait();
+            $promise->wait();
+        }
 
         if ($dataResource->save()) {
             return $dataResource;
