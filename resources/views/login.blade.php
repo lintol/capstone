@@ -54,7 +54,7 @@
                border: 1px solid #D4D4D4;
                background-color: #FFFFFF;
                width: 508px;
-               height: 300px;
+               height: 350px;
                margin: 181px  auto 0px;
             }
             .oAuthButton {
@@ -75,7 +75,7 @@
             .box {
               margin: 28px auto 0px;
               display: block;
-              width: 300px;
+              width: 350px;
             }
             .ckanServerDetails {
                margin: 0px auto;
@@ -87,6 +87,9 @@
               margin-top: 5px;
               color: white;
               padding: 5px;
+            }
+            .terms {
+              text-align: center
             }
         </style>
     </head>
@@ -109,6 +112,10 @@
                 <option value='{{ $server }}'>{{ $server }}</option>
              @endforeach
              </select>
+          </div>
+          <div class="terms">
+              <a href='{{ config('capstone.documents.terms-and-conditions') }}'>Terms &amp; Conditions</a> -
+              <a href='{{ config('capstone.documents.privacy-notice') }}'>Privacy Notice</a>
           </div>
         </div>
       </div>
