@@ -151,7 +151,12 @@ class ValidationProcess
             $content['tables'][0]['errors'][0]['message'] = $message;
         } else {
             $detail = $message['keyword arguments'];
-            $content['tables'][0]['errors'][0]['message'] = $detail->exception . ': ' . substr(json_encode($detail->message), 0, 20) . '...';
+            if (property_exists($detail, 'exception') && property_exists($detail, 'message')) {
+                $content['tables'][0]['errors'][0]['message'] = $detail->exception . ': ' . substr(json_encode($detail->message), 0, 20) . '...';
+            } else if (count($message['arguments']) == 1) {
+                $content['tables'][0]['errors'][0]['message'] = (string) $message['arguments'][0];
+            }
+
             $content['tables'][0]['errors'][0]['error-data'] = $message;
             if ($detail->processor) {
                 $content['tables'][0]['errors'][0]['processor'] = $detail->processor;
