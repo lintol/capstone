@@ -62,7 +62,7 @@ class LoginController extends Controller
      */
     public function redirectToProvider($driverName)
     {
-        if (!array_key_exists($driverName, $this->socialiteDriver)) {
+        if (!$this->checkDriverActive($driverName)) {
             abort(400, __("No OAuth2 available for this provider"));
         }
 
@@ -91,13 +91,32 @@ class LoginController extends Controller
     }
 
     /**
+     * Check whether this driver is active
+     *
+     * @return bool
+     */
+    public function checkDriverActive($driver)
+    {
+        if (!array_key_exists($driver, $this->socialiteDriver)) {
+            return false;
+        }
+
+        if ($driver == 'github') {
+            return config('capstone.features.services-github', false);
+        }
+
+        // If any other driver has not been disabled and is included in the list...
+        return true;
+    }
+
+    /**
      * Obtain the user information from OAuth2.
      *
      * @return \Illuminate\Http\Response
      */
     public function handleProviderCallback($driver, $remoteServerId = null)
     {
-        if (!array_key_exists($driver, $this->socialiteDriver)) {
+        if (!$this->checkDriverActive($driver)) {
             abort(400, __("No OAuth2 available for this provider"));
         }
 

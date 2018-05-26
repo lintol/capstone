@@ -3,6 +3,7 @@
 return [
     'features' => [
         'redirectable-content' => env('LINTOL_FEATURE_REDIRECTABLE_CONTENT', false),
+        'services-github' => env('LINTOL_FEATURE_SERVICES_GITHUB', false),
     ],
     'wamp' => [
         'realm' => env('LINTOL_CAPSTONE_REALM', 'realm1'),

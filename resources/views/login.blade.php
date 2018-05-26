@@ -96,7 +96,9 @@
         {{ HTML::image('images/logo.svg', 'Logo for Project Lintol', array('class' => 'logo')) }}
         <p class="instructions" >Please Login with the following services</p>
         <div>
+          @if (config('capstone.features.services-github', false))
           <button id="githubBtn" class="oAuthButton github" onClick='window.location="{{ URL::route('login.by-driver', ['driver' => 'github']) }}"'>Sign in with Github</button>
+          @endif
           <button id='ckanSwapBtn' class="oAuthButton ckan" onClick='ckanSwap()'>Sign in with CKAN</button>
           <div id='ckanServerDiv'  style="display: none" class="ckanServerDetails">
              <button class="oAuthButton ckan" onClick='ckanTarget(document.getElementById("ckanServer").value)'>Sign in with CKAN</button>
