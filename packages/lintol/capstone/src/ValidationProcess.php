@@ -158,7 +158,7 @@ class ValidationProcess
             }
 
             $content['tables'][0]['errors'][0]['error-data'] = $message;
-            if ($detail->processor) {
+            if (property_exists($detail, 'processor') && $detail->processor) {
                 $content['tables'][0]['errors'][0]['processor'] = $detail->processor;
             }
         }
