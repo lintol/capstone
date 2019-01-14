@@ -111,7 +111,7 @@ deploy_dev:
   stage: deploy
   script:
   script:
-  - 'kubectl patch cronjob.v2alpha1.batch $CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker -p "{ \"spec\": { \"jobTemplate\": { \"spec\": { \"template\": { \"spec\": { \"containers\": [ { \"name\": \"laravel-phpfpm-scheduler\", \"image\": \"$AWS_ECR_URI:phpfpm-$CI_PIPELINE_ID\" } ] } } } } } }"'
+  #- 'kubectl patch cronjob.v2alpha1.batch $CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker -p "{ \"spec\": { \"jobTemplate\": { \"spec\": { \"template\": { \"spec\": { \"containers\": [ { \"name\": \"laravel-phpfpm-scheduler\", \"image\": \"$AWS_ECR_URI:phpfpm-$CI_PIPELINE_ID\" } ] } } } } } }"'
   - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker laravel-phpfpm-worker=$AWS_ECR_URI:phpfpm-$CI_PIPELINE_ID
   - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker laravel-phpfpm-subscriber=$AWS_ECR_URI:phpfpm-$CI_PIPELINE_ID
   - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-nginx nginx=$AWS_ECR_URI:nginx-$CI_PIPELINE_ID
