@@ -33,6 +33,22 @@ meld:
     paths:
     - frontend-build.tgz
 
+composer:
+  stage: composer
+  before_script:
+  - echo "Building PHP dependencies"
+  image: composer
+  script:
+  - composer install
+  dependencies:
+  - meld
+  artifacts:
+    paths:
+    - vendor
+    - bootstrap/cache
+    - bootstrap/autoload.php
+    - composer.lock
+
 build:
   stage: build
   variables:
@@ -40,7 +56,6 @@ build:
   script:
   # First we build using an image we will have to download anyway
   - docker --version
-  - docker run -e COMPOSER_CACHE_DIR="$COMPOSER_CACHE_DIR" --volumes-from $HOSTNAME-build-4 -w `pwd` composer install
   - tar -xzf frontend-build.tgz && mv dist/static public && rm -f resources/views/welcome.blade.php && mv dist/index.html resources/views/welcome.blade.php
   - chown -R 33 storage/logs bootstrap/cache
   - docker build -f infrastructure/containers/nginx/Dockerfile -t $CONTAINER_NGINX_IMAGE .
@@ -49,6 +64,7 @@ build:
   - docker push $CONTAINER_PHPFPM_IMAGE
   dependencies:
   - meld
+  - composer
 
 test:
   stage: test
