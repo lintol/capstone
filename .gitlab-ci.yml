@@ -10,6 +10,7 @@ variables:
 
 stages:
 - meld
+- composer
 - build
 - test
 - release
