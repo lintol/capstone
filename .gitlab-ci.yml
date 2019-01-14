@@ -15,6 +15,9 @@ stages:
 - release
 - deploy
 
+services:
+- docker:dind
+
 before_script:
   - echo "Registering with token $CI_BUILD_TOKEN" 
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
