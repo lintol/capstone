@@ -117,7 +117,7 @@ deploy_dev:
   - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-nginx nginx=$AWS_ECR_URI:nginx-$CI_PIPELINE_ID
   - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm laravel-phpfpm=$AWS_ECR_URI:phpfpm-$CI_PIPELINE_ID
   environment:
-    name: development
+    name: ltl-buckram-dev
     url: http://$CI_ENVIRONMENT_SLUG.$CI_TARGET_DOMAIN
   only:
   - master
