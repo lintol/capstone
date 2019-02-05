@@ -2,9 +2,9 @@ image: docker:latest
 
 variables:
   CONTAINER_NGINX_IMAGE: $CI_REGISTRY_IMAGE:nginx-$CI_PIPELINE_ID
-  CONTAINER_NGINX_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:nginx-latest
+  CONTAINER_NGINX_RELEASE_IMAGE: $GCP_ECR_URI:nginx-latest
   CONTAINER_PHPFPM_IMAGE: $CI_REGISTRY_IMAGE:phpfpm-$CI_PIPELINE_ID
-  CONTAINER_PHPFPM_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:phpfpm-latest
+  CONTAINER_PHPFPM_RELEASE_IMAGE: $GCP_ECR_URI:phpfpm-latest
   COMPOSER_CACHE_DIR: /cache
   DOCKER_DRIVER: overlay
 
@@ -80,21 +80,18 @@ release:
   # NGINX
   - docker pull $CONTAINER_NGINX_IMAGE
   - docker tag $CONTAINER_NGINX_IMAGE $CONTAINER_NGINX_RELEASE_IMAGE
-  - docker push $CONTAINER_NGINX_RELEASE_IMAGE
-  - docker tag $CONTAINER_NGINX_RELEASE_IMAGE $DOCKER_HUB_IMAGE:nginx-$CI_PIPELINE_ID
-  #- docker tag $CONTAINER_NGINX_RELEASE_IMAGE $GCP_ECR_URI:nginx-$CI_PIPELINE_ID
+  - docker tag $CONTAINER_NGINX_RELEASE_IMAGE $GCP_ECR_URI:nginx-$CI_PIPELINE_ID
   # PHPFPM
   - docker pull $CONTAINER_PHPFPM_IMAGE
   - docker tag $CONTAINER_PHPFPM_IMAGE $CONTAINER_PHPFPM_RELEASE_IMAGE
+  - docker tag $CONTAINER_PHPFPM_RELEASE_IMAGE $GCP_ECR_URI:phpfpm-$CI_PIPELINE_ID
+  # Login to GCP container Registry
+  - docker login -u _json_key -p "$(echo $GCP_KEY_JSON)" $GCP_ECR_URI
+  # Push release versions to repository.
+  - docker push $CONTAINER_NGINX_RELEASE_IMAGE
+  - docker push $GCP_ECR_URI:nginx-$CI_PIPELINE_ID
   - docker push $CONTAINER_PHPFPM_RELEASE_IMAGE
-  - docker tag $CONTAINER_PHPFPM_RELEASE_IMAGE $DOCKER_HUB_IMAGE:phpfpm-$CI_PIPELINE_ID
-  #- docker tag $CONTAINER_PHPFPM_RELEASE_IMAGE $GCP_ECR_URI:phpfpm-$CI_PIPELINE_ID
-  - docker login -p "$DOCKER_HUB_PASSWORD" $DOCKER_HUB_REGISTRY --username $DOCKER_HUB_USER
-  - docker push $DOCKER_HUB_IMAGE:nginx-$CI_PIPELINE_ID
-  - docker push $DOCKER_HUB_IMAGE:phpfpm-$CI_PIPELINE_ID
-  #- eval "$(echo $(docker run -t -e GCP_ACCESS_KEY_ID=$GCP_ACCESS_KEY_ID -e GCP_SECRET_ACCESS_KEY=$GCP_SECRET_ACCESS_KEY -e GCP_DEFAULT_REGION=$GCP_DEFAULT_REGION garland/aws-cli-docker aws ecr get-login) | sed 's/\r$//' | sed 's/-e \S*//g')"
-  #- docker push $GCP_ECR_URI:nginx-$CI_PIPELINE_ID
-  #- docker push $GCP_ECR_URI:phpfpm-$CI_PIPELINE_ID
+  - docker push $GCP_ECR_URI:phpfpm-$CI_PIPELINE_ID
   only:
   - master
   - development
@@ -104,6 +101,7 @@ release:
 deploy_dev:
   image: google/cloud-sdk:162.0.0
   before_script:
+  # In gitlab operation -> kubernetes needs to be setup for this to work so you get the KUBE variables
   - kubectl config set-cluster "$CI_PROJECT_ID" --server="$KUBE_URL" --certificate-authority="$KUBE_CA_PEM_FILE"
   - kubectl config set-credentials "$CI_PROJECT_ID" --token="$KUBE_TOKEN"
   - kubectl config set-context "$CI_PROJECT_ID" --cluster="$CI_PROJECT_ID" --user="$CI_PROJECT_ID" --namespace="$KUBE_NAMESPACE"
@@ -112,10 +110,10 @@ deploy_dev:
   script:
   script:
   #- 'kubectl patch cronjob.v2alpha1.batch $CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker -p "{ \"spec\": { \"jobTemplate\": { \"spec\": { \"template\": { \"spec\": { \"containers\": [ { \"name\": \"laravel-phpfpm-scheduler\", \"image\": \"$GCP_ECR_URI:phpfpm-$CI_PIPELINE_ID\" } ] } } } } } }"'
-  #- kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker laravel-phpfpm-worker=$GCP_ECR_URI:phpfpm-$CI_PIPELINE_ID
-  #- kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker laravel-phpfpm-subscriber=$GCP_ECR_URI:phpfpm-$CI_PIPELINE_ID
-  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-nginx nginx=$GCP_ECR_URI:nginx-$CI_PIPELINE_ID
-  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm laravel-phpfpm=$GCP_ECR_URI:phpfpm-$CI_PIPELINE_ID
+  #- kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker laravel-phpfpm-worker=$CONTAINER_PHPFPM_RELEASE_IMAGE
+  #- kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker laravel-phpfpm-subscriber=$CONTAINER_PHPFPM_RELEASE_IMAGE
+  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-nginx nginx=$CONTAINER_NGINX_RELEASE_IMAGE
+  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm laravel-phpfpm=$CONTAINER_PHPFPM_RELEASE_IMAGE
   environment:
     name: ltl-buckram-dev
     url: http://$CI_ENVIRONMENT_SLUG.$CI_TARGET_DOMAIN
