@@ -20,6 +20,7 @@ services:
     env_file:
       - ./docker/config/laravel.env
   phpfpm:
+    #image: test_artisan_worker:latest
     build:
       context: ./infrastructure/containers/phpfpm
       dockerfile: Dockerfile.debug
@@ -36,6 +37,8 @@ services:
     environment:
       REDIS_HOST: "redis"
       REDIS_PORT: 6379
+      APP_LOG: "errorlog"
+      LOG_CHANNEL: "errorlog"
   nginx:
     image: nginx:stable
     volumes:
@@ -50,10 +53,10 @@ services:
       - phpfpm:phpfpm
     environment:
       LARAVEL_ROOT: "/var/www/app"
-  artisan_worker:
+  artisan_subscriber:
     build:
       context: ./infrastructure/containers/phpfpm
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.debug
     volumes:
       - .:/var/www/app
     env_file:
@@ -62,6 +65,30 @@ services:
     environment:
       REDIS_HOST: "redis"
       REDIS_PORT: 6379
+      APP_LOG: "errorlog"
+      LOG_CHANNEL: "errorlog"
+    links:
+      - db:db
+      - redis:redis
+    entrypoint:
+      - php
+      - /var/www/app/artisan
+    command:
+      - "ltl:observe"
+  artisan_worker:
+    build:
+      context: ./infrastructure/containers/phpfpm
+      dockerfile: Dockerfile.debug
+    volumes:
+      - .:/var/www/app
+    env_file:
+      - ./docker/config/laravel.env
+      - ./docker/config/redis.env
+    environment:
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
+      APP_LOG: "errorlog"
+      LOG_CHANNEL: "errorlog"
     links:
       - db:db
       - redis:redis

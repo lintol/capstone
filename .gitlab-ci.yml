@@ -29,7 +29,7 @@ meld:
   before_script:
   - echo "Pulling in latest front end build to the project."
   script: 
-  - wget "https://gitlab.com/api/v4/projects/$FRONTEND_GITLAB_PROJECT_ID/jobs/artifacts/master/download?job=release&private_token=$FRONTEND_GITLAB_TOKEN" -O frontend-build.zip
+  - wget "https://mo.ev.openindustry.in/minio/ltl-lintol-dev/cdn/dist-$(curl https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/latest-commit)/index.html" -O index.html
   artifacts:
     paths:
       - frontend-build.zip
