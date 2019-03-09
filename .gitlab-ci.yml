@@ -95,10 +95,10 @@ deploy_dev:
   script:
   script:
   #- 'kubectl patch cronjob.v2alpha1.batch $CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker -p "{ \"spec\": { \"jobTemplate\": { \"spec\": { \"template\": { \"spec\": { \"containers\": [ { \"name\": \"laravel-phpfpm-scheduler\", \"image\": \"$GCP_ECR_URI:phpfpm-$CI_PIPELINE_ID\" } ] } } } } } }"'
-  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker laravel-phpfpm-worker=$CONTAINER_PHPFPM_RELEASE_IMAGE
-  #- kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker laravel-phpfpm-subscriber=$CONTAINER_PHPFPM_RELEASE_IMAGE
-  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-nginx nginx=$CONTAINER_NGINX_RELEASE_IMAGE
-  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm laravel-phpfpm=$CONTAINER_PHPFPM_RELEASE_IMAGE
+  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker laravel-phpfpm-worker=$CONTAINER_PHPFPM_IMAGE
+  #- kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm-worker laravel-phpfpm-subscriber=$CONTAINER_PHPFPM_IMAGE
+  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-nginx nginx=$CONTAINER_NGINX_IMAGE
+  - kubectl set image deployment/$CI_ENVIRONMENT_SLUG-laravel-phpfpm laravel-phpfpm=$CONTAINER_PHPFPM_IMAGE
   environment:
     name: ltl-buckram-dev
     url: http://$CI_ENVIRONMENT_SLUG.$CI_TARGET_DOMAIN
