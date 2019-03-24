@@ -60,6 +60,26 @@ class LoginController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function localAdminLogin()
+    {
+        if (config('capstone.features.local-admin-login', false)) {
+            $user = User::whereEmail(config('capstone.features.local-admin-login', false))->firstOrFail();
+
+            if ($user) {
+                Auth::login($user, true);
+            }
+        } else {
+            abort(400, _("This feature is not available on this deployment."));
+        }
+
+        return redirect($this->redirectPath());
+    }
+
+    /**
+     * Redirect the user to the OAuth2 authentication page.
+     *
+     * @return \Illuminate\Http\Response
+     */
     public function redirectToProvider($driverName)
     {
         if (!$this->checkDriverActive($driverName)) {
