@@ -102,6 +102,9 @@
           @if (config('capstone.features.services-github', false))
           <button id="githubBtn" class="oAuthButton github" onClick='window.location="{{ URL::route('login.by-driver', ['driver' => 'github']) }}"'>Sign in with Github</button>
           @endif
+          @if (config('capstone.features.local-admin-login', false))
+          <button id="githubBtn" class="oAuthButton local-admin" onClick='window.location="{{ URL::route('login.local-admin') }}"'>Sign in as Local Admin</button>
+          @endif
           <button id='ckanSwapBtn' class="oAuthButton ckan" onClick='ckanSwap()'>Sign in with CKAN</button>
           <div id='ckanServerDiv'  style="display: none" class="ckanServerDetails">
              <button class="oAuthButton ckan" onClick='ckanTarget(document.getElementById("ckanServer").value)'>Sign in with CKAN</button>

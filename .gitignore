@@ -18,3 +18,5 @@ infrastructure
 /storage/db
 composer.phar
 /secrets
+
+/docker

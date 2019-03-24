@@ -4,6 +4,14 @@ return [
     'features' => [
         'redirectable-content' => env('LINTOL_FEATURE_REDIRECTABLE_CONTENT', false),
         'services-github' => env('LINTOL_FEATURE_SERVICES_GITHUB', false),
+
+        /**
+         * This should _never_ be on on a public-facing site - it is for local testing
+         * only when an OAuth provider is not available, and is passwordless.
+         *
+         * It should be false, or the email address of the admin user to auto-login.
+         */
+        'local-admin-login' => env('LINTOL_FEATURE_LOCAL_ADMIN_LOGIN', false),
     ],
     'documents' => [
         'terms-and-conditions' => env('LINTOL_DOCUMENT_PREFIX', '') . '/saas-terms-support.pdf',

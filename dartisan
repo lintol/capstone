@@ -1,0 +1,3 @@
+#!/bin/sh
+
+docker-compose run --entrypoint php artisan_worker /var/www/app/artisan $@

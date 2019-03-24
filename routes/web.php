@@ -12,12 +12,16 @@
 */
 
 Route::get('login', function () {
-    if (Auth::user()) {
+    if (Auth::guard('api')->user()) {
         return redirect('/');
     }
 
     return view('login');
 })->name('login');
+
+if (config('capstone.features.local-admin-login', false)) {
+    Route::get('login/local-admin', 'Auth\LoginController@localAdminLogin')->name('login.local-admin');
+}
 Route::get('login/{driver}', 'Auth\LoginController@redirectToProvider')->name('login.by-driver');
 Route::get('login/{driver}/callback', 'Auth\LoginController@handleProviderCallback');
 Route::get('login/{driver}/callback/{id}', 'Auth\LoginController@handleProviderCallback');

@@ -5,7 +5,7 @@ namespace Lintol\Capstone;
 use Event;
 use Lintol\Capstone\Events\ResultRetrievedEvent;
 use Lintol\Capstone\Models\ProcessorConfiguration;
-use Lintol\Capstone\Observer\ProcessorConfigurationObserver;
+use Lintol\Capstone\Observers\ProcessorConfigurationObserver;
 use Lintol\Capstone\Listeners\ResultRetrievedListener;
 use Lintol\Capstone\Console\Commands\ObserveDataCommand;
 use Lintol\Capstone\Console\Commands\ProcessDataCommand;
