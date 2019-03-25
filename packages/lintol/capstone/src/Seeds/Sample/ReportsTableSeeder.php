@@ -231,7 +231,7 @@ class ReportsTableSeeder extends Seeder
             'warnings' => '44',
             'passes' => '0',
             'quality_score' => '44',
-            'content' => []
+            'content' => '{}'
         ]);
         $report->owner()->associate($dataOwner);
         $report->save();
@@ -245,7 +245,7 @@ class ReportsTableSeeder extends Seeder
             'warnings' => '40',
             'passes' => '1',
             'quality_score' => '40',
-            'content' => []
+            'content' => '{}'
         ]);
         $report->owner()->associate($dataOwner);
         $report->save();
