@@ -21,7 +21,7 @@
         "fideloper/proxy": "~4.0",
         "guzzlehttp/guzzle": "^6.3",
         "imbo/behat-api-extension": "^2.0",
-        "laravel/framework": "5.6.0",
+        "laravel/framework": "5.6.30",
         "laravel/passport": "^6.0",
         "laravel/socialite": "dev-feature/ckan",
         "laravel/tinker": "~1.0",
