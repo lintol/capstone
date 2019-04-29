@@ -43,7 +43,7 @@ build:
   script:
   # First we build using an image we will have to download anyway
   - wget "https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/dist-$(wget https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/latest-commit -O - -q)/index.html" -O resources/views/index.blade.php
-  - sed -i "s/\/static/https:\/\/mo.ev.openindustry.in\/ltl-lintol-dev\/cdn\/dist-$(wget https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/latest-commit -O - -q)\/static/g" resources/views/index.blade.php
+  - sed -i "s/COMMIT/dist-$(wget https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/latest-commit -O - -q)/g" resources/views/index.blade.php
   - chown -R 33 storage/logs bootstrap/cache
   - docker build -f infrastructure/containers/nginx/Dockerfile -t $CONTAINER_NGINX_IMAGE .
   - docker build -f infrastructure/containers/phpfpm/Dockerfile -t $CONTAINER_PHPFPM_IMAGE .
