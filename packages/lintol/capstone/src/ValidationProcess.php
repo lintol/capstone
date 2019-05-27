@@ -118,6 +118,8 @@ class ValidationProcess
     protected static function _recordException(Report $reportFactory, ValidationRun $run, string $code, $message)
     {
         \Log::error('-exception-');
+        \Log::error($code);
+        \Log::error($message);
 
         $content = [
             'valid' => false,

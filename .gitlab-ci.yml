@@ -9,7 +9,7 @@ variables:
   DOCKER_DRIVER: overlay
 
 stages:
-- composer
+- meld
 - build
 - test
 - release
@@ -22,13 +22,25 @@ before_script:
   - echo "Registering with token $CI_BUILD_TOKEN" 
   - docker login -u gitlab-ci-token -p $CI_BUILD_TOKEN registry.gitlab.com
 
+meld:
+  stage: meld
+  variables:
+    GIT_SUBMODULE_STRATEGY: recursive
+  script:
+  # First we build using an image we will have to download anyway
+  - wget "https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/dist-$(wget https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/latest-commit$([ \"$CI_BUILD_REF_NAME\" == \"preview\" ] && echo "-preview") -O - -q)/index.html" -O resources/views/index.blade.php
+  - sed -i "s/\/static/https:\/\/mo.ev.openindustry.in\/ltl-lintol-dev\/cdn\/dist-$(wget https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/latest-commit$([ \"$CI_BUILD_REF_NAME\" == \"preview\" ] && echo "-preview") -O - -q)/g" resources/views/index.blade.php
+  artifacts:
+    paths:
+    - resources/views/index.blade.php
+
 composer:
-  stage: composer
+  stage: meld
   before_script:
   - echo "Building PHP dependencies"
   image: composer
   script:
-  - composer install
+  - composer install --ignore-platform-reqs
   artifacts:
     paths:
     - vendor
@@ -42,8 +54,6 @@ build:
     GIT_SUBMODULE_STRATEGY: recursive
   script:
   # First we build using an image we will have to download anyway
-  - wget "https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/dist-$(wget https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/latest-commit -O - -q)/index.html" -O resources/views/index.blade.php
-  - sed -i "s/\/static/https:\/\/mo.ev.openindustry.in\/ltl-lintol-dev\/cdn\/dist-$(wget https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/latest-commit -O - -q)\/static/g" resources/views/index.blade.php
   - chown -R 33 storage/logs bootstrap/cache
   - docker build -f infrastructure/containers/nginx/Dockerfile -t $CONTAINER_NGINX_IMAGE .
   - docker build -f infrastructure/containers/phpfpm/Dockerfile -t $CONTAINER_PHPFPM_IMAGE .
@@ -51,6 +61,7 @@ build:
   - docker push $CONTAINER_PHPFPM_IMAGE
   dependencies:
   - composer
+  - meld
 
 test:
   stage: test

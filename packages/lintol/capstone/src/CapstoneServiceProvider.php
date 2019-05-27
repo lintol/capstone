@@ -8,6 +8,7 @@ use Lintol\Capstone\Models\ProcessorConfiguration;
 use Lintol\Capstone\Observers\ProcessorConfigurationObserver;
 use Lintol\Capstone\Listeners\ResultRetrievedListener;
 use Lintol\Capstone\Console\Commands\ObserveDataCommand;
+use Lintol\Capstone\Console\Commands\ObserveNewResourcesCommand;
 use Lintol\Capstone\Console\Commands\ProcessDataCommand;
 use Lintol\Capstone\WampConnection;
 use Lintol\Capstone\Models\DataResource;
@@ -43,6 +44,7 @@ class CapstoneServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 ObserveDataCommand::class,
+                ObserveNewResourcesCommand::class,
                 ProcessDataCommand::class
             ]);
         }

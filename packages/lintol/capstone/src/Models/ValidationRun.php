@@ -80,6 +80,12 @@ class ValidationRun extends Model
             'definitions' => $definitions,
             'settings' => $settings
         ];
+
+        \Log::info($this->dataResource->package);
+        \Log::info($this->dataResource->package_id);
+        if ($this->dataResource->package) {
+            $definition['package'] = $this->dataResource->package->metadata;
+        }
         $this->doorstep_definition = $definition;
 
         return true;

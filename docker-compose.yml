@@ -53,6 +53,28 @@ services:
       - phpfpm:phpfpm
     environment:
       LARAVEL_ROOT: "/var/www/app"
+  artisan_new_resources_subscriber:
+    build:
+      context: ./infrastructure/containers/phpfpm
+      dockerfile: Dockerfile.debug
+    volumes:
+      - .:/var/www/app
+    env_file:
+      - ./docker/config/laravel.env
+      - ./docker/config/redis.env
+    environment:
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
+      APP_LOG: "errorlog"
+      LOG_CHANNEL: "errorlog"
+    links:
+      - db:db
+      - redis:redis
+    entrypoint:
+      - php
+      - /var/www/app/artisan
+    command:
+      - "ltl:observe-new"
   artisan_subscriber:
     build:
       context: ./infrastructure/containers/phpfpm
