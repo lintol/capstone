@@ -37,8 +37,8 @@ services:
     environment:
       REDIS_HOST: "redis"
       REDIS_PORT: 6379
-      APP_LOG: "errorlog"
-      LOG_CHANNEL: "errorlog"
+      APP_LOG: "stack"
+      LOG_CHANNEL: "stack"
   nginx:
     image: nginx:stable
     volumes:
@@ -65,8 +65,8 @@ services:
     environment:
       REDIS_HOST: "redis"
       REDIS_PORT: 6379
-      APP_LOG: "errorlog"
-      LOG_CHANNEL: "errorlog"
+      APP_LOG: "stack"
+      LOG_CHANNEL: "stack"
     links:
       - db:db
       - redis:redis
@@ -87,8 +87,8 @@ services:
     environment:
       REDIS_HOST: "redis"
       REDIS_PORT: 6379
-      APP_LOG: "errorlog"
-      LOG_CHANNEL: "errorlog"
+      APP_LOG: "stack"
+      LOG_CHANNEL: "stack"
     links:
       - db:db
       - redis:redis
