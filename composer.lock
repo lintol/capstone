@@ -1529,7 +1529,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/lintol/socialite.git",
-                "reference": "9b5e9d3e1f9394d00d0c085c49cf3bb96fff0f0a"
+                "reference": "7f569d96d41e5defd96556f1b81b9670db16db83"
             },
             "require": {
                 "guzzlehttp/guzzle": "~6.0",
@@ -1537,7 +1537,7 @@
                 "illuminate/http": "~5.4",
                 "illuminate/support": "~5.4",
                 "league/oauth1-client": "~1.0",
-                "php": ">=5.4.0"
+                "php": ">=5.6.4"
             },
             "require-dev": {
                 "mockery/mockery": "~0.9",
@@ -1577,11 +1577,16 @@
                 }
             ],
             "description": "Laravel wrapper around OAuth 1 & OAuth 2 libraries.",
+            "homepage": "https://laravel.com",
             "keywords": [
                 "laravel",
                 "oauth"
             ],
-            "time": "2018-03-15T13:29:16+00:00"
+            "support": {
+                "issues": "https://github.com/laravel/socialite/issues",
+                "source": "https://github.com/laravel/socialite"
+            },
+            "time": "2019-05-27T23:34:19+00:00"
         },
         {
             "name": "laravel/tinker",
