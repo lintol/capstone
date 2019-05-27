@@ -40,6 +40,11 @@ Route::group($group, function () {
     Route::resource('dataResources', 'DataResourceController', [
         'only' => ['index', 'store', 'update', 'destroy']
     ]);
+
+    Route::get('dataResources/getFileTypeFilters', 'DataResourceController@getFileTypeFilters')->name('getFileTypeFilters');
+    Route::get('dataResources/getSourceFilters', 'DataResourceController@getSourceFilters')->name('getSourceFilters');
+    Route::get('dataResources/getDateFilters', 'DataResourceController@getDateFilters')->name('getDateFilters');
+
     Route::resource('dataResources/settings', 'DataResourceSettingController', [
         'only' => ['store']
     ]);

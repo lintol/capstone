@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use Auth;
 use Log;
-use GuzzleHttp;
 use App\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
@@ -212,9 +211,38 @@ class DataResourceController extends Controller
      */
     public function destroy(DataResource $dataResource)
     {
-        //
         $resource = DataResource::findOrFail($dataResource->id);
         $resource->delete();
         
+    }
+
+    /**
+     * Gets array of values of file types
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getFileTypeFilters(Request $request)
+    {
+        return response(DataResource::select('filetype')->distinct()->get(), 200);
+    }
+
+    /**
+     * Gets array of values of sources
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getSourceFilters(Request $request)
+    {
+        return response(DataResource::select('source')->distinct()->get(), 200);
+    }
+
+    /**
+     * Gets array of values of dates
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getDateFilters(Request $request)
+    {
+        return response(DataResource::select('created_at')->distinct()->get(), 200);
     }
 }
