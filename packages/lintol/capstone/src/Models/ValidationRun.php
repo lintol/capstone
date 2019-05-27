@@ -57,7 +57,7 @@ class ValidationRun extends Model
         }
 
         \Log::info(__("Announcing run ") . $this->id . __(" has finished"));
-        Event::fire(new ResultRetrievedEvent($this->id));
+        Event::dispatch(new ResultRetrievedEvent($this->id));
     }
 
     public function report()
@@ -81,8 +81,6 @@ class ValidationRun extends Model
             'settings' => $settings
         ];
 
-        \Log::info($this->dataResource->package);
-        \Log::info($this->dataResource->package_id);
         if ($this->dataResource->package) {
             $definition['package'] = $this->dataResource->package->metadata;
         }

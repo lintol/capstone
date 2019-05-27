@@ -33,6 +33,10 @@ if (config('capstone.frontend.proxy', false)) {
             abort(400);
         }
 
+        if ($any == '') {
+            $any = Config::get('capstone.frontend.prefix', 'static/');
+        }
+
         $frontend = config('capstone.frontend.proxy', false);
         $client = new GuzzleHttp\Client();
         $url = $frontend . $any;

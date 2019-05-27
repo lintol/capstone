@@ -291,6 +291,7 @@ class ValidationProcess
             ->then(
                 function ($res) {
                     \Log::info('engaged...');
+                    \Log::info('(server: ' . $res[0][0] . ' ; session: ' . $res[0][1] . ')');
                     $this->beginValidation($res[0][0], $res[0][1]);
                     return $this->sendProcessor();
                 },
@@ -306,8 +307,6 @@ class ValidationProcess
                     return $this->sendData();
                 },
                 function ($error) {
-                    Log::info(get_class($error));
-                    Log::info($error);
                     $this->recordException($error);
                     throw new \RuntimeException($error);
                 }
@@ -318,14 +317,11 @@ class ValidationProcess
                     Log::info(__("Validation process initiated for ") . $this->run->id);
                 },
                 function ($error) {
-                    Log::info(get_class($error));
                     $this->recordException($error);
                     throw new \RuntimeException($error);
                 }
             );
         } catch (Throwable $e) {
-            Log::info(get_class($e));
-            Log::error($e);
             $this->recordException($e);
             throw $e;
         }

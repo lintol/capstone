@@ -54,7 +54,6 @@ class ObserveDataJob implements ShouldQueue
                 Log::info("[lintol-observe] " . __("Connected and subscribing to result events."));
 
                 $session->subscribe('com.ltldoorstep.event_result', function ($res) use ($session, $processFactory) {
-                    Log::debug(ValidationRun::whereDoorstepServerId($res[0])->get());
                     $process = $processFactory->fromDataSession($res[0], $res[1], $session);
 
                     Log::debug("[lintol-observe] " . __("Validation result event seen."));
