@@ -75,5 +75,16 @@ class ProfilesTableSeeder extends Seeder
             'lintol/ds-boundary-checker-py:1'
         );
 
+        $this->createProfile(
+            $dataOwner,
+            [
+                'name' => 'CSV (Goodtables) profile [test]',
+                'description' => 'Goodtables description',
+                'version' => 'version 1',
+                'unique_tag' => 'uniq-99'
+            ],
+            'frictionlessdata/goodtables-py:1'
+        );
+
     }
 }

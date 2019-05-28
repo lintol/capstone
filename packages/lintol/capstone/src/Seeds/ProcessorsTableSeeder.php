@@ -64,7 +64,7 @@ class ProcessorsTableSeeder extends Seeder
             'description' => 'CSV checking tool from Frictionless Data project',
             'module' => 'good.py',
             'content' => File::get($processorsPath . 'good.py'),
-            'rules' => [],
+            'rules' => ['fileType' => '/csv/'],
             'configuration_defaults' => json_encode([
                 'delimiter' => 'comma'
             ]),
