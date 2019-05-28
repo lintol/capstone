@@ -3,6 +3,7 @@
 return [
     'features' => [
         'redirectable-content' => env('LINTOL_FEATURE_REDIRECTABLE_CONTENT', false),
+        'remote-data-resources' => env('LINTOL_FEATURE_REMOTE_DATA_RESOURCES', false),
         'services-github' => env('LINTOL_FEATURE_SERVICES_GITHUB', false),
 
         /**

@@ -72,7 +72,7 @@ class DataResourceController extends Controller
                 $resourceProvider = $this->resourceManager->getProvider();
 
                 $data = collect();
-                if ($resourceProvider) {
+                if ($resourceProvider && config('capstone.features.remote-data-resources', false)) {
                     $data = $resourceProvider->getDataResources($search, $filters, $sortBy, $orderDesc);
                 }
 
