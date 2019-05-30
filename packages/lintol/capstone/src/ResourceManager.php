@@ -33,7 +33,9 @@ class ResourceManager
             $dataResource->filename = $path;
             $dataResource->name = $path;
             $pathParts = pathinfo($path);
-            $dataResource->filetype = $pathParts['extension'];
+            if (! $dataResource->filetype && isset($pathParts['extension'])) {
+                $dataResource->filetype = $pathParts['extension'];
+            }
             $dataResource->status = 'new resource';
             $settings = $dataResource->settings;
             $settings['fileType'] = $dataResource->filetype;
@@ -50,7 +52,9 @@ class ResourceManager
                 $dataResource->filename = $path;
                 $dataResource->name = $path;
                 $pathParts = pathinfo($path);
-                $dataResource->filetype = $pathParts['extension'];
+                if (! $dataResource->filetype && isset($pathParts['extension'])) {
+                    $dataResource->filetype = $pathParts['extension'];
+                }
                 $dataResource->status = 'new resource';
                 $settings = $dataResource->settings;
                 $settings['fileType'] = $dataResource->filetype;

@@ -80,9 +80,14 @@ class DataResourceController extends Controller
                 break;
             case '_local':
             default:
-                $query = new DataResource;
+                $query = DataResource::with('package');
                 if ($search) {
-                    $query = $query->where('filename', 'LIKE', '%' . $search . '%');
+                    $query = $query->where(function ($query) use ($search) {
+                        return $query->where('filename', 'LIKE', '%' . $search . '%')
+                            ->orWhereHas('package', function ($query) use ($search) {
+                                return $query->where('name', 'LIKE', '%' . $search . '%');
+                            });
+                    });
                 }
                 foreach ($filters as $filter => $value) {
                     if ($filter == 'created_at') {

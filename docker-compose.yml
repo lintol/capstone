@@ -39,6 +39,7 @@ services:
       REDIS_PORT: 6379
       APP_LOG: "stack"
       LOG_CHANNEL: "stack"
+      LINTOL_EXAMPLE_DT_CLASSIFY_CATEGORY_SERVER_URL: "http://localhost:5001"
   nginx:
     image: nginx:stable
     volumes:
@@ -89,6 +90,7 @@ services:
       REDIS_PORT: 6379
       APP_LOG: "stack"
       LOG_CHANNEL: "stack"
+      LINTOL_EXAMPLE_DT_CLASSIFY_CATEGORY_SERVER_URL: "http://localhost:5001"
     links:
       - db:db
       - redis:redis
@@ -111,6 +113,7 @@ services:
       REDIS_PORT: 6379
       APP_LOG: "stack"
       LOG_CHANNEL: "stack"
+      LINTOL_EXAMPLE_DT_CLASSIFY_CATEGORY_SERVER_URL: "http://localhost:5001"
     links:
       - db:db
       - redis:redis
