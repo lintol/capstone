@@ -41,6 +41,11 @@ class ResourceManager
             $settings['fileType'] = $dataResource->filetype;
             $dataResource->settings = $settings;
             $dataResource->content = $dataResource->url;
+if ($dataResource->package && ! $dataResource->package->id) {
+\Log::info($dataResource->package);
+$dataResource->package->save();
+$dataResource->package_id = $dataResource->package->id;
+}
             $dataResource->save();
 
             ValidationProcess::launch($dataResource);
