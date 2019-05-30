@@ -29,9 +29,9 @@ class ProcessorsTableSeeder extends Seeder
             'module' => 'cl.rb',
             'content' => '',
             'rules' => ['fileType' => '/csv/'],
-            'configuration_defaults' => json_encode([
+            'configuration_defaults' => [
                 'delimiter' => 'comma'
-            ]),
+            ],
             'configuration_options' => json_encode([
                 'fields' => [
                     [
@@ -65,9 +65,9 @@ class ProcessorsTableSeeder extends Seeder
             'module' => 'good.py',
             'content' => File::get($processorsPath . 'good.py'),
             'rules' => ['fileType' => '/csv/'],
-            'configuration_defaults' => json_encode([
+            'configuration_defaults' => [
                 'delimiter' => 'comma'
-            ]),
+            ],
             'configuration_options' => json_encode([
                 'fields' => [
                     [
@@ -132,9 +132,9 @@ class ProcessorsTableSeeder extends Seeder
               'GB-NIR:Settlement:Strabane' => 'https://s3.eu-west-2.amazonaws.com/resources.lintol.io/settlement-boundaries/strabane-settlement-development.geojson',
               'GB-NIR:Settlement:Enniskillen' => 'https://s3.eu-west-2.amazonaws.com/resources.lintol.io/settlement-boundaries/enniskillen-settlement-development.geojson'
             ],
-            'configuration_defaults' => json_encode([
+            'configuration_defaults' => [
                 'boundary' => '$GB-FMO'
-            ]),
+            ],
             'configuration_options' => json_encode([
                 'fields' => [
                     [
@@ -164,6 +164,30 @@ class ProcessorsTableSeeder extends Seeder
             'module' => 'registers.py',
             'content' => File::get($processorsPath . 'registers.py'),
             'rules' => ['fileType' => '/csv/'],
+            'definition' => [
+                'docker' => [
+                    'image' => 'lintol/doorstep',
+                    'revision' => 'latest'
+                ]
+            ]
+        ]);
+        $processor->creator()->associate($dataOwner);
+        $processor->save();
+
+        $processor = Processor::firstOrNew([
+            'unique_tag' => 'datatimes/dt-classify-category:1',
+        ]);
+        $processor->fill([
+            'name' => 'Data Times Category Classifier',
+            'description' => 'NLP category classifier for tagging datasets',
+            'module' => 'dt_classify_category.py',
+            'content' => File::get($processorsPath . 'dt_classify_category.py'),
+            'rules' => ['fileType' => '//'],
+            'configuration_defaults' => [
+                'categoryServerUrl' => 'http://localhost:5000/'
+            ],
+            'configuration_options' => json_encode([
+            ]),
             'definition' => [
                 'docker' => [
                     'image' => 'lintol/doorstep',

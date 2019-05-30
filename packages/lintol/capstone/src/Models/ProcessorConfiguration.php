@@ -55,10 +55,14 @@ class ProcessorConfiguration extends Model
 
     public function buildDefinition()
     {
-        $this->configuration = json_decode(json_encode($this->user_configuration_storage), true);
+        \Log::info('bd');
+        \Log::info(json_encode($this->processor->configuration_defaults));
+        $this->configuration = array_merge(
+            json_decode(json_encode($this->processor->configuration_defaults), true),
+            json_decode(json_encode($this->user_configuration_storage), true)
+        );
 
         $supplementary = [];
-        \Log::info($this->configuration);
         foreach ($this->configuration as $key => $value) {
           if (strlen($value) > 3 && substr($value, 0, 3) == '$->') {
             $value = substr($value, 3);

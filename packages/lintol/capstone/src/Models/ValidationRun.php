@@ -81,8 +81,9 @@ class ValidationRun extends Model
             'settings' => $settings
         ];
 
+        $definition['context'] = [];
         if ($this->dataResource->package) {
-            $definition['package'] = $this->dataResource->package->metadata;
+            $definition['context']['package'] = $this->dataResource->package->metadata;
         }
         $this->doorstep_definition = $definition;
 

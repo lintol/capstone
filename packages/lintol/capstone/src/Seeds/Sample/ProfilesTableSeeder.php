@@ -86,5 +86,16 @@ class ProfilesTableSeeder extends Seeder
             'frictionlessdata/goodtables-py:1'
         );
 
+        $this->createProfile(
+            $dataOwner,
+            [
+                'name' => 'Data Times Category Classifier [test]',
+                'description' => 'Category classifier for the Data Times project',
+                'version' => 'version 1',
+                'unique_tag' => 'uniq-101'
+            ],
+            'datatimes/dt-classify-category:1'
+        );
+
     }
 }

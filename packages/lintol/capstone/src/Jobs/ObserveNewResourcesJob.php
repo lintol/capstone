@@ -84,7 +84,8 @@ class ObserveNewResourcesJob implements ShouldQueue
                     $res = DataResource::whereRemoteId($resourceId)->whereSource($source)->first();
                     if (! $res) {
                         $res = new DataResource;
-                        if (! $resource->name) {
+                        $name = $resource->name;
+                        if (! $name) {
                             $name = basename($resource->url);
                         }
                         $res->fill([
@@ -92,6 +93,7 @@ class ObserveNewResourcesJob implements ShouldQueue
                             'content' => '',
                             'name' => $name,
                             'url' => $resource->url,
+                            'package_id' => $package->id,
                             'filename' => basename($resource->url),
                             'filetype' => $resource->format,
                             'source' => $source
