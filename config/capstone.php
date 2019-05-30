@@ -14,6 +14,11 @@ return [
          */
         'local-admin-login' => env('LINTOL_FEATURE_LOCAL_ADMIN_LOGIN', false),
     ],
+    'examples' => [
+        'classify-category' => [
+            'category-server-url' => env('LINTOL_EXAMPLE_DT_CLASSIFY_CATEGORY_SERVER_URL', 'http://localhost:5000/')
+        ]
+    ],
     'documents' => [
         'terms-and-conditions' => env('LINTOL_DOCUMENT_PREFIX', '') . '/saas-terms-support.pdf',
         'privacy-notice' => env('LINTOL_DOCUMENT_PREFIX', '') . '/privacy-terms.pdf'

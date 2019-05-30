@@ -184,7 +184,7 @@ class ProcessorsTableSeeder extends Seeder
             'content' => File::get($processorsPath . 'dt_classify_category.py'),
             'rules' => ['fileType' => '//'],
             'configuration_defaults' => [
-                'categoryServerUrl' => 'http://localhost:5000/'
+                'categoryServerUrl' => config('capstone.examples.classify-category.category-server-url', 'http://localhost:5000/')
             ],
             'configuration_options' => json_encode([
             ]),

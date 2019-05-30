@@ -12,7 +12,6 @@ import ltldoorstep
 import gettext
 from ltldoorstep.processor import DoorstepProcessor
 from ltldoorstep.reports import report
-from ltldoorstep.location_utils import load_berlin
 from dask.threaded import get
 import requests
 
