@@ -120,7 +120,7 @@ class CkanResourceProvider implements ResourceProviderInterface
             try {
                 $search = $this->ckanClient->ResourceSearch($ckanQuery);
                 break;
-            } catch (\GuzzleHttp\\Exception\\ServerException $e) {
+            } catch (\GuzzleHttp\Exception\ServerException $e) {
                 if ($e->getResponse()->getStatusCode() != 502) {
                     throw $e;
                 }
