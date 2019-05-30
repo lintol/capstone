@@ -116,26 +116,41 @@ class CkanResourceProvider implements ResourceProviderInterface
             }
         }
 
-        $ckanData = collect($this->ckanClient->ResourceSearch($ckanQuery)['result']['results'])
-            ->map(function ($ckanData) use ($localData, $user) {
-                $data = $localData->get($ckanData['id']);
-
-                if (!$data) {
-                    $data = new DataResource;
-                    $data->url = $ckanData['url'];
-                    $data->remote_id = $ckanData['id'];
-                    $data->source = 'CKAN';
-                    $data->filetype = 'csv';
-                    $data->archived = 0;
-                    $data->filename = basename($data->url);
-                    $data->status = 'valid link';
-                    $data->resourceable = $this->ckanInstance;
-                    $data->created_at = $ckanData['created'] ? Carbon::parse($ckanData['created']) : null;
-                    $data->updated_at = $ckanData['last_modified'] ? Carbon::parse($ckanData['last_modified']) : null;
+        for ($i = 0 ; $i < 10 ; $i++) {
+            try {
+                $search = $this->ckanClient->ResourceSearch($ckanQuery);
+                break;
+            } catch (\GuzzleHttp\\Exception\\ServerException $e) {
+                if ($e->getResponse()->getStatusCode() != 502) {
+                    throw $e;
                 }
+            }
+        }
 
-                return $data;
-            });
+        if ($search) {
+            $ckanData = collect($search['result']['results'])
+                ->map(function ($ckanData) use ($localData, $user) {
+                    $data = $localData->get($ckanData['id']);
+
+                    if (!$data) {
+                        $data = new DataResource;
+                        $data->url = $ckanData['url'];
+                        $data->remote_id = $ckanData['id'];
+                        $data->source = 'CKAN';
+                        $data->filetype = 'csv';
+                        $data->archived = 0;
+                        $data->filename = basename($data->url);
+                        $data->status = 'valid link';
+                        $data->resourceable = $this->ckanInstance;
+                        $data->created_at = $ckanData['created'] ? Carbon::parse($ckanData['created']) : null;
+                        $data->updated_at = $ckanData['last_modified'] ? Carbon::parse($ckanData['last_modified']) : null;
+                    }
+
+                    return $data;
+                });
+        } else {
+            $ckanData = collect();
+        }
 
         \Log::info($ckanData);
         return $ckanData;
