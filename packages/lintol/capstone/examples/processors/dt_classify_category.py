@@ -62,13 +62,14 @@ def classify_sentences(rprt, data_sentences, metadata_sentences, context):
         issue_text = _("Possible categories in {}: {}").format(key, ", ".join(["{} ({:.2f}%)".format(_(c), r * 100) for r, c in result if r > 0.2]))
         slug_key = key.lower().replace(' ', '-')
 
-        rprt.add_issue(
-            logging.INFO,
-            'possible-categories-{}'.format(slug_key),
-            issue_text,
-            error_data=results,
-            at_top=True
-        )
+        if result:
+            rprt.add_issue(
+                logging.INFO,
+                'possible-categories-{}'.format(slug_key),
+                issue_text,
+                error_data=result,
+                at_top=True
+            )
 
     return rprt
 
