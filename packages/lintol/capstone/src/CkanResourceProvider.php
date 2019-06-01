@@ -75,7 +75,7 @@ class CkanResourceProvider implements ResourceProviderInterface
         $this->ckanInstance = $ckanInstance;
     }
 
-    public function getDataResources($search = '', $filters = [], $sortBy = 'name', $orderDesc = false) : Collection
+    public function getDataResources($search = '', $filters = [], $sortBy = 'name', $orderDesc = false, $limit = 50) : Collection
     {
 if (strlen($search) < 4) {
 return collect();
@@ -85,7 +85,7 @@ return collect();
         $user = Auth::user();
         $localData = $this->ckanInstance->resources()->whereUserId($user->id)->get()->keyBy('remote_id');
 
-        $query = ['url' => '.'];
+        $query = ['url' => '.', 'rows' => $limit];
         if ($search) {
             $query['url'] = preg_replace('[^A-Za-z0-9_-.]', '', $search);
         }
