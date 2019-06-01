@@ -104,15 +104,15 @@ class DataResourceController extends Controller
         $data = $paginator->getCollection();
         $paginator->setPath('/dataResources/');
 
-        $users = User::whereIn('id', $data->pluck('user_id')->filter())->get()->each(function (&$user) {
-          $user->retrieve();
-        })->keyBy('id');
+        //$users = User::whereIn('id', $data->pluck('user_id')->filter())->get()->each(function (&$user) {
+        //  $user->retrieve();
+        //})->keyBy('id');
 
-        $data->each(function (&$data) use ($users) {
-            if ($data->user_id) {
-                $data->user = $users[$data->user_id];
-            }
-        });
+        //$data->each(function (&$data) use ($users) {
+        //    if ($data->user_id) {
+        //        $data->user = $users[$data->user_id];
+        //    }
+        //});
 
         return fractal()
             ->collection($data, $this->transformer, 'dataResources')
