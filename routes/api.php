@@ -30,9 +30,7 @@ if (!env('CAPSTONE_WITHOUT_AUTH', false)) {
     $machineGroup['middleware'] = 'client';
 }
 
-Route::resource('reports', 'ReportController', [
-    'only' => ['all']
-]);
+Route::get('reports/all', 'ReportController@all');
 
 //Route::group($machineGroup, function () {
 //    Route::resource('dataResources', 'DataResourceController', [
