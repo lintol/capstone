@@ -51,7 +51,7 @@ class ReportController extends Controller
      */
     public function all()
     {
-        return $this->index();
+        return "HERE";
     }
 
     /**
