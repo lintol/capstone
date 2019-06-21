@@ -21,9 +21,27 @@ $group = [
     'prefix' => 'v1.0'
 ];
 
+$machineGroup = [
+    'prefix' => 'v1.0'
+];
+
 if (!env('CAPSTONE_WITHOUT_AUTH', false)) {
     $group['middleware'] = 'auth:api';
+    $machineGroup['middleware'] = 'client';
 }
+
+Route::resource('reports', 'ReportController', [
+    'only' => ['all']
+]);
+
+//Route::group($machineGroup, function () {
+//    Route::resource('dataResources', 'DataResourceController', [
+//        'only' => ['all']
+//    ]);
+//    Route::resource('reports', 'ReportController', [
+//        'only' => ['all']
+//    ]);
+//});
 
 Route::group($group, function () {
     Route::get('users/me', 'UserController@me');

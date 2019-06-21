@@ -45,6 +45,16 @@ class ReportController extends Controller
     }
 
     /**
+     * Display a listing of the resource for machine route.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function all()
+    {
+        return $this->index();
+    }
+
+    /**
      * Display the specified resource.
      *
      * @param  int  $id
