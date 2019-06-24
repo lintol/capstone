@@ -33,11 +33,11 @@ class ReportController extends Controller
           })
           ->keyBy('id');
 
-        $reports->each(function (&$report) use ($users) {
-            if ($report->owner_id) {
-                $report->owner = $users[$report->owner_id];
-            }
-        });
+        // $reports->each(function (&$report) use ($users) {
+        //     if ($report->owner_id) {
+        //         $report->owner = $users[$report->owner_id];
+        //     }
+        // });
 
         return fractal()
             ->collection($reports, $this->transformer, 'reports')
