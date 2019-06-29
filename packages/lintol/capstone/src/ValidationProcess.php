@@ -332,7 +332,7 @@ class ValidationProcess
             );
         } catch (Throwable $e) {
             $this->recordException($e);
-            throw $e;
+            // throw $e;
         }
         return $promise;
     }
