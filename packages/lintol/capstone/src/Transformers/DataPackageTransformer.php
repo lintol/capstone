@@ -3,15 +3,15 @@
 namespace Lintol\Capstone\Transformers;
 
 use League\Fractal;
-use Lintol\Capstone\Models\DataResource;
+use Lintol\Capstone\Models\DataPackage;
 use App\Transformers\UserTransformer;
 
-class DataResourceTransformer extends Fractal\TransformerAbstract
+class DataPackageTransformer extends Fractal\TransformerAbstract
 {
     protected $defaultIncludes = [
     ];
 
-    public function transform(DataResource $data)
+    public function transform(DataPackage $data)
     {
         return [
             'id' => ($data->id || !$data->remote_id) ? $data->id : 'remote-' . $data->remote_id,
@@ -23,7 +23,7 @@ class DataResourceTransformer extends Fractal\TransformerAbstract
         ];
     }
 
-    public function includeUser(DataResource $data)
+    public function includeUser(DataPackage $data)
     {
         if ($data->user) {
             return $this->item(
