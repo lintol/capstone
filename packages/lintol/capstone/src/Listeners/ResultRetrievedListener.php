@@ -48,6 +48,6 @@ class ResultRetrievedListener
                 'com.ltlcapstone.validation.' . $validation->id . '.event_complete',
                 [$content]
             );
-        }, false);
+        });
     }
 }

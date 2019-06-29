@@ -45,6 +45,7 @@ class WampConnection
      */
     public function execute(callable $closure, $closeOnComplete = true)
     {
+        \Log::info($closeOnComplete ? 'Y' : 'N');
         if ($this->session) {
             $closure($this->session);
         } else {
@@ -58,14 +59,18 @@ class WampConnection
 
                 try {
                     $promise = $closure($session);
+                    \Log::info('promise on way');
                 } catch (Exception $e) {
                     Log::error($error);
                     $close = true;
                 }
+                \Log::info($close);
 
                 if ($close) {
+                    \Log::info('promise to close');
                     $this->session = null;
                     if ($promise) {
+                        \Log::info('promise to always');
                         $promise->always(function () use ($session) { $session->close(); });
                     } else {
                         $session->close();
