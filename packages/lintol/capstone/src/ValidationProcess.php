@@ -302,7 +302,6 @@ class ValidationProcess
                     \Log::info('engaged...');
                     \Log::info('(server: ' . $res[0][0] . ' ; session: ' . $res[0][1] . ')');
                     $this->beginValidation($res[0][0], $res[0][1]);
-                    throw new \RuntimeException(1);
                     return $this->sendProcessor();
                 },
                 function ($error) {

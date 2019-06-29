@@ -25,6 +25,8 @@ class WampConnection
 
     protected $session = null;
 
+    protected $stayOpen = false;
+
     /**
      * Create a new job instance.
      *
@@ -34,6 +36,11 @@ class WampConnection
     {
         $this->url = $url;
         $this->realm = $realm;
+    }
+
+    public function setStayOpen(bool $stayOpen)
+    {
+        $this->stayOpen = $stayOpen;
     }
 
     /**
@@ -66,7 +73,7 @@ class WampConnection
                 }
                 \Log::info($close);
 
-                if ($close) {
+                if ($close && ! $this->stayOpen) {
                     \Log::info('promise to close');
                     $this->session = null;
                     if ($promise) {
