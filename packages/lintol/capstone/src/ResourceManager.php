@@ -25,9 +25,6 @@ class ResourceManager
 
     public function onboard(DataResource $dataResource)
     {
-        $client = new GuzzleHttp\Client();
-        $request = new GuzzleHttp\Psr7\Request('GET', $dataResource->url);
-
         if (config('capstone.features.redirectable-content', false)) {
             $path = basename($dataResource->url);
             $dataResource->filename = $path;
@@ -36,20 +33,24 @@ class ResourceManager
             if (! $dataResource->filetype && isset($pathParts['extension'])) {
                 $dataResource->filetype = $pathParts['extension'];
             }
-            $dataResource->status = 'new resource';
+            $dataResource->status = 'ready to process';
             $settings = $dataResource->settings;
             $settings['fileType'] = $dataResource->filetype;
             $dataResource->settings = $settings;
             $dataResource->content = $dataResource->url;
-if ($dataResource->package && ! $dataResource->package->id) {
-\Log::info($dataResource->package);
-$dataResource->package->save();
-$dataResource->package_id = $dataResource->package->id;
-}
+
+            if ($dataResource->package && ! $dataResource->package->id) {
+                \Log::info($dataResource->package);
+                $dataResource->package->save();
+                $dataResource->package_id = $dataResource->package->id;
+            }
             $dataResource->save();
 
-            ValidationProcess::launch($dataResource);
+            // Will be done in observer, now it has a status: ValidationProcess::launch($dataResource);
         } else {
+            $client = new GuzzleHttp\Client();
+
+            $request = new GuzzleHttp\Psr7\Request('GET', $dataResource->url);
             $promise = $client->sendAsync($request)->then(function ($response) use ($dataResource) {
                 $path = basename($dataResource->url);
                 $dData = $response->getBody();
@@ -60,14 +61,15 @@ $dataResource->package_id = $dataResource->package->id;
                 if (! $dataResource->filetype && isset($pathParts['extension'])) {
                     $dataResource->filetype = $pathParts['extension'];
                 }
-                $dataResource->status = 'new resource';
+                $dataResource->status = 'ready to process';
                 $settings = $dataResource->settings;
                 $settings['fileType'] = $dataResource->filetype;
                 $dataResource->settings = $settings;
                 $dataResource->content = $dData;
                 $dataResource->save();
 
-                return ValidationProcess::launch($dataResource);
+                // Will be done in observer, now it has a status: return ValidationProcess::launch($dataResource);
+                return $dataResource;
             }, function ($error) {
                 abort(400, __("Invalid data URI request"));
             });

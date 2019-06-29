@@ -33,6 +33,11 @@ class DataResourceController extends Controller
         $filters = request()->input('filters');
         $sortBy = request()->input('sortBy');
         $orderDesc = (request()->input('order') == 'desc');
+        $ids = request()->input('ids');
+
+        if ($ids) {
+            $ids = explode(',', $ids);
+        }
 
         if ($filters) {
             $filters = collect(explode(',', $filters))
@@ -81,6 +86,9 @@ class DataResourceController extends Controller
             case '_local':
             default:
                 $query = DataResource::with('package');
+                if ($ids) {
+                    $query = $query->whereIn('id', $ids);
+                }
                 if ($search) {
                     $query = $query->where(function ($query) use ($search) {
                         return $query->where('filename', 'LIKE', '%' . $search . '%')

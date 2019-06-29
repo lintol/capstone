@@ -23,7 +23,8 @@ class ReportTransformer extends Fractal\TransformerAbstract
             'passes' => $report->passes,
             'qualityScore' => $report->quality_score,
             'content' => $report->content,
-            'createdAt' => $report->created_at
+            'createdAt' => $report->created_at,
+            'dataResourceId' => $report->getDataResourceId()
         ];
     }
 
@@ -34,6 +35,19 @@ class ReportTransformer extends Fractal\TransformerAbstract
                 $report->owner,
                 new UserTransformer,
                 'users'
+            );
+        }
+
+        return null;
+    }
+
+    public function includeDataResource(Report $report)
+    {
+        if ($report->data_resource) {
+            return $this->item(
+                $report->data_resource,
+                new DataResourceTransformer,
+                'resources'
             );
         }
 

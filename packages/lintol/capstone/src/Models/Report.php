@@ -43,7 +43,8 @@ class Report extends Model
         }
 
         if ($encode) {
-            $result = json_encode($result);
+            // FIXME: neutral may be fine here
+            // $result = json_encode($result);
         } else {
             $result = json_decode($result, true);
         }
@@ -78,5 +79,10 @@ class Report extends Model
     public function run()
     {
         return $this->belongsTo(ValidationRun::class);
+    }
+
+    public function getDataResourceId()
+    {
+        return $this->run ? $this->run->data_resource_id : null;
     }
 }

@@ -35,6 +35,10 @@ class ReportController extends Controller
                 'created_at',
                 '>=',
                 Carbon::parse($request->input('since'))
+            )->whereTime(
+                'created_at',
+                '>=',
+                Carbon::parse($request->input('since'))
             );
         }
 

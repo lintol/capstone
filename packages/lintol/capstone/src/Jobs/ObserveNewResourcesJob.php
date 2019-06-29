@@ -9,7 +9,7 @@ use App;
 use Lintol\Capstone\Models\ValidationRun;
 use Lintol\Capstone\Models\Processor;
 use Lintol\Capstone\Models\DataResource;
-use Lintol\Capstone\ValidationProcess;
+use Lintol\Capstone\ResourceManager;
 use Lintol\Capstone\Models\CkanInstance;
 use Thruway\ClientSession;
 use Thruway\Peer\Client;
@@ -20,6 +20,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Log;
+use Thruway\Logging\Logger;
 use Carbon\Carbon;
 use Lintol\Capstone\WampConnection;
 use Lintol\Capstone\Models\DataPackage;
@@ -42,14 +43,16 @@ class ObserveNewResourcesJob implements ShouldQueue
      *
      * @return void
      */
-    public function handle(WampConnection $wampConnection, CkanInstance $ckanFactory)
+    public function handle(WampConnection $wampConnection, CkanInstance $ckanFactory, ResourceManager $resourceManager)
     {
         Log::info(__("Subscribing."));
 
-        $wampConnection->execute(function (ClientSession $session) use ($ckanFactory) {
+        Logger::set(Log::driver());
+
+        $wampConnection->execute(function (ClientSession $session) use ($ckanFactory, $resourceManager) {
                 Log::info("[lintol-observe] " . __("Connected and subscribing to result events."));
 
-                $session->subscribe('com.ltldoorstep.event_found_resource', function ($res) use ($session) {
+                $session->subscribe('com.ltldoorstep.event_found_resource', function ($res) use ($session, $resourceManager) {
                     $resourceId = $res[0];
                     $resource = $res[1];
                     $ini = $res[2];
@@ -67,6 +70,8 @@ class ObserveNewResourcesJob implements ShouldQueue
                         $ckanInstance->save();
                     }
 
+                    $lastModified = Carbon::parse($metadata->metadata_modified);
+
                     $package = DataPackage::whereRemoteId($metadata->id)->whereSource($source)->first();
                     if (! $package) {
                         $package = new DataPackage;
@@ -82,14 +87,14 @@ class ObserveNewResourcesJob implements ShouldQueue
                     }
 
                     $res = DataResource::whereRemoteId($resourceId)->whereSource($source)->first();
-                    if (! $res) {
+                    if (! $res || $res->updated_at->lt($lastModified)) {
                         $res = new DataResource;
                         $name = $resource->name;
                         if (! $name) {
                             $name = basename($resource->url);
                         }
                         $res->fill([
-                            'remote_id' => $metadata->id,
+                            'remote_id' => $resourceId,
                             'content' => '',
                             'name' => $name,
                             'url' => $resource->url,
@@ -100,7 +105,8 @@ class ObserveNewResourcesJob implements ShouldQueue
                         ]);
                         $res->resourceable()->associate($ckanInstance);
                         $res->save();
-                        Log::debug("Added resource: " . $res->name);
+                        $res = $resourceManager->onboard($res);
+                        Log::info("Added resource: " . $res->name . " with remote ID " . $res->remote_id);
                     }
                 });
         }, false);

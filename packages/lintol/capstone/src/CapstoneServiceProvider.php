@@ -6,6 +6,7 @@ use Event;
 use Lintol\Capstone\Events\ResultRetrievedEvent;
 use Lintol\Capstone\Models\ProcessorConfiguration;
 use Lintol\Capstone\Observers\ProcessorConfigurationObserver;
+use Lintol\Capstone\Observers\DataResourceObserver;
 use Lintol\Capstone\Listeners\ResultRetrievedListener;
 use Lintol\Capstone\Console\Commands\ObserveDataCommand;
 use Lintol\Capstone\Console\Commands\ObserveNewResourcesCommand;
@@ -66,6 +67,7 @@ class CapstoneServiceProvider extends ServiceProvider
         });
 
         ProcessorConfiguration::observe(ProcessorConfigurationObserver::class);
+        DataResource::observe(DataResourceObserver::class);
     }
 
     /**
