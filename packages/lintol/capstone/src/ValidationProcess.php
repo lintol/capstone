@@ -67,6 +67,12 @@ class ValidationProcess
                 $run->save();
 
                 \Log::info(__("Definition built"));
+                if ($run) {
+                    \Log::info(__(" [added run]"));
+                } else {
+                    \Log::info(__(" [did not add run]"));
+                }
+
                 return $run;
             } catch (Throwable $e) {
                 $reportFactory = app()->make(Report::class);
@@ -75,6 +81,8 @@ class ValidationProcess
             }
         })
         ->filter();
+
+        \Log::info(__("Runs: ") . $runs->count());
 
         $runs->each(function ($run) {
             ProcessDataJob::dispatch($run->id);
