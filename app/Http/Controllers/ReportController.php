@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Lintol\Capstone\Models\Report;
 use Lintol\Capstone\Transformers\ReportTransformer;
@@ -20,17 +21,30 @@ class ReportController extends Controller
     /**
      * Display a listing of the resource.
      *
+     * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $reports = Report::all();
+        $reports = new Report;
+
+        if ($request->input('since')) {
+            $this->validate($request, ['since' => 'required|date']);
+
+            $reports = $reports->whereDate(
+                'created_at',
+                '>=',
+                Carbon::parse($request->input('since'))
+            );
+        }
+
+        $reports = $reports->get();
 
         $users = User::whereIn('id', $reports->pluck('owner_id')->filter())
           ->get()
-          ->each(function (&$user) {
-            $user->retrieve();
-          })
+          //->each(function (&$user) {
+          //  $user->retrieve();
+          //})
           ->keyBy('id');
 
         // $reports->each(function (&$report) use ($users) {
