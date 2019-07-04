@@ -4,6 +4,7 @@ namespace Lintol\Capstone;
 
 use Carbon\Carbon;
 use Auth;
+use Illuminate\Support\FacadesLog;
 use Lintol\Capstone\ResourceManager;
 use Socialite;
 use Silex\ckan\CkanClient;
@@ -75,11 +76,11 @@ class CkanResourceProvider implements ResourceProviderInterface
         $this->ckanInstance = $ckanInstance;
     }
 
-    public function getDataResources($search = '', $filters = [], $sortBy = 'name', $orderDesc = false, $limit = 50) : Collection
+    public function getDataResources($search = '', $filters = [], $sortBy = 'name', $orderDesc = false, $limit = 50): Collection
     {
-if (strlen($search) < 4) {
-return collect();
-}
+        if (strlen($search) < 4) {
+            return collect();
+        }
         $this->loadApiKey();
 
         $user = Auth::user();
@@ -125,7 +126,7 @@ return collect();
             }
         }
 
-        for ($i = 0 ; $i < 10 ; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             try {
                 $packageSearch = $this->ckanClient->PackageSearch($ckanPQuery);
                 break;
@@ -136,9 +137,9 @@ return collect();
             }
         }
 
-\Log::info('1');
+        Log::info('1');
 
-        for ($i = 0 ; $i < 10 ; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             try {
                 //$search = $this->ckanClient->ResourceSearch($ckanQuery);
                 break;
@@ -152,39 +153,39 @@ return collect();
         if ($packageSearch) {
             $ckanData = collect($packageSearch['result']['results'])
                 ->map(function ($ckanPackageData) use ($localData, $user) {
-return collect($ckanPackageData['resources'])->map(function ($ckanData) use ($localData, $user, $ckanPackageData) {
-                    $data = $localData->get($ckanData['id']);
+                    return collect($ckanPackageData['resources'])->map(function ($ckanData) use ($localData, $user, $ckanPackageData) {
+                        $data = $localData->get($ckanData['id']);
 
-                    if (!$data) {
-                        $data = new DataResource;
-                        $data->url = $ckanData['url'];
-                        $data->remote_id = $ckanData['id'];
-                        $data->source = 'CKAN';
-                        $data->filetype = strtolower($ckanData['format']) ? strtolower($ckanData['format']) : 'csv';
-                        $data->archived = 0;
-$parts = parse_url($ckanData['url']);
-                        $data->filename = basename($parts['path']);
-if (! str_contains(strtolower($data->filename), $data->filetype)) {
-$data->filename .= '.' . $data->filetype;
-}
-                        $data->status = 'valid link';
-$package = new DataPackage;
-$package->name = $ckanPackageData['title'];
-$data->package = $package;
-\Log::info($ckanData);
-                        $data->resourceable = $this->ckanInstance;
-                        $data->created_at = $ckanData['created'] ? Carbon::parse($ckanData['created']) : null;
-                        $data->updated_at = $ckanData['last_modified'] ? Carbon::parse($ckanData['last_modified']) : null;
-                    }
+                        if (!$data) {
+                            $data = new DataResource;
+                            $data->url = $ckanData['url'];
+                            $data->remote_id = $ckanData['id'];
+                            $data->source = 'CKAN';
+                            $data->filetype = strtolower($ckanData['format']) ? strtolower($ckanData['format']) : 'csv';
+                            $data->archived = 0;
+                            $parts = parse_url($ckanData['url']);
+                            $data->filename = basename($parts['path']);
+                            if (!str_contains(strtolower($data->filename), $data->filetype)) {
+                                $data->filename .= '.' . $data->filetype;
+                            }
+                            $data->status = 'valid link';
+                            $package = new DataPackage;
+                            $package->name = $ckanPackageData['title'];
+                            $data->package = $package;
+                            Log::info($ckanData);
+                            $data->resourceable = $this->ckanInstance;
+                            $data->created_at = $ckanData['created'] ? Carbon::parse($ckanData['created']) : null;
+                            $data->updated_at = $ckanData['last_modified'] ? Carbon::parse($ckanData['last_modified']) : null;
+                        }
 
-                    return $data;
-                });
-})->flatten();
+                        return $data;
+                    });
+                })->flatten();
         } else {
             $ckanData = collect();
         }
 
-        \Log::info($ckanData);
+        Log::info($ckanData);
         return $ckanData;
     }
 
@@ -203,30 +204,30 @@ $data->package = $package;
         $ckanPackageData = $this->ckanClient->PackageShow(['id' => $ckanData['result']['package_id']]);
 
         if ($ckanData) {
-$package = new DataPackage;
-$ckanPackageData = $ckanPackageData['result'];
-$package->name = $ckanPackageData['title'];
-$package->metadata = $ckanPackageData;
-$package->url = $ckanPackageData['url'];
-$package->source = 'CKAN';
-$package->remote_id = $ckanPackageData['id'];
+            $package = new DataPackage;
+            $ckanPackageData = $ckanPackageData['result'];
+            $package->name = $ckanPackageData['title'];
+            $package->metadata = $ckanPackageData;
+            $package->url = $ckanPackageData['url'];
+            $package->source = 'CKAN';
+            $package->remote_id = $ckanPackageData['id'];
             $package->user_id = $user->id;
             $ckanData = $ckanData['result'];
             $data->remote_id = $ckanData['id'];
             $data->url = $ckanData['url'];
             $data->user_id = $user->id;
             $data->source = 'CKAN';
-                        $data->filetype = strtolower($ckanData['format']) ? strtolower($ckanData['format']) : 'csv';
-$parts = parse_url($ckanData['url']);
-                        $data->filename = basename($parts['path']);
-if (! str_contains(strtolower($data->filename), $data->filetype)) {
-$data->filename .= '.' . $data->filetype;
-}
-                        $data->status = 'valid link';
+            $data->filetype = strtolower($ckanData['format']) ? strtolower($ckanData['format']) : 'csv';
+            $parts = parse_url($ckanData['url']);
+            $data->filename = basename($parts['path']);
+            if (!str_contains(strtolower($data->filename), $data->filetype)) {
+                $data->filename .= '.' . $data->filetype;
+            }
+            $data->status = 'valid link';
             $data->archived = 0;
             $data->status = 'valid link';
             $data->resourceable()->associate($this->ckanInstance);
-$data->package()->associate($package);
+            $data->package()->associate($package);
 
             return $data;
         }
@@ -234,7 +235,7 @@ $data->package()->associate($package);
         return null;
     }
 
-    public function getUsers() : Collection
+    public function getUsers(): Collection
     {
         $this->loadApiKey();
 
