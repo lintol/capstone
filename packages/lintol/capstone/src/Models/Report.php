@@ -43,12 +43,14 @@ class Report extends Model
         }
 
         if ($encode) {
-            $result = json_encode($result);
+            // FIXME: neutral may be fine here
+            // $result = json_encode($result);
         } else {
-            $result = json_decode($result);
+            $result = json_decode($result, true);
         }
         $report->content = $result;
-        $content = json_decode($report->content, true);
+        $content = $report->content;
+        //$content = json_decode($report->content, true);
 
         if (array_key_exists('error-count', $content)) {
             $report->errors = (int) $content['error-count'];
@@ -77,5 +79,10 @@ class Report extends Model
     public function run()
     {
         return $this->belongsTo(ValidationRun::class);
+    }
+
+    public function getDataResourceId()
+    {
+        return $this->run ? $this->run->data_resource_id : null;
     }
 }

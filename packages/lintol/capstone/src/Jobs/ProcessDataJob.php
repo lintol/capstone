@@ -51,7 +51,7 @@ class ProcessDataJob implements ShouldQueue
 
         $wampConnection->execute(function (ClientSession $session) use ($processFactory) {
             $process = $processFactory->make($this->validationId, $session);
-            return $process->run();
+            return $process->run()->always(function () { \Log::info("ENDED"); });
         });
 
         Log::info(__("Client exited"));

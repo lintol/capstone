@@ -67,6 +67,12 @@ class ValidationProcess
                 $run->save();
 
                 \Log::info(__("Definition built"));
+                if ($run) {
+                    \Log::info(__(" [added run]"));
+                } else {
+                    \Log::info(__(" [did not add run]"));
+                }
+
                 return $run;
             } catch (Throwable $e) {
                 $reportFactory = app()->make(Report::class);
@@ -75,6 +81,8 @@ class ValidationProcess
             }
         })
         ->filter();
+
+        \Log::info(__("Runs: ") . $runs->count());
 
         $runs->each(function ($run) {
             ProcessDataJob::dispatch($run->id);
@@ -118,6 +126,8 @@ class ValidationProcess
     protected static function _recordException(Report $reportFactory, ValidationRun $run, string $code, $message)
     {
         \Log::error('-exception-');
+        \Log::error($code);
+        \Log::error($message);
 
         $content = [
             'valid' => false,
@@ -252,7 +262,8 @@ class ValidationProcess
             $request = [
                 $this->run->doorstep_session_id,
                 $data->filename,
-                $data->content
+                $data->content,
+                false
             ];
         }
 
@@ -289,6 +300,7 @@ class ValidationProcess
             ->then(
                 function ($res) {
                     \Log::info('engaged...');
+                    \Log::info('(server: ' . $res[0][0] . ' ; session: ' . $res[0][1] . ')');
                     $this->beginValidation($res[0][0], $res[0][1]);
                     return $this->sendProcessor();
                 },
@@ -304,8 +316,6 @@ class ValidationProcess
                     return $this->sendData();
                 },
                 function ($error) {
-                    Log::info(get_class($error));
-                    Log::info($error);
                     $this->recordException($error);
                     throw new \RuntimeException($error);
                 }
@@ -316,16 +326,15 @@ class ValidationProcess
                     Log::info(__("Validation process initiated for ") . $this->run->id);
                 },
                 function ($error) {
-                    Log::info(get_class($error));
                     $this->recordException($error);
                     throw new \RuntimeException($error);
                 }
-            );
+            )->otherwise(function ($error) {
+                Log::info(__("Exited with exception"));
+            });
         } catch (Throwable $e) {
-            Log::info(get_class($e));
-            Log::error($e);
             $this->recordException($e);
-            throw $e;
+            // throw $e;
         }
         return $promise;
     }

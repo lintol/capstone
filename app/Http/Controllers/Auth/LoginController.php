@@ -99,7 +99,7 @@ class LoginController extends Controller
                     ]);
                 }
 
-                $driver = app(ResourceManager::class)->getOAuthDriver($driverName, $resourceable);
+                $driver = app(ResourceManager::class)->getOAuthDriver($driverName, $resourceable)->stateless();
             } else {
                 abort(400, __("You must provide a valid CKAN server to authenticate against."));
             }
@@ -161,7 +161,7 @@ class LoginController extends Controller
               abort(400, __("No valid OAuth2 server known or provided."));
         }
 
-        $oauthUser = app(ResourceManager::class)->getOAuthDriver($driver, $resourceable)->user();
+        $oauthUser = app(ResourceManager::class)->getOAuthDriver($driver, $resourceable)->stateless()->user();
 
         $user = User::findByRemote($driver, $driverServer, $oauthUser, true);
 

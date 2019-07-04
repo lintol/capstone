@@ -6,24 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 use Alsofronie\Uuid\UuidModelTrait;
 use App\User;
 
-class DataResource extends Model
+class DataPackage extends Model
 {
     use UuidModelTrait;
 
     protected $fillable = [
-         'filename',
-         'url',
          'name',
-         'filetype',
-         'status',
+         'metadata',
          'remote_id',
-         'user_id',
-         'package_id',
+         'url',
          'source',
          'user',
-         'archived',
-         'reportid',
-         'content'
+         'creator',
+         'archived'
     ];
 
     public $present = true;
@@ -34,12 +29,12 @@ class DataResource extends Model
     }
 
     public $casts = [
-        'settings' => 'json'
+        'metadata' => 'json'
     ];
 
-    public function run()
+    public function resources()
     {
-        return $this->hasMany(ValidationRun::class);
+        return $this->hasMany(DataResource::class);
     }
 
     public function resourceable()
@@ -50,10 +45,5 @@ class DataResource extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function package()
-    {
-        return $this->belongsTo(DataPackage::class);
     }
 }

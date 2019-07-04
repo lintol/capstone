@@ -64,6 +64,8 @@ class ObserveDataJob implements ShouldQueue
                         Log::info("[lintol-observe] " . __("Incoming validation is in our database."));
 
                         $process->retrieve();
+
+                        Log::info("[lintol-observe] " . __("FINISHED."));
                     }
                 });
 

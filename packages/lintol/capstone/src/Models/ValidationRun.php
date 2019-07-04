@@ -57,7 +57,7 @@ class ValidationRun extends Model
         }
 
         \Log::info(__("Announcing run ") . $this->id . __(" has finished"));
-        Event::fire(new ResultRetrievedEvent($this->id));
+        Event::dispatch(new ResultRetrievedEvent($this->id));
     }
 
     public function report()
@@ -80,6 +80,11 @@ class ValidationRun extends Model
             'definitions' => $definitions,
             'settings' => $settings
         ];
+
+        $definition['context'] = [];
+        if ($this->dataResource->package) {
+            $definition['context']['package'] = $this->dataResource->package->metadata;
+        }
         $this->doorstep_definition = $definition;
 
         return true;

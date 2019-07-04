@@ -14,11 +14,17 @@ class DataResourceTransformer extends Fractal\TransformerAbstract
 
     public function transform(DataResource $data)
     {
+        if ($data->package) {
+            $packageName = $data->package->name;
+        } else {
+            $packageName = '';
+        }
         return [
             'id' => ($data->id || !$data->remote_id) ? $data->id : 'remote-' . $data->remote_id,
             'filename' => $data->filename,
             'url' => $data->url,
             'filetype' => $data->filetype,
+            'packageName' => $packageName,
             'status' => $data->status,
             'source' => $data->source,
             'created_at' => $data->created_at,
@@ -36,6 +42,19 @@ class DataResourceTransformer extends Fractal\TransformerAbstract
                 $data->user,
                 new UserTransformer,
                 'users'
+            );
+        }
+
+        return null;
+    }
+
+    public function includePackage(DataResource $data)
+    {
+        if ($data->package) {
+            return $this->item(
+                $data->package,
+                new DataPackageTransformer,
+                'packages'
             );
         }
 

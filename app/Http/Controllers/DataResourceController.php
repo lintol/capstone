@@ -33,6 +33,11 @@ class DataResourceController extends Controller
         $filters = request()->input('filters');
         $sortBy = request()->input('sortBy');
         $orderDesc = (request()->input('order') == 'desc');
+        $ids = request()->input('ids');
+
+        if ($ids) {
+            $ids = explode(',', $ids);
+        }
 
         if ($filters) {
             $filters = collect(explode(',', $filters))
@@ -72,7 +77,7 @@ class DataResourceController extends Controller
                 $resourceProvider = $this->resourceManager->getProvider();
 
                 $data = collect();
-                if ($resourceProvider) {
+                if ($resourceProvider && config('capstone.features.remote-data-resources', false)) {
                     $data = $resourceProvider->getDataResources($search, $filters, $sortBy, $orderDesc);
                 }
 
@@ -80,9 +85,17 @@ class DataResourceController extends Controller
                 break;
             case '_local':
             default:
-                $query = new DataResource;
+                $query = DataResource::with('package');
+                if ($ids) {
+                    $query = $query->whereIn('id', $ids);
+                }
                 if ($search) {
-                    $query = $query->where('filename', 'LIKE', '%' . $search . '%');
+                    $query = $query->where(function ($query) use ($search) {
+                        return $query->where('filename', 'LIKE', '%' . $search . '%')
+                            ->orWhereHas('package', function ($query) use ($search) {
+                                return $query->where('name', 'LIKE', '%' . $search . '%');
+                            });
+                    });
                 }
                 foreach ($filters as $filter => $value) {
                     if ($filter == 'created_at') {
@@ -99,15 +112,15 @@ class DataResourceController extends Controller
         $data = $paginator->getCollection();
         $paginator->setPath('/dataResources/');
 
-        $users = User::whereIn('id', $data->pluck('user_id')->filter())->get()->each(function (&$user) {
-          $user->retrieve();
-        })->keyBy('id');
+        //$users = User::whereIn('id', $data->pluck('user_id')->filter())->get()->each(function (&$user) {
+        //  $user->retrieve();
+        //})->keyBy('id');
 
-        $data->each(function (&$data) use ($users) {
-            if ($data->user_id) {
-                $data->user = $users[$data->user_id];
-            }
-        });
+        //$data->each(function (&$data) use ($users) {
+        //    if ($data->user_id) {
+        //        $data->user = $users[$data->user_id];
+        //    }
+        //});
 
         return fractal()
             ->collection($data, $this->transformer, 'dataResources')
