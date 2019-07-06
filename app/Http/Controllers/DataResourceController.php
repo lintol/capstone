@@ -39,25 +39,7 @@ class DataResourceController extends Controller
             $ids = explode(',', $ids);
         }
 
-        if ($filters) {
-            $filters = collect(explode(',', $filters))
-              ->map(function ($filterString) {
-                $filter = explode(':', $filterString);
-
-                if (count($filter) !== 2 || !in_array($filter[0], $this->validFilters) || !$filter[1]) {
-                    return null;
-                }
-
-                return [
-                  'filter' => $filter[0],
-                  'value' => $filter[1]
-                ];
-              })
-              ->filter()
-              ->pluck('value', 'filter');
-        } else {
-            $filters = [];
-        }
+        $filters = $this->setFilters($filters);
 
         $maxPagination = config('capstone.frontend.max-pagination', 250);
 
@@ -257,5 +239,33 @@ class DataResourceController extends Controller
     public function getDateFilters(Request $request)
     {
         return response(DataResource::select('created_at')->distinct()->get(), 200);
+    }
+
+    /**
+     * @param $filters
+     * @return array
+     */
+    private function setFilters($filters): array
+    {
+        if ($filters) {
+            $filters = collect(explode(',', $filters))
+                ->map(function ($filterString) {
+                    $filter = explode(':', $filterString);
+
+                    if (count($filter) !== 2 || !in_array($filter[0], $this->validFilters) || !$filter[1]) {
+                        return null;
+                    }
+
+                    return [
+                        'filter' => $filter[0],
+                        'value' => $filter[1]
+                    ];
+                })
+                ->filter()
+                ->pluck('value', 'filter');
+        } else {
+            $filters = [];
+        }
+        return $filters;
     }
 }

@@ -3,7 +3,7 @@
 namespace Lintol\Capstone;
 
 use Auth;
-use Log;
+use Illuminate\Support\Facades\Log;
 use RuntimeException;
 use Event;
 use Carbon\Carbon;
@@ -17,6 +17,7 @@ use Lintol\Capstone\Events\ResultRetrievedEvent;
 
 class ValidationProcess
 {
+
     protected $run;
 
     protected $clientSession;
@@ -60,17 +61,17 @@ class ValidationProcess
 
                 $settings = $data->settings;
                 if (!$run->buildDefinition($settings)) {
-                    \Log::info(__("Definition not built"));
+                    Log::info(__("Definition not built"));
                     return null;
                 }
 
                 $run->save();
 
-                \Log::info(__("Definition built"));
+                Log::info(__("Definition built"));
                 if ($run) {
-                    \Log::info(__(" [added run]"));
+                    Log::info(__(" [added run]"));
                 } else {
-                    \Log::info(__(" [did not add run]"));
+                    Log::info(__(" [did not add run]"));
                 }
 
                 return $run;
@@ -79,10 +80,9 @@ class ValidationProcess
                 self::_recordException($reportFactory, $run, get_class($e) . ':' . $e->getCode(), $e->getMessage());
                 throw $e;
             }
-        })
-        ->filter();
+        })->filter();
 
-        \Log::info(__("Runs: ") . $runs->count());
+        Log::info(__("Runs: ") . $runs->count());
 
         $runs->each(function ($run) {
             ProcessDataJob::dispatch($run->id);
@@ -125,9 +125,9 @@ class ValidationProcess
 
     protected static function _recordException(Report $reportFactory, ValidationRun $run, string $code, $message)
     {
-        \Log::error('-exception-');
-        \Log::error($code);
-        \Log::error($message);
+        Log::error('-exception-');
+        Log::error($code);
+        Log::error($message);
 
         $content = [
             'valid' => false,
@@ -221,7 +221,7 @@ class ValidationProcess
      * @param $serverId
      * @return string
      */
-    protected function makeUri($endpoint, $serverId)
+    protected function makeUri(string $endpoint, string $serverId) : string
     {
         return 'com.ltldoorstep.' . $serverId . '.' . $endpoint;
     }
@@ -231,12 +231,10 @@ class ValidationProcess
         $configurations = $this->run->profile->configurations;
         $processors = $configurations->pluck('processor');
         $definition = $this->run->doorstep_definition;
+        $uri = $this->makeUri('processor.post', $this->run->doorstep_server_id);
 
         $future = $this->session->call(
-            $this->makeUri(
-                'processor.post',
-                $this->run->doorstep_server_id
-            ),
+            $uri,
             [
                 $this->run->doorstep_session_id,
                 $processors->pluck('content', 'module')->toArray(),
@@ -247,6 +245,11 @@ class ValidationProcess
         return $future;
     }
 
+    /**
+     * Send Data to Doorstep to process
+     *
+     * @return \React\Promise\Promise
+     */
     public function sendData()
     {
         $data = $this->run->dataResource;
@@ -267,14 +270,11 @@ class ValidationProcess
             ];
         }
 
+        $uri = $this->makeUri('data.post', $this->run->doorstep_server_id);
         $future = $this->session->call(
-            $this->makeUri(
-                'data.post',
-                $this->run->doorstep_server_id
-            ),
+            $uri,
             $request
         );
-
         return $future;
     }
 
@@ -294,13 +294,13 @@ class ValidationProcess
      */
     public function run()
     {
-        \Log::info('running...');
+        Log::info('running...');
         try {
             $promise = $this->engage()
             ->then(
                 function ($res) {
-                    \Log::info('engaged...');
-                    \Log::info('(server: ' . $res[0][0] . ' ; session: ' . $res[0][1] . ')');
+                    Log::info('engaged...');
+                    Log::info('(server: ' . $res[0][0] . ' ; session: ' . $res[0][1] . ')');
                     $this->beginValidation($res[0][0], $res[0][1]);
                     return $this->sendProcessor();
                 },
@@ -312,7 +312,7 @@ class ValidationProcess
                 }
             )->then(
                 function ($res) {
-                    \Log::info('sending data...');
+                    Log::info('sending data...');
                     return $this->sendData();
                 },
                 function ($error) {
@@ -366,9 +366,7 @@ class ValidationProcess
      */
     public function retrieve()
     {
-        $this->getReport()
-        ->then(
-            function ($res) {
+        $this->getReport()->then(function ($res) {
                 try {
                     return $this->outputReport($res);
                 } catch (Throwable $e) {
@@ -381,8 +379,7 @@ class ValidationProcess
                 $e = new \RuntimeException($error);
                 throw $e;
             }
-        )
-        ->done(function ($res) {
+        )->done(function ($res) {
             Log::info("Completed: " . $this->run->id);
         });
     }

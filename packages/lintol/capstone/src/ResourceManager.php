@@ -3,6 +3,7 @@
 namespace Lintol\Capstone;
 
 use Auth;
+use Illuminate\Support\FacadesLog;
 use Socialite;
 use Lintol\Capstone\CkanResourceProvider;
 use Lintol\Capstone\Models\DataResource;
@@ -23,60 +24,21 @@ class ResourceManager
         return $existingResource;
     }
 
+
+    /**
+     * Save the data resource information to the database.
+     *
+     * @param DataResource $dataResource
+     * @return DataResource|null
+     */
     public function onboard(DataResource $dataResource)
     {
         if (config('capstone.features.redirectable-content', false)) {
-            $path = basename($dataResource->url);
-            $dataResource->filename = $path;
-            $dataResource->name = $path;
-            $pathParts = pathinfo($path);
-            if (! $dataResource->filetype && isset($pathParts['extension'])) {
-                $dataResource->filetype = $pathParts['extension'];
-            }
-            $dataResource->status = 'ready to process';
-            $settings = $dataResource->settings;
-            $settings['fileType'] = $dataResource->filetype;
-            $dataResource->settings = $settings;
-            $dataResource->content = $dataResource->url;
-
-            if ($dataResource->package && ! $dataResource->package->id) {
-                \Log::info($dataResource->package);
-                $dataResource->package->save();
-                $dataResource->package_id = $dataResource->package->id;
-            }
-            $dataResource->save();
-
+            $this->onboardRedirectable($dataResource);
             // Will be done in observer, now it has a status: ValidationProcess::launch($dataResource);
         } else {
-            $client = new GuzzleHttp\Client();
-
-            $request = new GuzzleHttp\Psr7\Request('GET', $dataResource->url);
-            $promise = $client->sendAsync($request)->then(function ($response) use ($dataResource) {
-                $path = basename($dataResource->url);
-                $dData = $response->getBody();
-
-                $dataResource->filename = $path;
-                $dataResource->name = $path;
-                $pathParts = pathinfo($path);
-                if (! $dataResource->filetype && isset($pathParts['extension'])) {
-                    $dataResource->filetype = $pathParts['extension'];
-                }
-                $dataResource->status = 'ready to process';
-                $settings = $dataResource->settings;
-                $settings['fileType'] = $dataResource->filetype;
-                $dataResource->settings = $settings;
-                $dataResource->content = $dData;
-                $dataResource->save();
-
-                // Will be done in observer, now it has a status: return ValidationProcess::launch($dataResource);
-                return $dataResource;
-            }, function ($error) {
-                abort(400, __("Invalid data URI request"));
-            });
-
-            $promise->wait();
+            $this->saveDataResourceDetails($dataResource);
         }
-
         if ($dataResource->save()) {
             return $dataResource;
         }
@@ -136,7 +98,68 @@ class ResourceManager
                 }
             }
         }
-
         return $resourceProvider;
+    }
+
+    /**
+     * @param DataResource $dataResource
+     */
+    public function onboardRedirectable(DataResource $dataResource): void
+    {
+        $path = basename($dataResource->url);
+        $dataResource->filename = $path;
+        $dataResource->name = $path;
+        $pathParts = pathinfo($path);
+        if (!$dataResource->filetype && isset($pathParts['extension'])) {
+            $dataResource->filetype = $pathParts['extension'];
+        }
+        $dataResource->status = 'ready to process';
+        $settings = $dataResource->settings;
+        $settings['fileType'] = $dataResource->filetype;
+        $dataResource->settings = $settings;
+        $dataResource->content = $dataResource->url;
+
+        if ($dataResource->package && !$dataResource->package->id) {
+            Log::info($dataResource->package);
+            $dataResource->package->save();
+            $dataResource->package_id = $dataResource->package->id;
+        }
+        $dataResource->save();
+    }
+
+    /**
+     * A url is supplied by the user. The information about the data resource is
+     * retrieved from the http get and the information is saved to the data base.
+     * @param DataResource $dataResource
+     */
+    public function saveDataResourceDetails(DataResource $dataResource): void
+    {
+        $client = new GuzzleHttp\Client();
+
+        $request = new GuzzleHttp\Psr7\Request('GET', $dataResource->url);
+        $promise = $client->sendAsync($request)->then(function ($response) use ($dataResource) {
+            $path = basename($dataResource->url);
+            $dData = $response->getBody();
+
+            $dataResource->filename = $path;
+            $dataResource->name = $path;
+            $pathParts = pathinfo($path);
+            if (!$dataResource->filetype && isset($pathParts['extension'])) {
+                $dataResource->filetype = $pathParts['extension'];
+            }
+            $dataResource->status = 'ready to process';
+            $settings = $dataResource->settings;
+            $settings['fileType'] = $dataResource->filetype;
+            $dataResource->settings = $settings;
+            $dataResource->content = $dData;
+            $dataResource->save();
+
+            // Will be done in observer, now it has a status: return ValidationProcess::launch($dataResource);
+            return $dataResource;
+        }, function ($error) {
+            abort(400, __("Invalid data URI request"));
+        });
+
+        $promise->wait();
     }
 }
