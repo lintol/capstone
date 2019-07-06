@@ -17,8 +17,12 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Log;
+use Illuminate\Support\Facades\Log;
 
+/**
+ * Class WampConnection
+ * @package Lintol\Capstone
+ */
 class WampConnection
 {
     protected $realm;
@@ -52,7 +56,7 @@ class WampConnection
      */
     public function execute(callable $closure, $closeOnComplete = true)
     {
-        \Log::info($closeOnComplete ? 'Y' : 'N');
+        Log::debug($closeOnComplete ? 'Y' : 'N');
         if ($this->session) {
             $closure($this->session);
         } else {
@@ -66,19 +70,21 @@ class WampConnection
 
                 try {
                     $promise = $closure($session);
-                    \Log::info('promise on way');
-                } catch (Exception $e) {
-                    Log::error($error);
+                    Log::debug('promise on way');
+                } catch (Exception $error) {
+                    Log::error('Error Closing sessions' . $error);
                     $close = true;
                 }
-                \Log::info($close);
+                Log::debug($close);
 
                 if ($close && ! $this->stayOpen) {
-                    \Log::info('promise to close');
+                    Log::debug('promise to close');
                     $this->session = null;
                     if ($promise) {
-                        \Log::info('promise to always');
-                        $promise->always(function () use ($session) { $session->close(); });
+                        Log::debug('promise to always');
+                        $promise->always(function () use ($session) {
+                            $session->close();
+                        });
                     } else {
                         $session->close();
                     }
