@@ -19,6 +19,8 @@ class DataResourceObserver
 
         if ($resource->status == 'ready to process') {
             ValidationProcess::launch($resource);
+            $resource->status = 'processors checked';
+            $resource->save();
         }
     }
 }
