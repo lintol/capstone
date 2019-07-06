@@ -23,7 +23,8 @@ class DataResource extends Model
          'user',
          'archived',
          'reportid',
-         'content'
+         'content',
+         'settings'
     ];
 
     public $present = true;

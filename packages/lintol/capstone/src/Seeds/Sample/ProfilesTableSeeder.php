@@ -48,7 +48,8 @@ class ProfilesTableSeeder extends Seeder
                 'name' => 'CSV profile [test]',
                 'description' => 'csv description',
                 'version' => 'version 7',
-                'unique_tag' => 'uniq-44'
+                'unique_tag' => 'uniq-44',
+                'rules' => ['autorun' => false]
             ],
             'theodi/csvlint.rb:1'
         );
@@ -60,6 +61,7 @@ class ProfilesTableSeeder extends Seeder
                 'description' => 'PII description',
                 'version' => 'version 1',
                 'unique_tag' => 'uniq-48',
+                'rules' => ['autorun' => false]
             ],
             'lintol/ds-pii-legacy:1'
         );
@@ -71,6 +73,7 @@ class ProfilesTableSeeder extends Seeder
                 'description' => 'Boundary description',
                 'version' => 'version 1',
                 'unique_tag' => 'uniq-50',
+                'rules' => ['autorun' => false]
             ],
             'lintol/ds-boundary-checker-py:1'
         );
@@ -81,7 +84,8 @@ class ProfilesTableSeeder extends Seeder
                 'name' => 'CSV (Goodtables) profile [test]',
                 'description' => 'Goodtables description',
                 'version' => 'version 1',
-                'unique_tag' => 'uniq-99'
+                'unique_tag' => 'uniq-99',
+                'rules' => ['autorun' => false]
             ],
             'frictionlessdata/goodtables-py:1'
         );

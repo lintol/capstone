@@ -88,7 +88,9 @@ class ObserveNewResourcesJob implements ShouldQueue
 
                     $res = DataResource::whereRemoteId($resourceId)->whereSource($source)->first();
                     if (! $res || $res->updated_at->lt($lastModified)) {
-                        $res = new DataResource;
+                        if (! $res) {
+                            $res = new DataResource;
+                        }
                         $name = $resource->name;
                         if (! $name) {
                             $name = basename($resource->url);
@@ -101,6 +103,7 @@ class ObserveNewResourcesJob implements ShouldQueue
                             'package_id' => $package->id,
                             'filename' => basename($resource->url),
                             'filetype' => $resource->format,
+                            'settings' => ['autorun' => true],
                             'source' => $source
                         ]);
                         $res->resourceable()->associate($ckanInstance);
