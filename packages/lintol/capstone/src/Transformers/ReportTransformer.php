@@ -17,7 +17,7 @@ class ReportTransformer extends Fractal\TransformerAbstract
         return [
             'id' => $report->id,
             'name' => $report->name,
-            'profile' => $report->run ? $report->run->profile->name : $report->profile,
+            'profile' => $report->run && $report->run->profile ? $report->run->profile->name : $report->profile,
             'errors' => $report->errors,
             'warnings' => $report->warnings,
             'passes' => $report->passes,
