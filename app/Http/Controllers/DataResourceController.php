@@ -262,7 +262,8 @@ class DataResourceController extends Controller
                     ];
                 })
                 ->filter()
-                ->pluck('value', 'filter');
+                ->pluck('value', 'filter')
+                ->toArray();
         } else {
             $filters = [];
         }
