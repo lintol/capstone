@@ -28,8 +28,9 @@ meld:
     GIT_SUBMODULE_STRATEGY: recursive
   script:
   # First we build using an image we will have to download anyway
-  - wget "https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/dist-$(wget https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/latest-commit$([ \"$CI_BUILD_REF_NAME\" == \"preview\" ] && echo "-preview") -O - -q)/index.html" -O resources/views/index.blade.php
-  - sed -i "s/\/static/https:\/\/mo.ev.openindustry.in\/ltl-lintol-dev\/cdn\/dist-$(wget https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/latest-commit$([ \"$CI_BUILD_REF_NAME\" == \"preview\" ] && echo "-preview") -O - -q)/g" resources/views/index.blade.php
+  - if [ "$CI_BUILD_REF_NAME" == "preview" ]; then CI_FRONTEND_BUILD_REF_NAME="preview"; else CI_FRONTEND_BUILD_REF_NAME="master"; fi
+  - wget "https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/dist-$(wget https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/latest-commit-${CI_FRONTEND_BUILD_REF_NAME} -O - -q)/index.html" -O resources/views/index.blade.php
+  - sed -i "s/\/static/https:\/\/mo.ev.openindustry.in\/ltl-lintol-dev\/cdn\/dist-$(wget https://mo.ev.openindustry.in/ltl-lintol-dev/cdn/latest-commit-${CI_FRONTEND_BUILD_REF_NAME} -O - -q)/g" resources/views/index.blade.php
   artifacts:
     paths:
     - resources/views/index.blade.php
