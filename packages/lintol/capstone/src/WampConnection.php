@@ -83,6 +83,7 @@ class WampConnection
                     if ($promise) {
                         Log::debug('promise to always');
                         $promise->always(function () use ($session) {
+                            Log::debug('closing session');
                             $session->close();
                         });
                     } else {
