@@ -8,6 +8,10 @@ use App\Transformers\UserTransformer;
 
 class DataResourceTransformer extends Fractal\TransformerAbstract
 {
+    protected $availableIncludes = [
+        'package'
+    ];
+
     protected $defaultIncludes = [
         'user'
     ];
