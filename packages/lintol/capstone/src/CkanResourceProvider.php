@@ -137,8 +137,6 @@ class CkanResourceProvider implements ResourceProviderInterface
             }
         }
 
-        Log::info('1');
-
         for ($i = 0; $i < 10; $i++) {
             try {
                 //$search = $this->ckanClient->ResourceSearch($ckanQuery);
@@ -172,7 +170,6 @@ class CkanResourceProvider implements ResourceProviderInterface
                             $package = new DataPackage;
                             $package->name = $ckanPackageData['title'];
                             $data->package = $package;
-                            Log::info($ckanData);
                             $data->resourceable = $this->ckanInstance;
                             $data->created_at = $ckanData['created'] ? Carbon::parse($ckanData['created']) : null;
                             $data->updated_at = $ckanData['last_modified'] ? Carbon::parse($ckanData['last_modified']) : null;
@@ -185,7 +182,6 @@ class CkanResourceProvider implements ResourceProviderInterface
             $ckanData = collect();
         }
 
-        Log::info($ckanData);
         return $ckanData;
     }
 
