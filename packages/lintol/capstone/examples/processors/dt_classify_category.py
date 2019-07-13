@@ -33,8 +33,9 @@ def get_sentences_from_metadata(context):
 
     for k, (weight, extractor) in METADATA_ROWS.items():
         extracted = extractor(pkg_metadata)
-        w = weight / len(extracted)
-        data_lines += [(k, v, w) for v in extracted]
+        if extracted:
+            w = weight / len(extracted)
+            data_lines += [(k, v, w) for v in extracted]
 
     return data_lines
 
