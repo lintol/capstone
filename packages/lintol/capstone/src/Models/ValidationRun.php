@@ -74,6 +74,14 @@ class ValidationRun extends Model
             return false;
         }
 
+        $allMetadataOnly = true;
+        foreach ($definitions as $def) {
+            if (! array_key_exists('metadataOnly', $def) || ! $def['metadataOnly']) {
+                $allMetadataOnly = false;
+            }
+        }
+        $settings['allMetadataOnly'] = $allMetadataOnly;
+
         $this->settings = $settings;
 
         $definition = [
@@ -85,6 +93,7 @@ class ValidationRun extends Model
         if ($this->dataResource->package) {
             $definition['context']['package'] = $this->dataResource->package->metadata;
         }
+
         $this->doorstep_definition = $definition;
 
         return true;

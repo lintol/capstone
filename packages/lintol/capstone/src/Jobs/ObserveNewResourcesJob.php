@@ -72,21 +72,42 @@ class ObserveNewResourcesJob implements ShouldQueue
 
                     $lastModified = Carbon::parse($metadata->metadata_modified);
 
-                    $package = DataPackage::whereRemoteId($metadata->id)->whereSource($source)->first();
+                    $sourceObject = ['lintolSource' => $source, 'lintolCkanInstanceId' => $ckanInstance->id];
+                    if (property_exists($metadata, 'extras')) {
+                        foreach ($metadata->extras as $extra) {
+                            if ($extra->key == 'harvest_title') {
+                                $sourceObject['harvestTitle'] = $extra->value;
+                            }
+                            if ($extra->key == 'harvest_source') {
+                                $sourceObject['harvestSource'] = $extra->value;
+                            }
+                            if ($extra->key == 'harvest_url') {
+                                $sourceObject['sourceUrl'] = $extra->value;
+                            }
+                        }
+                    }
+                    \Log::info($sourceObject);
+
+                    if (array_key_exists('harvestSource', $sourceObject)) {
+                        $sourceObject['sourceChain'] = $sourceObject['lintolSource'] . '|' . $sourceObject['harvestSource'];
+                    }
+
+                    $package = DataPackage::whereRemoteId($metadata->id)->whereCkanInstanceId($ckanInstance->id)->first();
                     if (! $package) {
                         $package = new DataPackage;
                         $package->fill([
                             'remote_id' => $metadata->id,
+                            'ckan_instance_id' => $ckanInstance->id,
                             'metadata' => $metadata,
                             'name' => $metadata->name,
                             'url' => $metadata->url,
-                            'source' => $source
+                            'source' => json_encode($sourceObject)
                         ]);
                         $package->save();
                         Log::debug("Added package: " . $metadata->name);
                     }
 
-                    $res = DataResource::whereRemoteId($resourceId)->whereSource($source)->first();
+                    $res = DataResource::whereRemoteId($resourceId)->whereCkanInstanceId($ckanInstance->id)->first();
                     if (! $res || $res->updated_at->lt($lastModified)) {
                         if (! $res) {
                             $res = new DataResource;
@@ -97,6 +118,7 @@ class ObserveNewResourcesJob implements ShouldQueue
                         }
                         $res->fill([
                             'remote_id' => $resourceId,
+                            'ckan_instance_id' => $ckanInstance->id,
                             'content' => '',
                             'name' => $name,
                             'url' => $resource->url,
@@ -104,7 +126,7 @@ class ObserveNewResourcesJob implements ShouldQueue
                             'filename' => basename($resource->url),
                             'filetype' => $resource->format,
                             'settings' => ['autorun' => true],
-                            'source' => $source
+                            'source' => json_encode($sourceObject)
                         ]);
                         $res->resourceable()->associate($ckanInstance);
                         $res->save();

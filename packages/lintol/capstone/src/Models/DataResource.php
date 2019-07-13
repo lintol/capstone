@@ -19,6 +19,7 @@ class DataResource extends Model
          'remote_id',
          'user_id',
          'package_id',
+         'ckan_instance_id',
          'source',
          'user',
          'archived',
@@ -35,7 +36,8 @@ class DataResource extends Model
     }
 
     public $casts = [
-        'settings' => 'json'
+        'settings' => 'json',
+        'source' => 'json'
     ];
 
     public function run()

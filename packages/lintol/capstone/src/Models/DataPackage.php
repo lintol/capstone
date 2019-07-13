@@ -16,6 +16,7 @@ class DataPackage extends Model
          'remote_id',
          'url',
          'source',
+         'ckan_instance_id',
          'user',
          'creator',
          'archived'
@@ -29,7 +30,8 @@ class DataPackage extends Model
     }
 
     public $casts = [
-        'metadata' => 'json'
+        'metadata' => 'json',
+        'source' => 'json'
     ];
 
     public function resources()

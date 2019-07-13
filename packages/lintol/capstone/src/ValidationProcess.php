@@ -254,7 +254,10 @@ class ValidationProcess
     {
         $data = $this->run->dataResource;
 
-        if (config('capstone.features.redirectable-content', false)) {
+        $allMetadataOnly = $this->run->doorstep_definition['settings']['allMetadataOnly'];
+
+        if (! $allMetadataOnly && config('capstone.features.redirectable-content', false)) {
+            \Log::info($allMetadataOnly ? 'Y' : 'N');
             $request = [
                 $this->run->doorstep_session_id,
                 $data->filename,
