@@ -33,9 +33,8 @@ def get_sentences_from_metadata(context):
 
     for k, (weight, extractor) in METADATA_ROWS.items():
         extracted = extractor(pkg_metadata)
-        if extracted:
-            w = weight / len(extracted)
-            data_lines += [(k, v, w) for v in extracted]
+        w = weight / len(extracted)
+        data_lines += [(k, v, w) for v in extracted]
 
     return data_lines
 
@@ -107,10 +106,10 @@ class DTClassifyCategoryProcessor(DoorstepProcessor):
     def get_workflow(self, filename, metadata):
         # setting up workflow dict
         workflow = {
-            'load_csv': (p.read_csv, filename),
-            'sentences_from_data': (get_sentences_from_data, 'load_csv'),
+            # 'load_csv': (p.read_csv, filename),
+            # 'sentences_from_data': (get_sentences_from_data, 'load_csv'),
             'sentences_from_metadata': (get_sentences_from_metadata, self.metadata),
-            'output': (classify_sentences, self._report, 'sentences_from_data', 'sentences_from_metadata', self.metadata)
+            'output': (classify_sentences, self._report, [], 'sentences_from_metadata', self.metadata)
         }
         return workflow
 
