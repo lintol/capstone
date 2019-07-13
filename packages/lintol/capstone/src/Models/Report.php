@@ -19,7 +19,7 @@ class Report extends Model
     ];
 
     public $casts = [
-        'content' => 'json'
+        // 'content' => 'json'
     ];
 
     public function owner()
@@ -53,8 +53,8 @@ class Report extends Model
         } else {
             $result = json_decode($result, true);
         }
-        $report->content = $result;
-        $content = $report->content;
+        $report->content = json_encode($result);
+        $content = $result;
         //$content = json_decode($report->content, true);
 
         if (array_key_exists('error-count', $content)) {
