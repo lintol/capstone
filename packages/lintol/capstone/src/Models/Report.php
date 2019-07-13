@@ -37,7 +37,12 @@ class Report extends Model
                   ->whereProfileId($run->profile_id);
             })->count();
 
-            $report->name = $run->profile->name . ' | ' . $run->dataResource->filename . ' | ' . ($count + 1);
+            $reportName = $run->profile->name . ' | ';
+            $dataResource = $run->dataResource;
+            if ($dataResource->package) {
+                $reportName .= $dataResource->package->name . ' | ';
+            }
+            $report->name =  $reportName . $run->dataResource->filename . ' | #' . ($count + 1);
         } else {
             $report->name = '(none)';
         }
