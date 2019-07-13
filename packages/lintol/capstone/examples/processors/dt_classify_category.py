@@ -58,51 +58,52 @@ def get_sentences_from_data(csv):
 def classify_sentences(rprt, data_sentences, metadata_sentences, context):
     sentences = data_sentences + metadata_sentences
 
-    keys, sentences, weights = zip(*sentences)
-    results = get_categories(sentences, context)
-
     all_categories = {}
     categories_by_key = {}
-    for key, lines, result, weight in zip(keys, sentences, results, weights):
-        if key not in categories_by_key:
-            categories_by_key[key] = result
 
-        categories_by_key[key] += result
-        categories = {tuple(c): weight * r * 100 for r, c in result if r > 0.2}
+    if sentences:
+        keys, sentences, weights = zip(*sentences)
+        results = get_categories(sentences, context)
 
-        for c, w in categories.items():
-            if c in all_categories:
-                all_categories[c] += w
-            else:
-                all_categories[c] = w
+        for key, lines, result, weight in zip(keys, sentences, results, weights):
+            if key not in categories_by_key:
+                categories_by_key[key] = result
 
-    for key, result in categories_by_key.items():
-        result = sorted(result, key=lambda r: r[0], reverse=True)
-        result_trimmed = [(r, c) for r, c in result if r > 0.2][:MAX_CATEGORIES_PER_ITEM]
-        issue_text = _("Possible categories in {}: {}").format(key, ", ".join(["{} ({:.2f}%)".format(_(c), r * 100) for r, c in result_trimmed]))
-        slug_key = key.lower().replace(' ', '-')
+            categories_by_key[key] += result
+            categories = {tuple(c): weight * r * 100 for r, c in result if r > 0.2}
 
-        if result:
-            rprt.add_issue(
-                logging.INFO,
-                'possible-categories-{}'.format(slug_key),
-                issue_text,
-                row_number='Metadata',
-                row={key: []},
-                error_data=result,
-                at_top=True
-            )
+            for c, w in categories.items():
+                if c in all_categories:
+                    all_categories[c] += w
+                else:
+                    all_categories[c] = w
 
-    if all_categories:
-        result = [('{}:{}'.format(_(c[0]), _(c[1])), w) for c, w in sorted(all_categories.items(), key=lambda r: r[1], reverse=True)[:MAX_CATEGORIES_PER_ITEM]]
-        issue_text = _("Possible categories (all, weighted): {}").format(", ".join(["{} ({:.2f}%)".format(c, w) for c, w in result]))
-        rprt.add_issue(
-            logging.INFO,
-            'possible-categories-all-weighted',
-            issue_text,
-            error_data=result,
-            at_top=True
-        )
+        for key, result in categories_by_key.items():
+            result = sorted(result, key=lambda r: r[0], reverse=True)
+            result_trimmed = [(r, c) for r, c in result if r > 0.2][:MAX_CATEGORIES_PER_ITEM]
+            issue_text = _("Possible categories in {}: {}").format(key, ", ".join(["{} ({:.2f}%)".format(_(c), r * 100) for r, c in result_trimmed]))
+            slug_key = key.lower().replace(' ', '-')
+
+            if result:
+                rprt.add_issue(
+                    logging.INFO,
+                    'possible-categories-{}'.format(slug_key),
+                    issue_text,
+                    row_number='Metadata',
+                    row={key: []},
+                    error_data=result,
+                    at_top=True
+                )
+
+    result = [('{}:{}'.format(_(c[0]), _(c[1])), w) for c, w in sorted(all_categories.items(), key=lambda r: r[1], reverse=True)[:MAX_CATEGORIES_PER_ITEM]]
+    issue_text = _("Possible categories (all, weighted): {}").format(", ".join(["{} ({:.2f}%)".format(c, w) for c, w in result]))
+    rprt.add_issue(
+        logging.INFO,
+        'possible-categories-all-weighted',
+        issue_text,
+        error_data=result,
+        at_top=True
+    )
 
     return rprt
 
@@ -117,7 +118,6 @@ class DTClassifyCategoryProcessor(DoorstepProcessor):
 
     def get_workflow(self, filename, metadata):
         # setting up workflow dict
-        print(filename)
         workflow = {
             # 'load_csv': (p.read_csv, filename),
             # 'sentences_from_data': (get_sentences_from_data, 'load_csv'),
