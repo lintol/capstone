@@ -120,7 +120,6 @@ class ResourceManager
         $dataResource->content = $dataResource->url;
 
         if ($dataResource->package && !$dataResource->package->id) {
-            Log::info($dataResource->package);
             $dataResource->package->save();
             $dataResource->package_id = $dataResource->package->id;
         }
