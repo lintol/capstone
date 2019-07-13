@@ -76,7 +76,8 @@ class ValidationRun extends Model
 
         $allMetadataOnly = true;
         foreach ($definitions as $def) {
-            if (! array_key_exists('metadataOnly', $def) || ! $def['metadataOnly']) {
+            $configuration = $def['configuration'];
+            if (! array_key_exists('metadataOnly', $configuration) || ! $configuration['metadataOnly']) {
                 $allMetadataOnly = false;
             }
         }

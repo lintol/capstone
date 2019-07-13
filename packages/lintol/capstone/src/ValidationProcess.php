@@ -257,7 +257,6 @@ class ValidationProcess
         $allMetadataOnly = $this->run->doorstep_definition['settings']['allMetadataOnly'];
 
         if (! $allMetadataOnly && config('capstone.features.redirectable-content', false)) {
-            \Log::info($allMetadataOnly ? 'Y' : 'N');
             $request = [
                 $this->run->doorstep_session_id,
                 $data->filename,
@@ -265,6 +264,10 @@ class ValidationProcess
                 true
             ];
         } else {
+            if ($allMetadataOnly) {
+                \Log::info('Metadata only for this profile');
+            }
+
             $request = [
                 $this->run->doorstep_session_id,
                 $data->filename,
