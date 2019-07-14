@@ -168,7 +168,9 @@ class DataResourceController extends Controller
      */
     public function show(DataResource $dataResource)
     {
-        //
+        return fractal()
+            ->item($dataResource, $this->transformer, 'dataResources')
+            ->respond();
     }
 
     /**

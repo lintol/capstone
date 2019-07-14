@@ -28,7 +28,7 @@ Route::group($group, function () {
         'only' => ['index', 'show']
     ]);
     Route::resource('dataResources', 'DataResourceController', [
-        'only' => ['index', 'store', 'update', 'destroy']
+        'only' => ['index', 'show', 'store', 'update', 'destroy']
     ]);
     Route::resource('dataResources/settings', 'DataResourceSettingController', [
         'only' => ['store']
