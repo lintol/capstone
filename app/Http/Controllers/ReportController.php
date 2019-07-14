@@ -11,6 +11,8 @@ use Lintol\Capstone\Transformers\ReportTransformer;
 
 class ReportController extends Controller
 {
+    protected $validSortBy = ['created_at'];
+
     /**
      * Initialize the transformer
      */
@@ -50,6 +52,15 @@ class ReportController extends Controller
                 ->collection($reports, $this->transformer, 'reports')
                 ->respond();
         }
+
+        $sortBy = request()->input('sortBy');
+
+        if (!in_array($sortBy, $this->validSortBy)) {
+          $sortBy = 'created_at';
+        }
+
+        $orderDesc = ! (request()->input('order') == 'asc');
+        $reports = $reports->orderBy($sortBy, $orderDesc ? 'desc' : 'asc');
 
         $maxPagination = config('capstone.frontend.max-pagination', 250);
 
