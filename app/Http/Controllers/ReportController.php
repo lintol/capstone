@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Lintol\Capstone\Models\Report;
 use Lintol\Capstone\Transformers\ReportTransformer;
 
@@ -42,23 +43,28 @@ class ReportController extends Controller
             );
         }
 
-        $reports = $reports->get();
+        /* TODO: remove this when compatibility issues resolved */
+        if ($request->input('nopagination')) {
+            $reports = $reports->get();
+            return fractal()
+                ->collection($reports, $this->transformer, 'reports')
+                ->respond();
+        }
 
-        $users = User::whereIn('id', $reports->pluck('owner_id')->filter())
-          ->get()
-          //->each(function (&$user) {
-          //  $user->retrieve();
-          //})
-          ->keyBy('id');
+        $maxPagination = config('capstone.frontend.max-pagination', 250);
 
-        // $reports->each(function (&$report) use ($users) {
-        //     if ($report->owner_id) {
-        //         $report->owner = $users[$report->owner_id];
-        //     }
-        // });
+        $count = (int) request()->input('count');
+        if (!$count || $count > $maxPagination) {
+            $count = $maxPagination;
+        }
+
+        $paginator = $reports->paginate($count);
+        $reports = $paginator->getCollection();
+        $paginator->setPath('/reports/');
 
         return fractal()
             ->collection($reports, $this->transformer, 'reports')
+            ->paginateWith(new IlluminatePaginatorAdapter($paginator))
             ->respond();
     }
 
