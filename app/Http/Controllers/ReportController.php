@@ -43,14 +43,6 @@ class ReportController extends Controller
             );
         }
 
-        /* TODO: remove this when compatibility issues resolved */
-        if ($request->input('nopagination')) {
-            $reports = $reports->get();
-            $response = fractal()
-                ->collection($reports, $this->transformer, 'reports')
-                ->respond();
-        }
-
         $sortBy = request()->input('sortBy');
 
         if (!in_array($sortBy, $this->validSortBy)) {
