@@ -21,7 +21,7 @@ MAX_CATEGORIES_PER_ITEM = 20
 
 METADATA_ROWS = {
     'name': (10, lambda x, _: [x['name'].replace('-', ' ')] if 'name' in x and x['name'] else []),
-    'notes': (3, lambda x, _: [x['notes']] if 'notes' in x else []),
+    'notes': (10, lambda x, _: [x['notes']] if 'notes' in x else []),
     'resource name': (3, lambda x, f: [r['name'] for r in x['resources'] if 'name' in r] if 'resources' in x else []),
     'resource description': (5, lambda x, f: [r['description'] for r in x['resources'] if 'description' in r] if 'resources' in x else []),
     'group title': (10, lambda x, _: [r['title'] for r in x['groups']] if 'groups' in x else []),
