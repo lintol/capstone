@@ -36,11 +36,7 @@ class ReportController extends Controller
             $this->validate($request, ['since' => 'required|date']);
 
             Log::debug("Filtering with since");
-            $reports = $reports->whereDate(
-                'created_at',
-                '>=',
-                Carbon::parse($request->input('since'))
-            )->whereTime(
+            $reports = $reports->where(
                 'created_at',
                 '>=',
                 Carbon::parse($request->input('since'))
@@ -53,32 +49,33 @@ class ReportController extends Controller
             $response = fractal()
                 ->collection($reports, $this->transformer, 'reports')
                 ->respond();
-        } else {
-            $sortBy = request()->input('sortBy');
-
-            if (!in_array($sortBy, $this->validSortBy)) {
-                $sortBy = 'created_at';
-            }
-
-            $orderDesc = ! (request()->input('order') == 'asc');
-            $reports = $reports->orderBy($sortBy, $orderDesc ? 'desc' : 'asc');
-
-            $maxPagination = config('capstone.frontend.max-pagination', 250);
-
-            $count = (int) request()->input('count');
-            if (!$count || $count > $maxPagination) {
-                $count = $maxPagination;
-            }
-
-            $paginator = $reports->paginate($count);
-            $reports = $paginator->getCollection();
-            $paginator->setPath('/reports/');
-
-            $response = fractal()
-                ->collection($reports, $this->transformer, 'reports')
-                ->paginateWith(new IlluminatePaginatorAdapter($paginator))
-                ->respond();
         }
+
+        $sortBy = request()->input('sortBy');
+
+        if (!in_array($sortBy, $this->validSortBy)) {
+            $sortBy = 'created_at';
+        }
+
+        $orderDesc = ! (request()->input('order') == 'asc');
+        $reports = $reports->orderBy($sortBy, $orderDesc ? 'desc' : 'asc');
+
+        $maxPagination = config('capstone.frontend.max-pagination', 250);
+
+        $count = (int) request()->input('count');
+        if (!$count || $count > $maxPagination) {
+            $count = $maxPagination;
+        }
+
+        $paginator = $reports->paginate($count);
+        $reports = $paginator->getCollection();
+        $paginator->setPath('/reports/');
+
+        $response = fractal()
+            ->collection($reports, $this->transformer, 'reports')
+            ->paginateWith(new IlluminatePaginatorAdapter($paginator))
+            ->respond();
+
         return $response;
     }
 
