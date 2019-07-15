@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Lintol\Capstone\Models\Report;
 use Lintol\Capstone\Transformers\ReportTransformer;
@@ -34,6 +35,7 @@ class ReportController extends Controller
         if ($request->input('since')) {
             $this->validate($request, ['since' => 'required|date']);
 
+            Log::debug("Filtering with since");
             $reports = $reports->whereDate(
                 'created_at',
                 '>=',
@@ -48,35 +50,36 @@ class ReportController extends Controller
         /* TODO: remove this when compatibility issues resolved */
         if ($request->input('nopagination')) {
             $reports = $reports->get();
-            return fractal()
+            $response = fractal()
                 ->collection($reports, $this->transformer, 'reports')
                 ->respond();
+        } else {
+            $sortBy = request()->input('sortBy');
+
+            if (!in_array($sortBy, $this->validSortBy)) {
+                $sortBy = 'created_at';
+            }
+
+            $orderDesc = ! (request()->input('order') == 'asc');
+            $reports = $reports->orderBy($sortBy, $orderDesc ? 'desc' : 'asc');
+
+            $maxPagination = config('capstone.frontend.max-pagination', 250);
+
+            $count = (int) request()->input('count');
+            if (!$count || $count > $maxPagination) {
+                $count = $maxPagination;
+            }
+
+            $paginator = $reports->paginate($count);
+            $reports = $paginator->getCollection();
+            $paginator->setPath('/reports/');
+
+            $response = fractal()
+                ->collection($reports, $this->transformer, 'reports')
+                ->paginateWith(new IlluminatePaginatorAdapter($paginator))
+                ->respond();
         }
-
-        $sortBy = request()->input('sortBy');
-
-        if (!in_array($sortBy, $this->validSortBy)) {
-          $sortBy = 'created_at';
-        }
-
-        $orderDesc = ! (request()->input('order') == 'asc');
-        $reports = $reports->orderBy($sortBy, $orderDesc ? 'desc' : 'asc');
-
-        $maxPagination = config('capstone.frontend.max-pagination', 250);
-
-        $count = (int) request()->input('count');
-        if (!$count || $count > $maxPagination) {
-            $count = $maxPagination;
-        }
-
-        $paginator = $reports->paginate($count);
-        $reports = $paginator->getCollection();
-        $paginator->setPath('/reports/');
-
-        return fractal()
-            ->collection($reports, $this->transformer, 'reports')
-            ->paginateWith(new IlluminatePaginatorAdapter($paginator))
-            ->respond();
+        return $response;
     }
 
     /**
