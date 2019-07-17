@@ -237,7 +237,7 @@ class ValidationProcess
             $uri,
             [
                 $this->run->doorstep_session_id,
-                $processors->pluck('content', 'module')->toArray(),
+                $processors->pluck('content', 'module', 'unique_tag')->toArray(),
                 $definition
             ]
         );

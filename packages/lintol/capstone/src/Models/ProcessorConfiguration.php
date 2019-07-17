@@ -85,10 +85,16 @@ class ProcessorConfiguration extends Model
           $module = $this->processor->module;
         }
 
+        $tag = null;
+        if ($this->processor && $this->processor->unique_tag) {
+          $tag = $this->processor->unique_tag;
+        }
+
         return [
             'configuration' => $this->configuration,
             'definition' => $this->definition,
             'supplementary' => $supplementary,
+            'tag' => $tag,
             'module' => $module
         ];
     }
