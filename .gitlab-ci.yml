@@ -7,6 +7,7 @@ variables:
   CONTAINER_PHPFPM_RELEASE_IMAGE: $GCP_ECR_URI:phpfpm-latest
   COMPOSER_CACHE_DIR: /cache
   DOCKER_DRIVER: overlay
+  DOCKER_HOST: tcp://localhost:2375/
 
 stages:
 - meld
