@@ -93,6 +93,17 @@ class ProfilesTableSeeder extends Seeder
         $this->createProfile(
             $dataOwner,
             [
+                'name' => 'Data Times Location Classifier [test]',
+                'description' => 'Location classifier for the Data Times project',
+                'version' => 'version 1',
+                'unique_tag' => 'uniq-101'
+            ],
+            'datatimes/dt-classify-location:1'
+        );
+
+        $this->createProfile(
+            $dataOwner,
+            [
                 'name' => 'Data Times Category Classifier [test]',
                 'description' => 'Category classifier for the Data Times project',
                 'version' => 'version 1',
