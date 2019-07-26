@@ -7,9 +7,9 @@ variables:
   CONTAINER_PHPFPM_RELEASE_IMAGE: $GCP_ECR_URI:phpfpm-latest
   COMPOSER_CACHE_DIR: /cache
   DOCKER_DRIVER: overlay
-  DOCKER_HOST: tcp://localhost:2376/
-  DOCKER_TLS_VERIFY: 1
-  DOCKER_CERT_PATH: /certs/client
+  #DOCKER_HOST: tcp://localhost:2376/
+  #DOCKER_TLS_VERIFY: 1
+  #DOCKER_CERT_PATH: /certs/client
 
 stages:
 - meld
@@ -19,7 +19,7 @@ stages:
 - deploy
 
 services:
-- docker:dind
+- docker:18-dind
 
 before_script:
   - echo "Registering with token $CI_BUILD_TOKEN" 
