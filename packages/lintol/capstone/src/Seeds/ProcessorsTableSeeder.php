@@ -224,12 +224,12 @@ class ProcessorsTableSeeder extends Seeder
         $processor->save();
 
         $processor = Processor::firstOrNew([
-            'unique_tag' => 'datatimes/dt-comprehension:1',
+            'unique_tag' => 'datatimes/dt-comprehender:1',
         ]);
         $processor->fill([
-            'name' => 'Data Times Comprehension',
+            'name' => 'Data Times Comprehender',
             'description' => 'Compehension processor for inferring the nature of datasets',
-            'module' => 'dt_comprehension.py',
+            'module' => 'dt_comprehender.py',
             'content' => '',
             'rules' => ['fileType' => '//'],
             'configuration_defaults' => [
