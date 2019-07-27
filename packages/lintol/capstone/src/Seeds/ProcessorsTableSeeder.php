@@ -222,5 +222,29 @@ class ProcessorsTableSeeder extends Seeder
         ]);
         $processor->creator()->associate($dataOwner);
         $processor->save();
+
+        $processor = Processor::firstOrNew([
+            'unique_tag' => 'datatimes/dt-comprehension:1',
+        ]);
+        $processor->fill([
+            'name' => 'Data Times Comprehension',
+            'description' => 'Compehension processor for inferring the nature of datasets',
+            'module' => 'dt_comprehension.py',
+            'content' => '',
+            'rules' => ['fileType' => '//'],
+            'configuration_defaults' => [
+                'metadataOnly' => true
+            ],
+            'configuration_options' => json_encode([
+            ]),
+            'definition' => [
+                'docker' => [
+                    'image' => 'lintol/doorstep',
+                    'revision' => 'latest'
+                ]
+            ]
+        ]);
+        $processor->creator()->associate($dataOwner);
+        $processor->save();
     }
 }

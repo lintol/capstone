@@ -112,5 +112,16 @@ class ProfilesTableSeeder extends Seeder
             'datatimes/dt-classify-category:1'
         );
 
+        $this->createProfile(
+            $dataOwner,
+            [
+                'name' => 'Data Times Comprehension [test]',
+                'description' => 'Comprehension of the nature of a dataset',
+                'version' => 'version 1',
+                'unique_tag' => 'uniq-101'
+            ],
+            'datatimes/dt-comprehension:1'
+        );
+
     }
 }
