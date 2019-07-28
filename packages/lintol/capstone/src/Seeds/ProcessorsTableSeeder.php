@@ -207,7 +207,7 @@ class ProcessorsTableSeeder extends Seeder
             'description' => 'NLP location classifier for tagging datasets',
             'module' => 'dt_classify_location.py',
             'content' => '',
-            'rules' => ['fileType' => '//', 'maxSize' => '100000'],
+            'rules' => ['fileType' => '//', 'maxSize' => 100000],
             'configuration_defaults' => [
                 'renderCodes' => config('capstone.examples.classify-location.render-codes', True),
                 'metadataOnly' => true
