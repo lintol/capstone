@@ -3,6 +3,7 @@
 namespace Lintol\Capstone\Services;
 
 use Lintol\Capstone\Services\Rules\FileType;
+use Lintol\Capstone\Services\Rules\SizeMatch;
 use Lintol\Capstone\Services\Rules\NameMatch;
 use Lintol\Capstone\Services\Rules\DataProfileIdMatch;
 use Lintol\Capstone\Services\Rules\Autorun;
@@ -11,6 +12,7 @@ class RulesEngine
 {
     public static $rules = [
         FileType::class,
+        SizeMatch::class,
         NameMatch::class,
         DataProfileIdMatch::class,
         Autorun::class

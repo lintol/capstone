@@ -207,7 +207,7 @@ class ProcessorsTableSeeder extends Seeder
             'description' => 'NLP location classifier for tagging datasets',
             'module' => 'dt_classify_location.py',
             'content' => '',
-            'rules' => ['fileType' => '//'],
+            'rules' => ['fileType' => '//', 'maxSize' => '100000'],
             'configuration_defaults' => [
                 'metadataOnly' => true
             ],
@@ -231,7 +231,7 @@ class ProcessorsTableSeeder extends Seeder
             'description' => 'Compehension processor for inferring the nature of datasets',
             'module' => 'dt_comprehender.py',
             'content' => '',
-            'rules' => ['fileType' => '//'],
+            'rules' => ['fileType' => '//', 'maxSize' => '100000'],
             'configuration_defaults' => [
                 'metadataOnly' => true
             ],

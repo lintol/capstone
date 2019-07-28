@@ -25,7 +25,8 @@ class DataResource extends Model
          'archived',
          'reportid',
          'content',
-         'settings'
+         'settings',
+         'size'
     ];
 
     public $present = true;

@@ -53,6 +53,7 @@ class Profile extends Model
         // TODO: make a singleton
         $this->rulesService = app()->make(RulesService::class);
         $rules = Profile::select(['id', 'rules'])->get();
+        \Log::info('Matching: ' . $this->name);
         $profiles = $this->rulesService->match($definition, $rules);
 
         return Profile::whereIn(

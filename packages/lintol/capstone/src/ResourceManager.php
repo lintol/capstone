@@ -116,6 +116,7 @@ class ResourceManager
         $dataResource->status = 'ready to process';
         $settings = $dataResource->settings;
         $settings['fileType'] = $dataResource->filetype;
+        $settings['size'] = $dataResource->size;
         $dataResource->settings = $settings;
         $dataResource->content = $dataResource->url;
 
@@ -149,6 +150,7 @@ class ResourceManager
             $dataResource->status = 'ready to process';
             $settings = $dataResource->settings;
             $settings['fileType'] = $dataResource->filetype;
+            $settings['size'] = $dataResource->size;
             $dataResource->settings = $settings;
             $dataResource->content = $dData;
             $dataResource->save();

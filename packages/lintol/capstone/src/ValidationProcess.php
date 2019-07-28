@@ -41,6 +41,7 @@ class ValidationProcess
     {
         $user = Auth::user();
 
+        \Log::info('Launching: ' . $data->name);
         $profiles = app()->make(Profile::class)->match($data->settings);
         $runs = $profiles->map(function ($profile) use ($data, $user) {
             $run = app()->make(ValidationRun::class);

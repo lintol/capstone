@@ -68,6 +68,7 @@ services:
       REDIS_PORT: 6379
       APP_LOG: "errorlog"
       LOG_CHANNEL: "errorlog"
+      APP_DEBUG: 1
     links:
       - db:db
       - redis:redis

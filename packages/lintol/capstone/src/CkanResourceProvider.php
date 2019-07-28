@@ -219,7 +219,6 @@ class CkanResourceProvider implements ResourceProviderInterface
             if (!str_contains(strtolower($data->filename), $data->filetype)) {
                 $data->filename .= '.' . $data->filetype;
             }
-            $data->status = 'valid link';
             $data->archived = 0;
             $data->status = 'valid link';
             $data->resourceable()->associate($this->ckanInstance);

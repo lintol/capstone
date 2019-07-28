@@ -51,15 +51,50 @@ class ObserveNewResourcesJob implements ShouldQueue
 
         $wampConnection->execute(function (ClientSession $session) use ($ckanFactory, $resourceManager) {
                 Log::info("[lintol-observe] " . __("Connected and subscribing to result events."));
+                $client = new GuzzleHttp\Client();
+                Log::info("[lintol-observe] " . __("Will make HEAD request to any new resources."));
 
-                $session->subscribe('com.ltldoorstep.event_found_resource', function ($res) use ($session, $resourceManager) {
+                $session->subscribe('com.ltldoorstep.event_found_resource', function ($res) use ($session, $resourceManager, $client) {
+                    Log::info("[lintol-observe] com.ltldoorstep.event_found_resource!");
                     $resourceId = $res[0];
                     $resource = $res[1];
                     $ini = $res[2];
                     $source = $res[3];
                     $metadata = json_decode($ini->context->package);
-                    Log::debug("[lintol-observe] " . __("New resource seen on " . $source) . " -- " . $resource->name . " in " . $metadata->name);
+                    Log::info("[lintol-observe] " . __("New resource seen on " . $source) . " -- " . $resource->name . " in " . $metadata->name);
 
+                    Log::info("[lintol-observe] Checking url: $resource->url");
+                    $request = new GuzzleHttp\Psr7\Request('HEAD', $resource->url);
+
+                    $size = null;
+                    $missing = true;
+                    try {
+                        $response = $client->send($request, [
+                            'headers' => ['Accept-Encoding' => 'deflate, gzip'],
+                        ]);
+
+                        if ($response->hasHeader('Content-Length')) {
+                            $size = $response->getHeader('Content-Length')[0];
+                        } else if ($response->hasHeader('x-encoded-content-length')) {
+                            $size = $response->getHeader('x-encoded-content-length')[0];
+                        }
+
+                        $missing = false;
+                    } catch (\GuzzleHttp\Exception\ServerException $e) {
+                        $missing = $e->getResponse()->getStatusCode();
+                        Log::info("SERVER ERROR: " . $missing);
+                    } catch (\GuzzleHttp\Exception\ClientException $e) {
+                        $missing = $e->getResponse()->getStatusCode();
+                        Log::info("CLIENT ERROR: " . $missing);
+                    }
+                    Log::info("SIZE: " . $size);
+                    if ($missing !== false) {
+                        $status = 'missing: ' . $missing;
+                    } else {
+                        $status = 'valid link';
+                    }
+
+                    Log::info("[lintol-observe] Checked url: $resource->url");
                     $ckanInstance = CkanInstance::whereUri($source)->first();
                     if (! $ckanInstance) {
                         $ckanInstance = new CkanInstance;
@@ -116,6 +151,7 @@ class ObserveNewResourcesJob implements ShouldQueue
                         if (! $name) {
                             $name = basename($resource->url);
                         }
+
                         $res->fill([
                             'remote_id' => $resourceId,
                             'ckan_instance_id' => $ckanInstance->id,
@@ -126,12 +162,19 @@ class ObserveNewResourcesJob implements ShouldQueue
                             'filename' => basename($resource->url),
                             'filetype' => $resource->format,
                             'settings' => ['autorun' => true],
+                            'status' => $status,
+                            'size' => $size,
                             'source' => json_encode($sourceObject)
                         ]);
                         $res->resourceable()->associate($ckanInstance);
                         $res->save();
-                        $res = $resourceManager->onboard($res);
-                        Log::info("Added resource: " . $res->name . " with remote ID " . $res->remote_id);
+
+                        if ($missing) {
+                            Log::info("Added missing resource: " . $res->name . " with remote ID " . $res->remote_id);
+                        } else {
+                            $res = $resourceManager->onboard($res);
+                            Log::info("Added resource: " . $res->name . " with remote ID " . $res->remote_id);
+                        }
                     }
                 });
         }, false);
