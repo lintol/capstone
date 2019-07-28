@@ -209,6 +209,7 @@ class ProcessorsTableSeeder extends Seeder
             'content' => '',
             'rules' => ['fileType' => '//', 'maxSize' => '100000'],
             'configuration_defaults' => [
+                'renderCodes' => config('capstone.examples.classify-location.render-codes', True),
                 'metadataOnly' => true
             ],
             'configuration_options' => json_encode([
