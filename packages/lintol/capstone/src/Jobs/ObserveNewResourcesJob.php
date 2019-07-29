@@ -64,37 +64,6 @@ class ObserveNewResourcesJob implements ShouldQueue
                     Log::info("[lintol-observe] " . __("New resource seen on " . $source) . " -- " . $resource->name . " in " . $metadata->name);
 
                     Log::info("[lintol-observe] Checking url: $resource->url");
-                    $request = new GuzzleHttp\Psr7\Request('HEAD', $resource->url);
-
-                    $size = null;
-                    $missing = true;
-                    try {
-                        $response = $client->send($request, [
-                            'headers' => ['Accept-Encoding' => 'deflate, gzip'],
-                        ]);
-
-                        if ($response->hasHeader('Content-Length')) {
-                            $size = $response->getHeader('Content-Length')[0];
-                        } else if ($response->hasHeader('x-encoded-content-length')) {
-                            $size = $response->getHeader('x-encoded-content-length')[0];
-                        }
-
-                        $missing = false;
-                    } catch (\GuzzleHttp\Exception\ServerException $e) {
-                        $missing = $e->getResponse()->getStatusCode();
-                        Log::info("SERVER ERROR: " . $missing);
-                    } catch (\GuzzleHttp\Exception\ClientException $e) {
-                        $missing = $e->getResponse()->getStatusCode();
-                        Log::info("CLIENT ERROR: " . $missing);
-                    }
-                    Log::info("SIZE: " . $size);
-                    if ($missing !== false) {
-                        $status = 'missing: ' . $missing;
-                    } else {
-                        $status = 'valid link';
-                    }
-
-                    Log::info("[lintol-observe] Checked url: $resource->url");
                     $ckanInstance = CkanInstance::whereUri($source)->first();
                     if (! $ckanInstance) {
                         $ckanInstance = new CkanInstance;
@@ -106,6 +75,7 @@ class ObserveNewResourcesJob implements ShouldQueue
                     }
 
                     $lastModified = Carbon::parse($metadata->metadata_modified);
+                    $organization = $metadata->organization ? $metadata->organization->name : null;
 
                     $sourceObject = ['lintolSource' => $source, 'lintolCkanInstanceId' => $ckanInstance->id];
                     if (property_exists($metadata, 'extras')) {
@@ -121,7 +91,6 @@ class ObserveNewResourcesJob implements ShouldQueue
                             }
                         }
                     }
-                    \Log::info($sourceObject);
 
                     if (array_key_exists('harvestSource', $sourceObject)) {
                         $sourceObject['sourceChain'] = $sourceObject['lintolSource'] . '|' . $sourceObject['harvestSource'];
@@ -162,19 +131,15 @@ class ObserveNewResourcesJob implements ShouldQueue
                             'filename' => basename($resource->url),
                             'filetype' => $resource->format,
                             'settings' => ['autorun' => true],
-                            'status' => $status,
-                            'size' => $size,
+                            'status' => 'new resource',
+                            'organization' => $organization,
                             'source' => json_encode($sourceObject)
                         ]);
                         $res->resourceable()->associate($ckanInstance);
                         $res->save();
 
-                        if ($missing) {
-                            Log::info("Added missing resource: " . $res->name . " with remote ID " . $res->remote_id);
-                        } else {
-                            $res = $resourceManager->onboard($res);
-                            Log::info("Added resource: " . $res->name . " with remote ID " . $res->remote_id);
-                        }
+                        $res = $resourceManager->onboard($res);
+                        Log::info("Added resource: " . $res->name . " with remote ID " . $res->remote_id . " and status " . $res->status);
                     }
                 });
         }, false);

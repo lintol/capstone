@@ -3,6 +3,7 @@
 namespace Lintol\Capstone;
 
 use Auth;
+use Log;
 use Illuminate\Support\FacadesLog;
 use Socialite;
 use Lintol\Capstone\CkanResourceProvider;
@@ -104,7 +105,41 @@ class ResourceManager
     /**
      * @param DataResource $dataResource
      */
-    public function onboardRedirectable(DataResource $dataResource): void
+    public function checkHead(DataResource $dataResource): array
+    {
+        $client = new GuzzleHttp\Client();
+
+        $request = new GuzzleHttp\Psr7\Request('HEAD', $dataResource->url);
+
+        $size = null;
+        $missing = true;
+        try {
+            $response = $client->send($request, [
+                'headers' => ['Accept-Encoding' => 'deflate, gzip'],
+            ]);
+
+            if ($response->hasHeader('Content-Length')) {
+                $size = $response->getHeader('Content-Length')[0];
+            } else if ($response->hasHeader('x-encoded-content-length')) {
+                $size = $response->getHeader('x-encoded-content-length')[0];
+            }
+
+            $missing = false;
+        } catch (\GuzzleHttp\Exception\ServerException $e) {
+            $missing = $e->getResponse()->getStatusCode();
+            Log::info("SERVER ERROR: " . $missing);
+        } catch (\GuzzleHttp\Exception\ClientException $e) {
+            $missing = $e->getResponse()->getStatusCode();
+            Log::info("CLIENT ERROR: " . $missing);
+        }
+        Log::info("SIZE: " . $size);
+        return [$missing, $size];
+    }
+
+    /**
+     * @param DataResource $dataResource
+     */
+    public function onboardRedirectable(DataResource $dataResource, bool $getHead=True): void
     {
         $path = basename($dataResource->url);
         $dataResource->filename = $path;
@@ -113,10 +148,22 @@ class ResourceManager
         if (!$dataResource->filetype && isset($pathParts['extension'])) {
             $dataResource->filetype = $pathParts['extension'];
         }
-        $dataResource->status = 'ready to process';
+
         $settings = $dataResource->settings;
         $settings['fileType'] = $dataResource->filetype;
-        $settings['size'] = $dataResource->size;
+
+        list($missing, $size) = $this->checkHead($dataResource);
+
+        if ($missing !== false) {
+            $status = 'missing: ' . $missing;
+        } else {
+            $status = 'ready to process';
+        }
+        $dataResource->status = $status;
+        $dataResource->size = $size;
+
+        $settings['size'] = $size;
+        $settings['organization'] = $dataResource->organization;
         $dataResource->settings = $settings;
         $dataResource->content = $dataResource->url;
 
@@ -150,7 +197,8 @@ class ResourceManager
             $dataResource->status = 'ready to process';
             $settings = $dataResource->settings;
             $settings['fileType'] = $dataResource->filetype;
-            $settings['size'] = $dataResource->size;
+            $settings['size'] = strlen($dData);
+            $settings['organization'] = $dataResource->organization;
             $dataResource->settings = $settings;
             $dataResource->content = $dData;
             $dataResource->save();
