@@ -14,7 +14,7 @@ class AddOrganizationColumnToDataResourcesTable extends Migration
     public function up()
     {
         Schema::table('data_resources', function (Blueprint $table) {
-            $table->string('organization');
+            $table->string('organization')->nullable();
         });
     }
 
