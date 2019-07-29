@@ -36,6 +36,7 @@ class DataResourceTransformer extends Fractal\TransformerAbstract
             'providerId' => $data->resourceable ? $data->resourceable->id : null,
             'providerType' => $data->resourceable ? $data->resourceable->driver : null,
             'providerServer' => $data->resourceable ? $data->resourceable->uri : null,
+            'size' => $data->size,
             'remote_id' => $data->remote_id,
         ];
     }
