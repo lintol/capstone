@@ -118,6 +118,13 @@ class ResourceManager
                 'headers' => ['Accept-Encoding' => 'deflate, gzip'],
             ]);
 
+            if ($response->hasHeader('Content-Type')) {
+                $type = $response->getHeader('Content-Type')[0];
+            } else if ($response->hasHeader('x-encoded-content-type')) {
+                $type = $response->getHeader('x-encoded-content-type')[0];
+            }
+            Log::info("TYPE: " . $type);
+
             if ($response->hasHeader('Content-Length')) {
                 $size = $response->getHeader('Content-Length')[0];
             } else if ($response->hasHeader('x-encoded-content-length')) {
@@ -127,13 +134,15 @@ class ResourceManager
             $missing = false;
         } catch (\GuzzleHttp\Exception\ServerException $e) {
             $missing = $e->getResponse()->getStatusCode();
+            $type = null;
             Log::info("SERVER ERROR: " . $missing);
         } catch (\GuzzleHttp\Exception\ClientException $e) {
             $missing = $e->getResponse()->getStatusCode();
+            $type = null;
             Log::info("CLIENT ERROR: " . $missing);
         }
         Log::info("SIZE: " . $size);
-        return [$missing, $size];
+        return [$missing, $size, $type];
     }
 
     /**
@@ -150,9 +159,12 @@ class ResourceManager
         }
 
         $settings = $dataResource->settings;
-        $settings['fileType'] = $dataResource->filetype;
 
-        list($missing, $size) = $this->checkHead($dataResource);
+        list($missing, $size, $type) = $this->checkHead($dataResource);
+        if ($type) {
+            $dataResource->filetype = $type;
+        }
+        $settings['fileType'] = $dataResource->filetype;
 
         if ($missing !== false) {
             $status = 'missing: ' . $missing;
@@ -191,9 +203,16 @@ class ResourceManager
             $dataResource->filename = $path;
             $dataResource->name = $path;
             $pathParts = pathinfo($path);
+
+            if ($response->hasHeader('Content-Type')) {
+                $dataResource->filetype = $response->getHeader('Content-Type')[0];
+            } else if ($response->hasHeader('x-encoded-content-type')) {
+                $dataResource->filetype = $response->getHeader('x-encoded-content-type')[0];
+            }
             if (!$dataResource->filetype && isset($pathParts['extension'])) {
                 $dataResource->filetype = $pathParts['extension'];
             }
+
             $dataResource->status = 'ready to process';
             $settings = $dataResource->settings;
             $settings['fileType'] = $dataResource->filetype;
