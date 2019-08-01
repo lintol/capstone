@@ -11,6 +11,7 @@ use Lintol\Capstone\Listeners\ResultRetrievedListener;
 use Lintol\Capstone\Console\Commands\ObserveDataCommand;
 use Lintol\Capstone\Console\Commands\ObserveNewResourcesCommand;
 use Lintol\Capstone\Console\Commands\ProcessDataCommand;
+use Lintol\Capstone\Console\Commands\RerunValidationRunCommand;
 use Lintol\Capstone\WampConnection;
 use Lintol\Capstone\Models\DataResource;
 
@@ -46,7 +47,8 @@ class CapstoneServiceProvider extends ServiceProvider
             $this->commands([
                 ObserveDataCommand::class,
                 ObserveNewResourcesCommand::class,
-                ProcessDataCommand::class
+                ProcessDataCommand::class,
+                RerunValidationRunCommand::class
             ]);
         }
 

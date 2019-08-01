@@ -31,6 +31,14 @@ class ValidationRun extends Model
     const STATUS_FAILED = 2;
     const STATUS_RUNNING = 3;
 
+    public function duplicate()
+    {
+        $dupe = new self();
+        $dupe->data_resource_id = $this->data_resource_id;
+        $dupe->profile_id = $this->profile_id;
+        return $dupe;
+    }
+
     public function creator()
     {
         return $this->belongsTo(User::class);
