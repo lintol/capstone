@@ -31,11 +31,19 @@ class ValidationRun extends Model
     const STATUS_FAILED = 2;
     const STATUS_RUNNING = 3;
 
-    public function duplicate()
+    public function duplicate($replicate=false)
     {
         $dupe = new self();
         $dupe->data_resource_id = $this->data_resource_id;
         $dupe->profile_id = $this->profile_id;
+
+        if ($replicate) {
+            $dupe->doorstep_definition = $this->doorstep_definition;
+            $dupe->settings = $this->settings;
+        } else {
+            $dupe->buildDefinition($this->settings);
+        }
+
         return $dupe;
     }
 
