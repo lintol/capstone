@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Lintol\Capstone\Models\Report;
 use Lintol\Capstone\Transformers\ReportTransformer;
+use Lintol\Capstone\Jobs\ProcessDataJob;
 
 class ReportController extends Controller
 {
@@ -98,5 +99,28 @@ class ReportController extends Controller
         return fractal()
             ->item($report, $this->transformer, 'reports')
             ->respond();
+    }
+
+    /**
+     * Re-run the specified validation run.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function rerun($id)
+    {
+        $report = Report::findOrFail($id);
+
+        $run = $report->run;
+        if (! $run) {
+            throw RuntimeException(__("This report has no matching validation run."));
+        }
+
+        $newRun = $run->duplicate();
+        $newRun->save();
+
+        ProcessDataJob::dispatch($newRun->id);
+
+        return $newRun->id;
     }
 }

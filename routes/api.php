@@ -53,6 +53,7 @@ Route::group($group, function () {
     Route::resource('reports', 'ReportController', [
         'only' => ['index', 'show']
     ]);
+    Route::post('reports/{id}/rerun', 'ReportController@rerun');
     Route::resource('dataResources', 'DataResourceController', [
         'only' => ['index', 'store', 'update', 'destroy']
     ]);
