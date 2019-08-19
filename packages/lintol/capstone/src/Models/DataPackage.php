@@ -19,6 +19,7 @@ class DataPackage extends Model
          'ckan_instance_id',
          'user',
          'creator',
+         'locale',
          'archived'
     ];
 

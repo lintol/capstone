@@ -27,6 +27,7 @@ class DataResource extends Model
          'content',
          'settings',
          'size',
+         'locale',
          'organization'
     ];
 
