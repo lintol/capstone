@@ -75,6 +75,10 @@ class ObserveNewResourcesJob implements ShouldQueue
                         $ckanInstance->save();
                     }
 
+                    if ($update) {
+                        Log::info("[lintol-observe] FORCE UPDATE is on");
+                    }
+
                     $lastModified = Carbon::parse($metadata->metadata_modified);
                     $organization = $metadata->organization ? $metadata->organization->name : null;
                     $locale = config('app.locale');
