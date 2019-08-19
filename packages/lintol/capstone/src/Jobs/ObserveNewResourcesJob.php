@@ -76,6 +76,7 @@ class ObserveNewResourcesJob implements ShouldQueue
 
                     $lastModified = Carbon::parse($metadata->metadata_modified);
                     $organization = $metadata->organization ? $metadata->organization->name : null;
+                    $locale = config('app.locale');
 
                     $sourceObject = ['lintolSource' => $source, 'lintolCkanInstanceId' => $ckanInstance->id];
                     if (property_exists($metadata, 'extras')) {
@@ -89,8 +90,13 @@ class ObserveNewResourcesJob implements ShouldQueue
                             if ($extra->key == 'harvest_url') {
                                 $sourceObject['sourceUrl'] = $extra->value;
                             }
+                            if ($extra->key == 'default_locale' && $extra->value) {
+                                $locale = $extra->value;
+                            }
                         }
                     }
+
+                    \Log::info($locale);
 
                     if (array_key_exists('harvestSource', $sourceObject)) {
                         $sourceObject['sourceChain'] = $sourceObject['lintolSource'] . '|' . $sourceObject['harvestSource'];
@@ -105,6 +111,7 @@ class ObserveNewResourcesJob implements ShouldQueue
                             'metadata' => $metadata,
                             'name' => $metadata->name,
                             'url' => $metadata->url,
+                            'locale' => $locale,
                             'source' => json_encode($sourceObject)
                         ]);
                         $package->save();
@@ -133,6 +140,7 @@ class ObserveNewResourcesJob implements ShouldQueue
                             'settings' => ['autorun' => true],
                             'status' => 'new resource',
                             'organization' => $organization,
+                            'locale' => $locale,
                             'source' => json_encode($sourceObject)
                         ]);
                         $res->resourceable()->associate($ckanInstance);

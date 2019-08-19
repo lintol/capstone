@@ -106,6 +106,10 @@ class ValidationRun extends Model
             'settings' => $settings
         ];
 
+        if (array_key_exists('locale', $settings)) {
+            $definition['lang'] = $settings['locale'];
+        }
+
         $definition['context'] = [];
         if ($this->dataResource->package) {
             $definition['context']['package'] = $this->dataResource->package->metadata;

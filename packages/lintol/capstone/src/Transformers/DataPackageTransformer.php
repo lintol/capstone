@@ -19,6 +19,7 @@ class DataPackageTransformer extends Fractal\TransformerAbstract
             'url' => $data->url,
             'source' => $data->source,
             'created_at' => $data->created_at,
+            'locale' => $data->locale,
             'archived' => $data->archived
         ];
     }

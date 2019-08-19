@@ -165,6 +165,7 @@ class ResourceManager
             $dataResource->filetype = $type;
         }
         $settings['fileType'] = $dataResource->filetype;
+        $settings['locale'] = $dataResource->locale;
 
         if ($missing !== false) {
             $status = 'missing: ' . $missing;
@@ -216,6 +217,7 @@ class ResourceManager
             $dataResource->status = 'ready to process';
             $settings = $dataResource->settings;
             $settings['fileType'] = $dataResource->filetype;
+            $settings['locale'] = $dataResource->locale;
             $settings['size'] = strlen($dData);
             $settings['organization'] = $dataResource->organization;
             $dataResource->settings = $settings;
