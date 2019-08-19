@@ -60,6 +60,7 @@ class ObserveNewResourcesJob implements ShouldQueue
                     $resource = $res[1];
                     $ini = $res[2];
                     $source = $res[3];
+                    $update = (count($res) > 4) && $res[4];
                     $metadata = json_decode($ini->context->package);
                     Log::info("[lintol-observe] " . __("New resource seen on " . $source) . " -- " . $resource->name . " in " . $metadata->name);
 
@@ -103,8 +104,10 @@ class ObserveNewResourcesJob implements ShouldQueue
                     }
 
                     $package = DataPackage::whereRemoteId($metadata->id)->whereCkanInstanceId($ckanInstance->id)->first();
-                    if (! $package) {
-                        $package = new DataPackage;
+                    if (! $package || $update) {
+                        if (! $package) {
+                            $package = new DataPackage;
+                        }
                         $package->fill([
                             'remote_id' => $metadata->id,
                             'ckan_instance_id' => $ckanInstance->id,
@@ -119,7 +122,7 @@ class ObserveNewResourcesJob implements ShouldQueue
                     }
 
                     $res = DataResource::whereRemoteId($resourceId)->whereCkanInstanceId($ckanInstance->id)->first();
-                    if (! $res || $res->updated_at->lt($lastModified)) {
+                    if (! $res || $res->updated_at->lt($lastModified) || $update) {
                         if (! $res) {
                             $res = new DataResource;
                         }
