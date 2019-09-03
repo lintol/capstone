@@ -210,7 +210,7 @@ class ProcessorsTableSeeder extends Seeder
             'rules' => ['fileType' => '/(csv|json|geojson)/', 'maxSize' => 100000],
             'configuration_defaults' => [
                 'renderCodes' => config('capstone.examples.classify-location.render-codes', True),
-                'metadataOnly' => true
+                'metadataOnly' => false
             ],
             'configuration_options' => json_encode([
             ]),
@@ -234,7 +234,7 @@ class ProcessorsTableSeeder extends Seeder
             'content' => '',
             'rules' => ['fileType' => '/(csv|json|geojson)/', 'maxSize' => 100000],
             'configuration_defaults' => [
-                'metadataOnly' => true
+                'metadataOnly' => false
             ],
             'configuration_options' => json_encode([
             ]),
