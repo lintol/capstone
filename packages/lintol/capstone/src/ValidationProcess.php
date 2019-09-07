@@ -340,6 +340,8 @@ class ValidationProcess
                 Log::info(__("Exited with exception"));
             });
         } catch (Throwable $e) {
+            Log::error(__("Could not execute"));
+            Log::error((string)$e);
             $this->recordException($e);
             // throw $e;
         }
