@@ -146,9 +146,12 @@ class ValidationProcess
                             'processor' => '(unidentified)',
                             'code' => $code,
                             'item' => [
-                                'type' => 'Exception',
-                                'location' => null,
-                                'definition' => null
+                                'entity' => [
+                                    'type' => 'Exception',
+                                    'location' => null,
+                                    'definition' => null
+                                ],
+                                'properties' => null
                             ]
                         ]
                     ]
