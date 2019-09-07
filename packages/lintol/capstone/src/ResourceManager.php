@@ -122,6 +122,8 @@ class ResourceManager
                 $type = $response->getHeader('Content-Type')[0];
             } else if ($response->hasHeader('x-encoded-content-type')) {
                 $type = $response->getHeader('x-encoded-content-type')[0];
+            } else {
+                $type = null;
             }
             Log::info("TYPE: " . $type);
 
