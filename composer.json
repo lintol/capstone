@@ -17,6 +17,7 @@
     "require": {
         "php": ">=7.2.0",
         "alsofronie/eloquent-uuid": "^1.0",
+        "doctrine/dbal": "^2.9",
         "fideloper/proxy": "~4.0",
         "guzzlehttp/guzzle": "^6.3",
         "imbo/behat-api-extension": "^2.0",
