@@ -69,26 +69,26 @@ class ObserveDataJob implements ShouldQueue
                     }
                 });
 
-                $session->register(
-                    'com.ltlcapstone.validation',
-                    function ($res) use ($session, $ckanFactory) {
-                        $token = $res[0];
+                //$session->register(
+                //    'com.ltlcapstone.validation',
+                //    function ($res) use ($session, $ckanFactory) {
+                //        $token = $res[0];
 
-                        $oauth = $this->checkToken($token);
-                        $ckanInstance = $ckanFactory->findOrFail($oauth['oauth_user_id']);
-                        $dataUri = $res[1];
-                        $settings = $res[2];
+                //        $oauth = $this->checkToken($token);
+                //        $ckanInstance = $ckanFactory->findOrFail($oauth['oauth_user_id']);
+                //        $dataUri = $res[1];
+                //        $settings = $res[2];
 
-                        try {
-                            $validationIds = $this->exampleValidationLaunch($dataUri, $settings);
-                        } catch (\Exception $e) {
-                            Log::error($e);
-                            throw $e;
-                        }
+                //        try {
+                //            $validationIds = $this->exampleValidationLaunch($dataUri, $settings);
+                //        } catch (\Exception $e) {
+                //            Log::error($e);
+                //            throw $e;
+                //        }
 
-                        return $validationIds;
-                    }
-                );
+                //        return $validationIds;
+                //    }
+                //);
         }, false);
 
         Log::info(__("Subscription exited."));
