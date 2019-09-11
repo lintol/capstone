@@ -134,10 +134,14 @@ class ResourceManager
             }
 
             $missing = false;
+        } catch (\GuzzleHttp\Exception\ConnectException $e) {
+            $missing = 1500;
+            $type = null;
+            Log::info("CONNECTION EXCEPTION: " . $e->getMessage());
         } catch (\GuzzleHttp\Exception\TooManyRedirectsException $e) {
             $missing = 1302;
             $type = null;
-            Log::info("TOO MANY REDIRECTS" . $missing);
+            Log::info("TOO MANY REDIRECTS: " . $missing);
         } catch (\GuzzleHttp\Exception\ServerException $e) {
             $missing = $e->getResponse()->getStatusCode();
             $type = null;
@@ -146,7 +150,12 @@ class ResourceManager
             $missing = $e->getResponse()->getStatusCode();
             $type = null;
             Log::info("CLIENT ERROR: " . $missing);
+        } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+            $missing = 1000;
+            $type = null;
+            Log::info("GUZZLE ERROR: " . $e->getMessage());
         }
+
         Log::info("SIZE: " . $size);
         return [$missing, $size, $type];
     }
