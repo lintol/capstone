@@ -134,6 +134,10 @@ class ResourceManager
             }
 
             $missing = false;
+        } catch (\GuzzleHttp\Exception\TooManyRedirectsException $e) {
+            $missing = 1302;
+            $type = null;
+            Log::info("TOO MANY REDIRECTS" . $missing);
         } catch (\GuzzleHttp\Exception\ServerException $e) {
             $missing = $e->getResponse()->getStatusCode();
             $type = null;
