@@ -378,21 +378,30 @@ class ValidationProcess
      */
     public function retrieve()
     {
-        $this->getReport()->then(function ($res) {
-                try {
-                    return $this->outputReport($res);
-                } catch (Throwable $e) {
-                    $this->recordException($e);
+        $this->run->refresh();
+        if (! $this->run->completed_at) {
+            \Log::warn("Validation completing: " . $this->run->id);
+
+            $this->run->markCompleted();
+
+            $this->getReport()->then(function ($res) {
+                    try {
+                        return $this->outputReport($res);
+                    } catch (Throwable $e) {
+                        $this->recordException($e);
+                        throw $e;
+                    }
+                },
+                function ($error) {
+                    $this->recordException($error);
+                    $e = new \RuntimeException($error);
                     throw $e;
                 }
-            },
-            function ($error) {
-                $this->recordException($error);
-                $e = new \RuntimeException($error);
-                throw $e;
-            }
-        )->done(function ($res) {
-            Log::info("Completed: " . $this->run->id);
-        });
+            )->done(function ($res) {
+                Log::info("Completed: " . $this->run->id);
+            });
+        } else {
+            \Log::warn("Validation already completed: " . $this->run->id);
+        }
     }
 }
