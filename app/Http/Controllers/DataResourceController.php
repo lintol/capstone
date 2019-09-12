@@ -8,6 +8,7 @@ use App\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Lintol\Capstone\Models\DataResource;
+use Lintol\Capstone\Models\ValidationRun;
 use Illuminate\Http\Request;
 use Lintol\Capstone\Transformers\DataResourceTransformer;
 use Lintol\Capstone\ResourceManager;
@@ -274,11 +275,13 @@ class DataResourceController extends Controller
 
     public function summary()
     {
-        $model = app()->make(DataResource::class);
+        $dataResourceModel = app()->make(DataResource::class);
+        $validationRunModel = app()->make(ValidationRun::class);
 
         return [
             'success' => true,
-            'statuses' => $model->summaryByStatus()
+            'resource_statuses' => $dataResourceModel->summaryByStatus(),
+            'run_statuses' => $validationRunModel->summaryByStatus()
         ];
     }
 }
