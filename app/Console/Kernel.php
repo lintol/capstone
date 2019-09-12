@@ -13,7 +13,8 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        Commands\CreateCkanInstanceToken::class
+        Commands\CreateCkanInstanceToken::class,
+        Commands\RecordStatusesCommand::class
     ];
 
     /**
@@ -24,8 +25,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $schedule->command('ltl:record-statuses')
+            ->hourly();
     }
 
     /**

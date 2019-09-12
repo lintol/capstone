@@ -63,6 +63,10 @@ Route::group($group, function () {
     Route::get('dataResources/getDateFilters', 'DataResourceController@getDateFilters')->name('getDateFilters');
     Route::get('dataResources/summary', 'DataResourceController@summary');
 
+    Route::get('tracking', function () {
+        return \App\StatusTracking::where('created_at', '>', \Carbon\Carbon::now()->subHours(24))->get();
+    });
+
     Route::resource('dataResources/settings', 'DataResourceSettingController', [
         'only' => ['store']
     ]);
