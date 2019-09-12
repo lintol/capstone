@@ -271,4 +271,14 @@ class DataResourceController extends Controller
         }
         return $filters;
     }
+
+    public function summary()
+    {
+        $model = app()->make(DataResource::class);
+
+        return [
+            'success' => true,
+            'statuses' => $model->summaryByStatus()
+        ];
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace Lintol\Capstone\Models;
 
+use DB;
 use App\User;
 use Carbon\Carbon;
 use Event;
@@ -62,9 +63,19 @@ class ValidationRun extends Model
         return $this->belongsTo(DataResource::class, 'data_resource_id');
     }
 
-    public function markCompleted()
+    public function summaryByStatus()
+    {
+        return DB::table('validation_runs')
+            ->select('completion_status', DB::raw('count(*) as total'))
+            ->groupBy('completion_status')
+            ->pluck('total', 'completion_status')
+            ->all();
+    }
+
+    public function markCompleted($success=true)
     {
         $this->completed_at = Carbon::now();
+        $this->completed_status = $success ? self::STATUS_SUCCEEDED : self::STATUS_FAILED;
         $this->save();
 
         if ($this->dataResource) {

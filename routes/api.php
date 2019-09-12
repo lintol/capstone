@@ -30,7 +30,7 @@ if (!env('CAPSTONE_WITHOUT_AUTH', false)) {
     $machineGroup['middleware'] = 'client';
 }
 
-Route::get('reports/all', 'ReportController@all');
+//Route::get('reports/all', 'ReportController@all');
 
 //Route::group($machineGroup, function () {
 //    Route::resource('dataResources', 'DataResourceController', [
@@ -53,6 +53,7 @@ Route::group($group, function () {
     Route::resource('reports', 'ReportController', [
         'only' => ['index', 'show']
     ]);
+    Route::get('runs/summary', 'ValidationRunController@summary');
     Route::post('reports/{id}/rerun', 'ReportController@rerun');
     Route::resource('dataResources', 'DataResourceController', [
         'only' => ['index', 'store', 'update', 'destroy']
@@ -61,6 +62,7 @@ Route::group($group, function () {
     Route::get('dataResources/getFileTypeFilters', 'DataResourceController@getFileTypeFilters')->name('getFileTypeFilters');
     Route::get('dataResources/getSourceFilters', 'DataResourceController@getSourceFilters')->name('getSourceFilters');
     Route::get('dataResources/getDateFilters', 'DataResourceController@getDateFilters')->name('getDateFilters');
+    Route::get('dataResources/summary', 'DataResourceController@summary');
 
     Route::resource('dataResources/settings', 'DataResourceSettingController', [
         'only' => ['store']

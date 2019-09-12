@@ -181,7 +181,7 @@ class ValidationProcess
 
         $report->save();
 
-        $run->markCompleted();
+        $run->markCompleted(false);
         $run->save();
     }
 
@@ -370,7 +370,7 @@ class ValidationProcess
 
         $report->save();
 
-        $this->run->markCompleted();
+        $this->run->markCompleted(true);
     }
 
     /**

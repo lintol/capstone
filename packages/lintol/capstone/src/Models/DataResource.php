@@ -3,6 +3,7 @@
 namespace Lintol\Capstone\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use DB;
 use Alsofronie\Uuid\UuidModelTrait;
 use App\User;
 
@@ -61,5 +62,14 @@ class DataResource extends Model
     public function package()
     {
         return $this->belongsTo(DataPackage::class);
+    }
+
+    public function summaryByStatus()
+    {
+        return DB::table('data_resources')
+            ->select('status', DB::raw('count(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->all();
     }
 }
