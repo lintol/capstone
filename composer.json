@@ -22,6 +22,7 @@
         "guzzlehttp/guzzle": "^6.3",
         "imbo/behat-api-extension": "^2.0",
         "laravel/framework": "5.8.*",
+        "laravel/horizon": "^3.3",
         "laravel/passport": "^7.0",
         "laravel/socialite": "dev-feature/ckan",
         "laravel/tinker": "~1.0",
