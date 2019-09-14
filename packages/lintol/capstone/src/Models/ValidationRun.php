@@ -75,7 +75,7 @@ class ValidationRun extends Model
     public function markCompleted($success=true)
     {
         $this->completed_at = Carbon::now();
-        $this->completed_status = $success ? self::STATUS_SUCCEEDED : self::STATUS_FAILED;
+        $this->completion_status = $success ? self::STATUS_SUCCEEDED : self::STATUS_FAILED;
         $this->save();
 
         if ($this->dataResource) {
