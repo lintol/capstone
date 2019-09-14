@@ -79,7 +79,7 @@ class ValidationRun extends Model
         $this->save();
 
         if ($this->dataResource) {
-          $this->dataResource->status = 'report run';
+          $this->dataResource->setStatus('report run');
           $this->dataResource->save();
         }
 

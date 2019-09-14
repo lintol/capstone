@@ -279,6 +279,7 @@ class DataResourceController extends Controller
     {
         $from = request()->input('from');
         $to = request()->input('to');
+        $createdSince = request()->input('createdSince');
 
         try {
             if ($from) {
@@ -291,6 +292,12 @@ class DataResourceController extends Controller
                 $to = Carbon::parse($to);
             } else {
                 $to = Carbon::now();
+            }
+
+            if ($createdSince) {
+                $createdSince = Carbon::parse($createdSince);
+            } else {
+                $createdSince = null;
             }
         } catch (\Exception $e) {
             return [

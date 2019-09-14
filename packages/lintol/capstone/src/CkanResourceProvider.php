@@ -166,7 +166,7 @@ class CkanResourceProvider implements ResourceProviderInterface
                             if (!str_contains(strtolower($data->filename), $data->filetype)) {
                                 $data->filename .= '.' . $data->filetype;
                             }
-                            $data->status = 'valid link';
+                            $data->setStatus('valid link');
                             $package = new DataPackage;
                             $package->name = $ckanPackageData['title'];
                             $data->package = $package;
@@ -220,7 +220,7 @@ class CkanResourceProvider implements ResourceProviderInterface
                 $data->filename .= '.' . $data->filetype;
             }
             $data->archived = 0;
-            $data->status = 'valid link';
+            $data->setStatus('valid link');
             $data->resourceable()->associate($this->ckanInstance);
             $data->package()->associate($package);
 

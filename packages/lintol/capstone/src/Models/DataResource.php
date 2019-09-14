@@ -49,6 +49,16 @@ class DataResource extends Model
         return $this->hasMany(ValidationRun::class);
     }
 
+    public function setStatus($status)
+    {
+        if ($this->id) {
+            $this->status = $status;
+            $change = new DataResourceStatusChange;
+            $change->data_resource_id = $this->id;
+            $change->save();
+        }
+    }
+
     public function resourceable()
     {
         return $this->morphTo();

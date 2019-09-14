@@ -187,7 +187,7 @@ class ResourceManager
         } else {
             $status = 'ready to process';
         }
-        $dataResource->status = $status;
+        $dataResource->setStatus($status);
         $dataResource->size = $size;
 
         $settings['size'] = $size;
@@ -229,7 +229,7 @@ class ResourceManager
                 $dataResource->filetype = $pathParts['extension'];
             }
 
-            $dataResource->status = 'ready to process';
+            $dataResource->setStatus('ready to process');
             $settings = $dataResource->settings;
             $settings['fileType'] = $dataResource->filetype;
             $settings['locale'] = $dataResource->locale;
