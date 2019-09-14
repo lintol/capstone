@@ -2,7 +2,7 @@
 
 return json_decode(<<<ENDJ
 {
-    "record_status_frequency": "* * * * *"
+    "record-status-frequency": "* * * * *"
 }
 ENDJ
 );
