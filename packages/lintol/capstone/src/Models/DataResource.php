@@ -55,6 +55,7 @@ class DataResource extends Model
             $this->status = $status;
             $change = new DataResourceStatusChange;
             $change->data_resource_id = $this->id;
+            $change->new_status = $status;
             $change->save();
         }
     }
