@@ -79,8 +79,12 @@ class ValidationRun extends Model
         $this->save();
 
         if ($this->dataResource) {
-          $this->dataResource->setStatus('report run');
-          $this->dataResource->save();
+            if ($success) {
+                $this->dataResource->setStatus('report run');
+            } else {
+                $this->dataResource->setStatus('report failed');
+            }
+            $this->dataResource->save();
         }
 
         \Log::info(__("Announcing run ") . $this->id . __(" has finished"));
