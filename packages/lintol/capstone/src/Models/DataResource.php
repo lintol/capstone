@@ -75,9 +75,15 @@ class DataResource extends Model
         return $this->belongsTo(DataPackage::class);
     }
 
-    public function summaryByStatus()
+    public function summaryByStatus($createdSince=null)
     {
-        return DB::table('data_resources')
+        $query = DB::table('data_resources');
+
+        if ($createdSince) {
+            $query = $query->where('created_at', '>', $createdSince);
+        }
+
+        return $query
             ->select('status', DB::raw('count(*) as total'))
             ->groupBy('status')
             ->pluck('total', 'status')

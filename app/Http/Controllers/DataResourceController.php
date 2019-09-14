@@ -315,8 +315,8 @@ class DataResourceController extends Controller
 
         $results = [
             'now' => [
-                'resource_statuses' => $dataResourceModel->summaryByStatus($from, $to),
-                'run_statuses' => $validationRunModel->summaryByStatus($from, $to)
+                'resource_statuses' => $dataResourceModel->summaryByStatus($createdSince),
+                'run_statuses' => $validationRunModel->summaryByStatus($createdSince)
             ]
         ];
         $trackings->each(function ($tracking) use (&$results) {
