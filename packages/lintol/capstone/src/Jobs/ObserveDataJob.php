@@ -34,6 +34,11 @@ class ObserveDataJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public function tags()
+    {
+        return ['validation-incoming', 'observe'];
+    }
+
     public $validation = null;
 
     protected $processFactory;

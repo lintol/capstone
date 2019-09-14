@@ -181,4 +181,9 @@ class ProcessNewResourcesJob implements ShouldQueue
             }
         });
     }
+
+    public function tags()
+    {
+        return ['new-resources', 'process'];
+    }
 }

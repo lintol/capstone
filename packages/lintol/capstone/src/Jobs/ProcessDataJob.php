@@ -56,4 +56,9 @@ class ProcessDataJob implements ShouldQueue
 
         Log::info(__("Client exited"));
     }
+
+    public function tags()
+    {
+        return ['validation-outgoing', 'process'];
+    }
 }

@@ -36,6 +36,11 @@ class ObserveNewResourcesJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    public function tags()
+    {
+        return ['new-resources', 'observe'];
+    }
+
     /**
      * Execute the job.
      *
