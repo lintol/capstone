@@ -100,6 +100,29 @@ services:
       - /var/www/app/artisan
     command:
       - "ltl:observe"
+  artisan_schedule:
+    build:
+      context: ./infrastructure/containers/phpfpm
+      dockerfile: Dockerfile.debug
+    volumes:
+      - .:/var/www/app
+      - ./infrastructure/containers/phpfpm/repeat.sh:/repeat.sh
+    env_file:
+      - ./docker/config/laravel.env
+      - ./docker/config/redis.env
+    environment:
+      REDIS_HOST: "redis"
+      REDIS_PORT: 6379
+      APP_LOG: "single"
+      LOG_CHANNEL: "single"
+      LINTOL_EXAMPLE_DT_CLASSIFY_CATEGORY_SERVER_URL: "http://localhost:5001"
+    links:
+      - db:db
+      - redis:redis
+    entrypoint:
+      - sh
+    command:
+      - "/repeat.sh"
   artisan_worker:
     build:
       context: ./infrastructure/containers/phpfpm

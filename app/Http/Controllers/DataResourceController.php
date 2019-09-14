@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Auth;
 use Log;
 use App\User;
+use App\StatusTracking;
+use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Lintol\Capstone\Models\DataResource;
@@ -275,13 +277,52 @@ class DataResourceController extends Controller
 
     public function summary()
     {
+        $from = request()->input('from');
+        $to = request()->input('to');
+
+        try {
+            if ($from) {
+                $from = Carbon::parse($from);
+            } else {
+                $from = Carbon::now()->subHours(1);
+            }
+
+            if ($to) {
+                $to = Carbon::parse($to);
+            } else {
+                $to = Carbon::now();
+            }
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'message' => __("Invalid from or to dates")
+            ];
+        }
+
         $dataResourceModel = app()->make(DataResource::class);
         $validationRunModel = app()->make(ValidationRun::class);
 
+        $trackings = StatusTracking::where('created_at', '>=', $from)
+            ->where('created_at', '<', $to)
+            ->get();
+
+        $results = [
+            'now' => [
+                'resource_statuses' => $dataResourceModel->summaryByStatus($from, $to),
+                'run_statuses' => $validationRunModel->summaryByStatus($from, $to)
+            ]
+        ];
+        $trackings->each(function ($tracking) use (&$results) {
+            $results[$tracking->created_at->format('c')] = [
+                'resource_statuses' => $tracking->statuses['resource_statuses'],
+                'run_statuses' => $tracking->statuses['run_statuses'],
+                'jobs' => $tracking->statuses['jobs']
+            ];
+        });
+
         return [
             'success' => true,
-            'resource_statuses' => $dataResourceModel->summaryByStatus(),
-            'run_statuses' => $validationRunModel->summaryByStatus()
+            'results' => $results
         ];
     }
 }
