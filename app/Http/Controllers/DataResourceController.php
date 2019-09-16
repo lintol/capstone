@@ -70,7 +70,7 @@ class DataResourceController extends Controller
                 break;
             case '_local':
             default:
-                $query = DataResource::with('package');
+                $query = DataResource::with(['package', 'run']);
                 if ($ids) {
                     $query = $query->whereIn('id', $ids);
                 }

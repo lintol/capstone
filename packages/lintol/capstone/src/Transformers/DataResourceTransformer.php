@@ -23,6 +23,9 @@ class DataResourceTransformer extends Fractal\TransformerAbstract
         } else {
             $packageName = '';
         }
+
+        $runCount = $data->run->count();
+
         return [
             'id' => ($data->id || !$data->remote_id) ? $data->id : 'remote-' . $data->remote_id,
             'filename' => $data->filename,
@@ -38,6 +41,7 @@ class DataResourceTransformer extends Fractal\TransformerAbstract
             'providerServer' => $data->resourceable ? $data->resourceable->uri : null,
             'size' => $data->size,
             'locale' => $data->locale,
+            'runs' => $runCount,
             'remote_id' => $data->remote_id,
         ];
     }

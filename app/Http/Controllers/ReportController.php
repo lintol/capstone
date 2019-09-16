@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Lintol\Capstone\Models\Report;
+use Lintol\Capstone\Models\ValidationRun;
 use Lintol\Capstone\Transformers\ReportTransformer;
 use Lintol\Capstone\Jobs\ProcessDataJob;
 
@@ -41,6 +42,16 @@ class ReportController extends Controller
                 'created_at',
                 '>=',
                 Carbon::parse($request->input('since'))
+            );
+        }
+
+        if ($request->input('resourceId')) {
+            $this->validate($request, ['resourceId' => 'uuid']);
+
+            $runIds = ValidationRun::whereDataResourceId($request->input('resourceId'))->pluck('id');
+            $reports = $reports->whereIn(
+                'run_id',
+                $runIds
             );
         }
 

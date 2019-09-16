@@ -172,6 +172,8 @@ class ProcessNewResourcesJob implements ShouldQueue
 
                     $res = $resourceManager->onboard($res);
                     Log::info("Added resource: " . $res->name . " with remote ID " . $res->remote_id . " and status " . $res->status);
+                } else {
+                    Log::info("Resource already present: " . $res->name . " with remote ID " . $res->remote_id . " and status " . $res->status);
                 }
 
                 Log::info(__("Subscription exited."));
