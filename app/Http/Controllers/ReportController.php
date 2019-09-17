@@ -45,6 +45,17 @@ class ReportController extends Controller
             );
         }
 
+        if ($request->input('until')) {
+            $this->validate($request, ['until' => 'required|date']);
+
+            Log::debug("Filtering with until");
+            $reports = $reports->where(
+                'created_at',
+                '<',
+                Carbon::parse($request->input('until'))
+            );
+        }
+
         if ($request->input('resourceId')) {
             $this->validate($request, ['resourceId' => 'uuid']);
 
