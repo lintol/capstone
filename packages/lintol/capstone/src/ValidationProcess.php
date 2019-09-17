@@ -235,6 +235,7 @@ class ValidationProcess
         $configurations = $this->run->profile->configurations;
         $processors = $configurations->pluck('processor');
         $definition = $this->run->doorstep_definition;
+        \Log::info($definition['context']['resource']);
         $uri = $this->makeUri('processor.post', $this->run->doorstep_server_id);
 
         $future = $this->session->call(
