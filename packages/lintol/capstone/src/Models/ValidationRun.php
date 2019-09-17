@@ -126,6 +126,31 @@ class ValidationRun extends Model
         }
 
         $definition['context'] = [];
+
+        // Find without relations
+        $fields = [
+             'filename',
+             'url',
+             'name',
+             'filetype',
+             'status',
+             'remote_id',
+             'package_id',
+             'ckan_instance_id',
+             'source',
+             'archived',
+             'reportid',
+             'settings',
+             'size',
+             'locale',
+             'organization'
+        ];
+
+        $definition['context']['resource'] = [];
+        foreach ($fields as $field) {
+            $definition['context']['resource'][$field] = $this->dataResource->{$field};
+        }
+
         if ($this->dataResource->package) {
             $definition['context']['package'] = $this->dataResource->package->metadata;
         }
