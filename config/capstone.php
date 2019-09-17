@@ -30,7 +30,7 @@ return [
     'frontend' => [
         'url' => env('LINTOL_FRONTEND_URL', '/'),
         'proxy' => env('LINTOL_FRONTEND_PROXY', false),
-        'max-pagination' => 250
+        'max-pagination' => env('LINTOL_MAX_PAGINATION', 200)
     ],
     'encryption' => [
         'blind-index-key' => env('LINTOL_BLIND_INDEX_KEY', config('app.key'))
