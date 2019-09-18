@@ -163,6 +163,7 @@ class ValidationProcess
         }
         if (is_string($message)) {
             $content['tables'][0]['errors'][0]['message'] = $message;
+            \Log::info(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
         } else {
             $detail = $message['keyword arguments'];
             if (property_exists($detail, 'exception') && property_exists($detail, 'message')) {
@@ -235,7 +236,6 @@ class ValidationProcess
         $configurations = $this->run->profile->configurations;
         $processors = $configurations->pluck('processor');
         $definition = $this->run->doorstep_definition;
-        \Log::info($definition['context']['resource']);
         $uri = $this->makeUri('processor.post', $this->run->doorstep_server_id);
 
         $future = $this->session->call(
