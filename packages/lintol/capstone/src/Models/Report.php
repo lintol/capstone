@@ -53,7 +53,10 @@ class Report extends Model
         } else {
             $result = json_decode($result, true);
         }
+        \Log::info($result);
         $report->content = json_encode($result);
+        \Log::info($report->content);
+        \Log::info('=====');
         $content = $result;
         //$content = json_decode($report->content, true);
 
