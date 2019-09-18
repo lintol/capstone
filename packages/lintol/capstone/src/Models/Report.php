@@ -29,6 +29,7 @@ class Report extends Model
 
     public function make($result, ValidationRun $run, $encode = false)
     {
+        \Log::info('-------');
         $report = new self;
 
         if ($run->data_resource_id && $run->profile_id) {
@@ -47,6 +48,7 @@ class Report extends Model
             $report->name = '(none)';
         }
 
+        \Log::info($result);
         if ($encode) {
             // FIXME: neutral may be fine here
             // $result = json_encode($result);
