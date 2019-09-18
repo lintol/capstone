@@ -25,6 +25,7 @@ class DataResourceController extends Controller
         $this->transformer = $transformer;
         $this->resourceManager = $resourceManager;
     }
+
     /**
      * Display a listing of the resource.
      *

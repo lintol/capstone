@@ -55,7 +55,7 @@ Route::group($group, function () {
     ]);
     Route::post('reports/{id}/rerun', 'ReportController@rerun');
     Route::resource('dataResources', 'DataResourceController', [
-        'only' => ['index', 'store', 'update', 'destroy']
+        'only' => ['index', 'show', 'store', 'update', 'destroy']
     ]);
 
     Route::get('dataResources/getFileTypeFilters', 'DataResourceController@getFileTypeFilters')->name('getFileTypeFilters');
