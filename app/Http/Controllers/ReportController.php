@@ -63,6 +63,9 @@ class ReportController extends Controller
 
             if ($entity == 'resource') {
                 $runQuery = ValidationRun::whereDataResourceId($entityId);
+            } else if ($entity == 'package') {
+                $resourceIds = DataResource::wherePackageId($entityId)->pluck('id');
+                $runQuery = ValidationRun::whereIn('data_resource_id', $resourceIds);
             } else if ($entity == 'profile') {
                 $runQuery = ValidationRun::whereProfileId($entityId);
             } else {
