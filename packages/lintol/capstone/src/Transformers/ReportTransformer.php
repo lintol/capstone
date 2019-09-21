@@ -24,6 +24,7 @@ class ReportTransformer extends Fractal\TransformerAbstract
             'qualityScore' => $report->quality_score,
             'content' => $report->content,
             'createdAt' => $report->created_at,
+            'profileId' => $report->getProfileId(),
             'dataResourceId' => $report->getDataResourceId()
         ];
     }

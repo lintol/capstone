@@ -56,10 +56,22 @@ class ReportController extends Controller
             );
         }
 
-        if ($request->input('resourceId')) {
-            $this->validate($request, ['resourceId' => 'uuid']);
+        if ($request->input('entity') && $request->input('id')) {
+            $this->validate($request, ['id' => 'uuid']);
+            $entity = $request->input('entity');
+            $entityId = $request->input('id');
 
-            $runIds = ValidationRun::whereDataResourceId($request->input('resourceId'))->pluck('id');
+            if ($entity == 'resource') {
+                $runQuery = ValidationRun::whereDataResourceId($entityId);
+            } else if ($entity == 'profile') {
+                $runQuery = ValidationRun::whereProfileId($entityId);
+            } else {
+                return response([
+                    'success' => false,
+                    'message' => 'Only resource and profile searches are allowed'
+                ], 400);
+            }
+            $runIds = $runQuery->pluck('id');
             $reports = $reports->whereIn(
                 'run_id',
                 $runIds

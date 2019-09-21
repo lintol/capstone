@@ -95,4 +95,9 @@ class Report extends Model
     {
         return $this->run ? $this->run->data_resource_id : null;
     }
+
+    public function getProfileId()
+    {
+        return $this->run ? $this->run->profile_id : null;
+    }
 }
