@@ -58,9 +58,9 @@ Route::group($group, function () {
         'only' => ['index', 'show', 'store', 'update', 'destroy']
     ]);
 
-    Route::get('dataResources/getFileTypeFilters', 'DataResourceController@getFileTypeFilters')->name('getFileTypeFilters');
-    Route::get('dataResources/getSourceFilters', 'DataResourceController@getSourceFilters')->name('getSourceFilters');
-    Route::get('dataResources/getDateFilters', 'DataResourceController@getDateFilters')->name('getDateFilters');
+    Route::get('dataResourcesFilters/getFileTypeFilters', 'DataResourceController@getFileTypeFilters')->name('getFileTypeFilters');
+    Route::get('dataResourcesFilters/getSourceFilters', 'DataResourceController@getSourceFilters')->name('getSourceFilters');
+    Route::get('dataResourcesFilters/getDateFilters', 'DataResourceController@getDateFilters')->name('getDateFilters');
     Route::get('dataResources/summary', 'DataResourceController@summary');
 
     Route::get('statistics/entities', 'StatisticsController@entities');
