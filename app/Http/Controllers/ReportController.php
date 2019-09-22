@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use League\Fractal\Pagination\IlluminatePaginatorAdapter;
 use Lintol\Capstone\Models\Report;
+use Lintol\Capstone\Models\DataResource;
 use Lintol\Capstone\Models\ValidationRun;
 use Lintol\Capstone\Transformers\ReportTransformer;
 use Lintol\Capstone\Jobs\ProcessDataJob;
