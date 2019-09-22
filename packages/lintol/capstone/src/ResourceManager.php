@@ -176,7 +176,8 @@ class ResourceManager
         $settings = $dataResource->settings;
 
         list($missing, $size, $type) = $this->checkHead($dataResource);
-        if ($type) {
+        /* Octet-stream is a "we don't know", so don't lose already-inferred information for it */
+        if ($type && $type != 'application/octet-stream') {
             $dataResource->filetype = $type;
         }
         $settings['fileType'] = $dataResource->filetype;
