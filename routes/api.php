@@ -57,6 +57,9 @@ Route::group($group, function () {
     Route::resource('dataResources', 'DataResourceController', [
         'only' => ['index', 'show', 'store', 'update', 'destroy']
     ]);
+    Route::resource('dataPackages', 'DataPackageController', [
+        'only' => ['show']
+    ]);
 
     Route::get('dataResourcesFilters/getFileTypeFilters', 'DataResourceController@getFileTypeFilters')->name('getFileTypeFilters');
     Route::get('dataResourcesFilters/getSourceFilters', 'DataResourceController@getSourceFilters')->name('getSourceFilters');

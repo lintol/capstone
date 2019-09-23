@@ -16,6 +16,7 @@ class DataPackageTransformer extends Fractal\TransformerAbstract
         return [
             'id' => ($data->id || !$data->remote_id) ? $data->id : 'remote-' . $data->remote_id,
             'metadata' => $data->metadata,
+            'name' => $data->name,
             'url' => $data->url,
             'source' => $data->source,
             'created_at' => $data->created_at,
