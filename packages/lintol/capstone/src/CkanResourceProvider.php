@@ -199,20 +199,38 @@ class CkanResourceProvider implements ResourceProviderInterface
         $ckanData = $this->ckanClient->ResourceShow(['id' => $id]);
         $ckanPackageData = $this->ckanClient->PackageShow(['id' => $ckanData['result']['package_id']]);
 
+        $sourceObject = ['lintolSource' => $ckanInstance->uri, 'lintolCkanInstanceId' => $ckanInstance->id];
+        if (array_key_exists('extras', $ckanPackageData)) {
+            foreach ($ckanPackageData['extras'] as $extra) {
+                if ($extra['key'] == 'harvest_title') {
+                    $sourceObject['harvestTitle'] = $extra['value'];
+                }
+                if ($extra['key'] == 'harvest_source') {
+                    $sourceObject['harvestSource'] = $extra['value'];
+                }
+                if ($extra['key'] == 'harvest_url') {
+                    $sourceObject['sourceUrl'] = $extra['value'];
+                }
+                if ($extra['key'] == 'default_locale' && $extra['value']) {
+                    $locale = $extra['value'];
+                }
+            }
+        }
+
         if ($ckanData) {
             $package = new DataPackage;
             $ckanPackageData = $ckanPackageData['result'];
             $package->name = $ckanPackageData['title'];
             $package->metadata = $ckanPackageData;
             $package->url = $ckanPackageData['url'];
-            $package->source = 'CKAN';
+            $package->source = $sourceObject;
             $package->remote_id = $ckanPackageData['id'];
             $package->user_id = $user->id;
             $ckanData = $ckanData['result'];
             $data->remote_id = $ckanData['id'];
             $data->url = $ckanData['url'];
             $data->user_id = $user->id;
-            $data->source = 'CKAN';
+            $data->source = $sourceObject;
             $data->filetype = strtolower($ckanData['format']) ? strtolower($ckanData['format']) : 'csv';
             $parts = parse_url($ckanData['url']);
             $data->filename = basename($parts['path']);
