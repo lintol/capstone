@@ -62,24 +62,41 @@ class ReportController extends Controller
             $entity = $request->input('entity');
             $entityId = $request->input('id');
 
-            if ($entity == 'resource') {
-                $runQuery = ValidationRun::whereDataResourceId($entityId);
-            } else if ($entity == 'package') {
-                $resourceIds = DataResource::wherePackageId($entityId)->pluck('id');
-                $runQuery = ValidationRun::whereIn('data_resource_id', $resourceIds);
-            } else if ($entity == 'profile') {
-                $runQuery = ValidationRun::whereProfileId($entityId);
+            $cachedOnly = (bool)$request->input('cachedOnly');
+
+            if ($cachedOnly) {
+                if ($entity == 'resource') {
+                    $reports = $reports->whereCachedDataResourceId($entityId);
+                } else if ($entity == 'package') {
+                    $reports = $reports->whereCachedDataPackageId($entityId);
+                } else if ($entity == 'profile') {
+                    $reports = $reports->whereCachedProfileId($entityId);
+                } else {
+                    return response([
+                        'success' => false,
+                        'message' => 'Only resource and profile searches are allowed'
+                    ], 400);
+                }
             } else {
-                return response([
-                    'success' => false,
-                    'message' => 'Only resource and profile searches are allowed'
-                ], 400);
+                if ($entity == 'resource') {
+                    $runQuery = ValidationRun::whereDataResourceId($entityId);
+                } else if ($entity == 'package') {
+                    $resourceIds = DataResource::wherePackageId($entityId)->pluck('id');
+                    $runQuery = ValidationRun::whereIn('data_resource_id', $resourceIds);
+                } else if ($entity == 'profile') {
+                    $runQuery = ValidationRun::whereProfileId($entityId);
+                } else {
+                    return response([
+                        'success' => false,
+                        'message' => 'Only resource and profile searches are allowed'
+                    ], 400);
+                }
+                $runIds = $runQuery->pluck('id');
+                $reports = $reports->whereIn(
+                    'run_id',
+                    $runIds
+                );
             }
-            $runIds = $runQuery->pluck('id');
-            $reports = $reports->whereIn(
-                'run_id',
-                $runIds
-            );
         }
 
         $sortBy = request()->input('sortBy');

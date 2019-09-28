@@ -29,7 +29,6 @@ class Report extends Model
 
     public function make($result, ValidationRun $run, $encode = false)
     {
-        \Log::info('-------');
         $report = new self;
 
         if ($run->data_resource_id && $run->profile_id) {
@@ -40,25 +39,27 @@ class Report extends Model
 
             $reportName = $run->profile->name . ' | ';
             $dataResource = $run->dataResource;
+            $report->cached_data_resource_id = $run->data_resource_id;
             if ($dataResource->package) {
                 $reportName .= $dataResource->package->name . ' | ';
+                $report->cached_data_package_id = $dataResource->package_id;
             }
             $report->name =  $reportName . $run->dataResource->filename . ' | #' . ($count + 1);
+
+            $report->cached_profile_id = $run->profile_id;
         } else {
             $report->name = '(none)';
         }
 
-        \Log::info($result);
         if ($encode) {
             // FIXME: neutral may be fine here
             // $result = json_encode($result);
         } else {
             $result = json_decode($result, true);
         }
-        \Log::info($result);
+
         $report->content = json_encode($result);
-        \Log::info($report->content);
-        \Log::info('=====');
+
         $content = $result;
         //$content = json_decode($report->content, true);
 
@@ -91,13 +92,23 @@ class Report extends Model
         return $this->belongsTo(ValidationRun::class);
     }
 
+    public function profile()
+    {
+        return $this->belongsTo(Profile::class);
+    }
+
     public function getDataResourceId()
     {
-        return $this->run ? $this->run->data_resource_id : null;
+        return $this->cached_data_resource_id ?: ($this->run ? $this->run->data_resource_id : null);
+    }
+
+    public function getDataPackageId()
+    {
+        return $this->cached_data_package_id ?: ($this->run && $this->run->dataResource ? $this->run->dataResource->package_id : null);
     }
 
     public function getProfileId()
     {
-        return $this->run ? $this->run->profile_id : null;
+        return $this->cached_profile_id ?: ($this->run ? $this->run->profile_id : null);
     }
 }
