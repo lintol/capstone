@@ -323,7 +323,7 @@ class ValidationProcess
                     $this->recordException($error);
 
                     if ((string)$error === 'wamp.error.no_such_procedure') {
-                        throw ThrottleRequestsException(
+                        throw new ThrottleRequestsException(
                             __("Doorstep cannot engage, possibly too many attempts"),
                             $error,
                             ['cause' => 'doorstep']
