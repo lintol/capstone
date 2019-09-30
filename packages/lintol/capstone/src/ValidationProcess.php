@@ -307,18 +307,9 @@ class ValidationProcess
     public function run()
     {
         Log::info('running...');
-        try {
-            $promise = $this->engage();
-        } catch (Throwable $e) {
-            throw ThrottleRequestsException(
-                __("Doorstep cannot engage, possibly too many attempts"),
-                $e,
-                ['cause' => 'doorstep']
-            );
-        }
 
         try {
-            $promise = $promise
+            $promise = $this->engage()
             ->then(
                 function ($res) {
                     Log::info('engaged...');
@@ -330,6 +321,15 @@ class ValidationProcess
                     Log::info(get_class($error));
                     Log::info($error);
                     $this->recordException($error);
+
+                    if ((string)$e === 'wamp.error.no_such_procedure') {
+                        throw ThrottleRequestsException(
+                            __("Doorstep cannot engage, possibly too many attempts"),
+                            $e,
+                            ['cause' => 'doorstep']
+                        );
+                    }
+
                     throw new \RuntimeException($error);
                 }
             )->then(
@@ -354,6 +354,8 @@ class ValidationProcess
             )->otherwise(function ($error) {
                 Log::info(__("Exited with exception"));
             });
+        } catch (ThrottleRequestsException $e) {
+            throw $e;
         } catch (Throwable $e) {
             Log::error(__("Could not execute"));
             Log::error((string)$e);
