@@ -14,7 +14,9 @@ use Lintol\Capstone\Models\Report;
 use Lintol\Capstone\Models\Profile;
 use Lintol\Capstone\Jobs\ProcessDataJob;
 use Lintol\Capstone\Events\ResultRetrievedEvent;
-use Illuminate\Http\Exceptions\ThrottleRequestsException;
+
+class ValidationExceptionHandled extends RuntimeException { }
+class ValidationExceptionThrottled extends ValidationExceptionHandled { }
 
 class ValidationProcess
 {
@@ -322,16 +324,14 @@ class ValidationProcess
                     Log::info($error);
 
                     if ((string)$error === 'wamp.error.no_such_procedure') {
-                        throw new ThrottleRequestsException(
-                            __("Doorstep cannot engage, possibly too many attempts"),
-                            null,
-                            ['cause' => 'doorstep']
+                        throw new ValidationExceptionThrottled(
+                            __("Doorstep cannot engage, possibly too many attempts")
                         );
                     }
 
                     $this->recordException($error);
 
-                    throw new \RuntimeException($error);
+                    throw new ValidationExceptionHandled($error);
                 }
             )->then(
                 function ($res) {
@@ -339,8 +339,12 @@ class ValidationProcess
                     return $this->sendData();
                 },
                 function ($error) {
-                    $this->recordException($error);
-                    throw new \RuntimeException($error);
+                    Log::info('1:' . get_class($error));
+                    if (!($error instanceof ValidationExceptionHandled)) {
+                        $this->recordException($error);
+                        $error = new ValidationExceptionHandled($error);
+                    }
+                    throw $error;
                 }
             )->then(
                 function ($res) {
@@ -349,14 +353,22 @@ class ValidationProcess
                     Log::info(__("Validation process initiated for ") . $this->run->id);
                 },
                 function ($error) {
-                    $this->recordException($error);
-                    throw new \RuntimeException($error);
+                    Log::info('2:' . get_class($error));
+                    if (!($error instanceof ValidationExceptionHandled)) {
+                        $this->recordException($error);
+                        $error = new ValidationExceptionHandled($error);
+                    }
+                    throw $error;
                 }
             )->otherwise(function ($error) {
-                Log::info(__("Exited with exception"));
+                Log::info(__("Exited with exception: ") . get_class($error));
+                if ($error instanceof ValidationExceptionThrottled) {
+                    Log::info(__("Exited with throttling"));
+                    throw $error;
+                }
                 return $error;
             });
-        } catch (ThrottleRequestsException $e) {
+        } catch (ValidationExceptionThrottled $e) {
             Log::error(__("Throttle caught"));
             throw $e;
         } catch (Throwable $e) {
