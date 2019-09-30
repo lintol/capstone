@@ -14,6 +14,7 @@ use Lintol\Capstone\Models\Report;
 use Lintol\Capstone\Models\Profile;
 use Lintol\Capstone\Jobs\ProcessDataJob;
 use Lintol\Capstone\Events\ResultRetrievedEvent;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 class ValidationProcess
 {
@@ -307,7 +308,17 @@ class ValidationProcess
     {
         Log::info('running...');
         try {
-            $promise = $this->engage()
+            $promise = $this->engage();
+        } catch (Throwable $e) {
+            throw ThrottleRequestsException(
+                __("Doorstep cannot engage, possibly too many attempts"),
+                $e,
+                ['cause' => 'doorstep']
+            );
+        }
+
+        try {
+            $promise = $promise
             ->then(
                 function ($res) {
                     Log::info('engaged...');

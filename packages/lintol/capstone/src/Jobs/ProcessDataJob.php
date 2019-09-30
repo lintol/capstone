@@ -19,6 +19,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Log;
 use Lintol\Capstone\WampConnection;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 class ProcessDataJob implements ShouldQueue
 {
@@ -51,7 +52,14 @@ class ProcessDataJob implements ShouldQueue
 
         $wampConnection->execute(function (ClientSession $session) use ($processFactory) {
             $process = $processFactory->make($this->validationId, $session);
-            return $process->run()->always(function () { \Log::info("ENDED"); });
+            try {
+                $promise = $process->run()->always(function () { \Log::info("ENDED"); });
+            } catch (ThrottleRequestsException $e) {
+                $retryDelay = config('capstone.wamp.doorstep-retry-delay', 120);
+                Log::warn(__("Throttled job for ") . $retryDelay . "s");
+                $this->release($retryDelay);
+            }
+            return $promise;
         });
 
         Log::info(__("Client exited"));
