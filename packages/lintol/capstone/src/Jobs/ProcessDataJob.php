@@ -52,13 +52,13 @@ class ProcessDataJob implements ShouldQueue
 
         $wampConnection->execute(function (ClientSession $session) use ($processFactory) {
             $process = $processFactory->make($this->validationId, $session);
-            try {
-                $promise = $process->run()->always(function () { \Log::info("ENDED"); });
-            } catch (ThrottleRequestsException $e) {
-                $retryDelay = config('capstone.wamp.doorstep-retry-delay', 120);
-                Log::warn(__("Throttled job for ") . $retryDelay . "s");
-                $this->release($retryDelay);
-            }
+            $promise = $process->run()
+                ->otherwise(function (ThrottleRequestsException $e) {
+                    $retryDelay = config('capstone.wamp.doorstep-retry-delay', 120);
+                    Log::warn(__("Throttled job for ") . $retryDelay . "s");
+                    $this->release($retryDelay);
+                })
+                ->always(function () { \Log::info("ENDED"); });
             return $promise;
         });
 

@@ -320,7 +320,6 @@ class ValidationProcess
                 function ($error) {
                     Log::info(get_class($error));
                     Log::info($error);
-                    $this->recordException($error);
 
                     if ((string)$error === 'wamp.error.no_such_procedure') {
                         throw new ThrottleRequestsException(
@@ -329,6 +328,8 @@ class ValidationProcess
                             ['cause' => 'doorstep']
                         );
                     }
+
+                    $this->recordException($error);
 
                     throw new \RuntimeException($error);
                 }
@@ -353,8 +354,10 @@ class ValidationProcess
                 }
             )->otherwise(function ($error) {
                 Log::info(__("Exited with exception"));
+                return $error;
             });
         } catch (ThrottleRequestsException $e) {
+            Log::error(__("Throttle caught"));
             throw $e;
         } catch (Throwable $e) {
             Log::error(__("Could not execute"));
