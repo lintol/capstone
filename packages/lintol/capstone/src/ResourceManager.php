@@ -214,7 +214,7 @@ class ResourceManager
 
         $request = new GuzzleHttp\Psr7\Request('GET', $dataResource->url);
         $promise = $client->sendAsync($request)->then(function ($response) use ($dataResource) {
-            $path = basename($dataResource->url);
+            $path = parse_url($dataResource->url, PHP_URL_PATH);
             $dData = $response->getBody();
 
             $dataResource->filename = $path;
