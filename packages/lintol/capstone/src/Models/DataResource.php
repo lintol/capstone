@@ -70,9 +70,14 @@ class DataResource extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function getPackageNameAttribute()
+    {
+        return $this->package ? $this->package->name : '';
+    }
+
     public function package()
     {
-        return $this->belongsTo(DataPackage::class);
+        return $this->belongsTo(DataPackage::class, 'package_id');
     }
 
     public function summaryByStatus($createdSince=null)

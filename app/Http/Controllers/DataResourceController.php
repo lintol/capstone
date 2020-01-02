@@ -18,7 +18,9 @@ use Lintol\Capstone\ResourceManager;
 class DataResourceController extends Controller
 {
     protected $validFilters = ['filetype', 'user_id', 'created_at'];
-    protected $validSortBy = ['filetype', 'filename', 'created_at', 'status', 'user_id'];
+    protected $validSortBy = ['filetype', 'packageName', 'created_at', 'status', 'user_id'];
+    protected $sortByMappingRemote = ['packageName' => 'name'];
+    protected $sortByMappingLocal = ['packageName' => 'data_packages.name'];
 
     public function __construct(DataResourceTransformer $transformer, ResourceManager $resourceManager)
     {
@@ -52,50 +54,89 @@ class DataResourceController extends Controller
             $count = $maxPagination;
         }
 
+        $page = (int) request()->input('page');
+        if (!$page) {
+            $page = 1;
+        }
+
         if (!in_array($sortBy, $this->validSortBy)) {
-          $sortBy = 'filename';
+          $sortBy = 'packageName';
         }
 
-        switch (request()->input('provider')) {
-            case '_remote':
-                // Add windowing/pagination to call
+        $data = collect();
+        $providers = explode(',', request()->input('provider'));
+        $totalRows = 0;
+        foreach ($providers as $provider) {
+            switch ($provider) {
+                case '_remote':
+                    // Add windowing/pagination to call
 
-                $resourceProvider = $this->resourceManager->getProvider();
+                    $resourceProvider = $this->resourceManager->getProvider();
 
-                $data = collect();
-                if ($resourceProvider && config('capstone.features.remote-data-resources', false)) {
-                    $data = $resourceProvider->getDataResources($search, $filters, $sortBy, $orderDesc);
-                }
-
-                $paginator = new LengthAwarePaginator($data, $data->count(), $count);
-                break;
-            case '_local':
-            default:
-                $query = DataResource::with(['package', 'run']);
-                if ($ids) {
-                    $query = $query->whereIn('id', $ids);
-                }
-                if ($search) {
-                    $query = $query->where(function ($query) use ($search) {
-                        return $query->where('filename', 'LIKE', '%' . $search . '%')
-                            ->orWhereHas('package', function ($query) use ($search) {
-                                return $query->where('name', 'LIKE', '%' . $search . '%');
-                            });
-                    });
-                }
-                foreach ($filters as $filter => $value) {
-                    if ($filter == 'created_at') {
-                        $query = $query->whereDate('created_at', '=', date('Y-m-d', $value));
-                    } else {
-                        $query = $query->where($filter, '=', $value);
+                    if ($resourceProvider && config('capstone.features.remote-data-resources', false)) {
+                        // FIXME: at present, because we have no foreknowledge (to avoid retaining external data)
+                        // and are interleaving local and remote, we have to get rows 1 to $count * page, instead
+                        // of a smaller number. This gets unboundedly large as page number increases
+                        $sortByRemote = $sortBy;
+                        if (array_key_exists($sortBy, $this->sortByMappingRemote)) {
+                            $sortByRemote = $this->sortByMappingRemote[$sortBy];
+                        }
+                        list($rows, $dataResult) = $resourceProvider->getDataResources($search, $filters, $sortByRemote, $orderDesc, $count * $page);
+                        $data = $data->merge($dataResult);
+                        $totalRows += $rows;
                     }
-                }
 
-                $query = $query->orderBy($sortBy, $orderDesc ? 'desc' : 'asc');
-                $paginator = $query->paginate($count);
+                    break;
+                case '_local':
+                default:
+                    $query = DataResource::with(['package', 'run'])
+                        ->join('data_packages', 'data_packages.id', '=', 'package_id');
+
+                    if ($ids) {
+                        $query = $query->whereIn('id', $ids);
+                    }
+                    if ($search) {
+                        $query = $query->where(function ($query) use ($search) {
+                            return $query->where('filename', 'LIKE', '%' . $search . '%')
+                                ->orWhereHas('package', function ($query) use ($search) {
+                                    return $query->where('name', 'LIKE', '%' . $search . '%');
+                                });
+                        });
+                    }
+                    foreach ($filters as $filter => $value) {
+                        if ($filter == 'created_at') {
+                            $query = $query->whereDate('created_at', '=', date('Y-m-d', $value));
+                        } else {
+                            $query = $query->where($filter, '=', $value);
+                        }
+                    }
+
+                    $sortByLocal = $sortBy;
+                    if (array_key_exists($sortBy, $this->sortByMappingLocal)) {
+                        $sortByLocal = $this->sortByMappingLocal[$sortBy];
+                    }
+
+                    $query = $query->orderBy($sortByLocal, $orderDesc ? 'desc' : 'asc');
+                    $rows = $query->count();
+
+                    $query
+                        ->offset(0)
+                        ->limit($count * $page);
+
+                    $data = $data->merge($query->get());
+                    $totalRows += $rows;
+            }
         }
 
-        $data = $paginator->getCollection();
+        if ($orderDesc) {
+            $data = $data->sortByDesc($sortBy, SORT_NATURAL|SORT_FLAG_CASE);
+        } else {
+            $data = $data->sortBy($sortBy, SORT_NATURAL|SORT_FLAG_CASE);
+        }
+
+        $data = $data->slice($count * ($page - 1), $count);
+
+        $paginator = new LengthAwarePaginator($data, $totalRows, $count);
         $paginator->setPath('/dataResources/');
 
         //$users = User::whereIn('id', $data->pluck('user_id')->filter())->get()->each(function (&$user) {

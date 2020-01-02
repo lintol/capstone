@@ -8,5 +8,5 @@ interface ResourceProviderInterface
 {
     public function getUsers() : Collection;
 
-    public function getDataResources() : Collection;
+    public function getDataResources() : array;
 }

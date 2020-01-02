@@ -421,6 +421,7 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
+            "abandoned": "psr/container",
             "time": "2017-02-14T19:40:03+00:00"
         },
         {
@@ -3988,7 +3989,7 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/lintol/CKAN_PHP.git",
-                "reference": "a632929d300f6ec48c8ab2e2af062b945e15c221"
+                "reference": "d7bd454ccff0c75212b222acbcd014a65aa59c32"
             },
             "require": {
                 "guzzle/guzzle": "*"
@@ -4004,7 +4005,7 @@
                     "Silex\\ckan\\tests": "test/"
                 }
             },
-            "time": "2019-05-30T23:32:52+00:00"
+            "time": "2020-01-02T14:57:17+00:00"
         },
         {
             "name": "smartins/passport-multiauth",
@@ -6640,6 +6641,7 @@
                 "psr",
                 "psr-7"
             ],
+            "abandoned": "laminas/laminas-diactoros",
             "time": "2019-04-29T21:11:00+00:00"
         }
     ],

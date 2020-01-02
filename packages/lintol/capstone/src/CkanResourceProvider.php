@@ -4,7 +4,7 @@ namespace Lintol\Capstone;
 
 use Carbon\Carbon;
 use Auth;
-use Illuminate\Support\FacadesLog;
+use Illuminate\Support\Facades\Log;
 use Lintol\Capstone\ResourceManager;
 use Socialite;
 use Silex\ckan\CkanClient;
@@ -30,9 +30,11 @@ class CkanResourceProvider implements ResourceProviderInterface
     {
         /* This should be the only way of setting user credentials */
         $user = Auth::user();
+
         if ($user && $user->primaryRemoteUser && $user->primaryRemoteUser->driver === 'ckan') {
             $this->remoteUser = $user->primaryRemoteUser;
             $this->driver = $resourceManager->getOAuthDriver('ckan', $this->remoteUser->resourceable);
+            $this->user = $user;
         } else {
             throw RuntimeException(__(
                 "Attempt to create a CKAN resource provider " .
@@ -64,9 +66,9 @@ class CkanResourceProvider implements ResourceProviderInterface
                 ));
             }
 
-            $this->ckanClient = CkanClient::factory([
-                'baseUrl' => $this->ckanInstance->uri . '/api',
-                'apiKey' => $apiKey
+            $this->ckanClientApiKey = $apiKey;
+            $this->ckanClient = new \GuzzleHttp\Client([
+                'base_uri' => $this->ckanInstance->uri
             ]);
         }
     }
@@ -76,17 +78,17 @@ class CkanResourceProvider implements ResourceProviderInterface
         $this->ckanInstance = $ckanInstance;
     }
 
-    public function getDataResources($search = '', $filters = [], $sortBy = 'name', $orderDesc = false, $limit = 50): Collection
+    public function getDataResources($search = '', $filters = [], $sortBy = 'name', $orderDesc = false, $limit = 50, $offset = 0): array
     {
         if (strlen($search) < 4) {
-            return collect();
+            return [0, collect()];
         }
         $this->loadApiKey();
 
-        $user = Auth::user();
+        $user = $this->user;
         $localData = $this->ckanInstance->resources()->whereUserId($user->id)->get()->keyBy('remote_id');
 
-        $query = ['url' => '.', 'rows' => $limit];
+        $query = ['url' => '.', 'rows' => $limit, 'start' => $offset];
         if ($search) {
             $query['url'] = preg_replace('[^A-Za-z0-9_-.]', '', $search);
         }
@@ -100,7 +102,7 @@ class CkanResourceProvider implements ResourceProviderInterface
             $ckanQuery[] = $key . ':' . $value;
         }
         //$ckanQuery = ['query' => implode('&', $ckanQuery)];
-        $ckanPQuery = ['q' => str_replace(' ', '&', $search)];
+        $ckanPQuery = ['q' => str_replace(' ', '&', $search), 'rows' => $limit, 'start' => $offset];
 
         if ($sortBy) {
             switch ($sortBy) {
@@ -117,8 +119,8 @@ class CkanResourceProvider implements ResourceProviderInterface
             }
             if ($sortBy) {
                 if ($orderDesc) {
-                    $ckanPQuery['sort'] .= ' dec';
-                    $ckanQuery['sort'] .= ' dec';
+                    $ckanPQuery['sort'] .= ' desc';
+                    $ckanQuery['sort'] .= ' desc';
                 } else {
                     $ckanPQuery['sort'] .= ' asc';
                     $ckanQuery['sort'] .= ' asc';
@@ -128,7 +130,14 @@ class CkanResourceProvider implements ResourceProviderInterface
 
         for ($i = 0; $i < 10; $i++) {
             try {
-                $packageSearch = $this->ckanClient->PackageSearch($ckanPQuery);
+                $packageSearch = $this->ckanClient->request(
+                    'GET',
+                    '/api/action/package_search',
+                    [
+                        'query' => $ckanPQuery,
+                        'headers' => ['X-CKAN-API-Key' => $this->ckanClientApiKey]
+                    ]
+                );
                 break;
             } catch (\GuzzleHttp\Exception\ServerException $e) {
                 if ($e->getResponse()->getStatusCode() != 502) {
@@ -136,6 +145,7 @@ class CkanResourceProvider implements ResourceProviderInterface
                 }
             }
         }
+        $packageSearch = json_decode($packageSearch->getBody(), true);
 
         for ($i = 0; $i < 10; $i++) {
             try {
@@ -149,6 +159,7 @@ class CkanResourceProvider implements ResourceProviderInterface
         }
 
         if ($packageSearch) {
+            $count = $packageSearch['result']['count'];
             $ckanData = collect($packageSearch['result']['results'])
                 ->map(function ($ckanPackageData) use ($localData, $user) {
                     return collect($ckanPackageData['resources'])->map(function ($ckanData) use ($localData, $user, $ckanPackageData) {
@@ -162,11 +173,15 @@ class CkanResourceProvider implements ResourceProviderInterface
                             $data->filetype = strtolower($ckanData['format']) ? strtolower($ckanData['format']) : 'csv';
                             $data->archived = 0;
                             $parts = parse_url($ckanData['url']);
-                            $data->filename = basename($parts['path']);
-                            if (!str_contains(strtolower($data->filename), $data->filetype)) {
-                                $data->filename .= '.' . $data->filetype;
+
+                            if (array_key_exists('path', $parts)) {
+                                $data->filename = basename($parts['path']);
+                                if (!str_contains(strtolower($data->filename), $data->filetype)) {
+                                    $data->filename .= '.' . $data->filetype;
+                                }
+                                $data->setStatus('valid link');
                             }
-                            $data->setStatus('valid link');
+
                             $package = new DataPackage;
                             $package->name = $ckanPackageData['title'];
                             $data->package = $package;
@@ -179,17 +194,18 @@ class CkanResourceProvider implements ResourceProviderInterface
                     });
                 })->flatten();
         } else {
+            $count = 0;
             $ckanData = collect();
         }
 
-        return $ckanData;
+        return [$count, $ckanData];
     }
 
     public function getDataResource($id)
     {
         $this->loadApiKey();
 
-        $user = Auth::user();
+        $user = $this->user;
         $data = $this->ckanInstance->resources()->whereUserId($user->id)->whereRemoteId($id)->first();
 
         if (!$data) {

@@ -25,7 +25,7 @@ return [
     ],
     'wamp' => [
         'realm' => env('LINTOL_CAPSTONE_REALM', 'realm1'),
-        'url' => env('LINTOL_CAPSTONE_URL', 'ws://172.19.0.1:8081/ws'),
+        'url' => env('LINTOL_CAPSTONE_URL', 'ws://172.26.0.1:8081/ws'),
         'doorstep-retry-delay' => env('LINTOL_CAPSTONE_DOORSTEP_RETRY_DELAY', 120),
     ],
     'frontend' => [
